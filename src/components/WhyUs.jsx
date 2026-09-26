@@ -3,7 +3,7 @@ import { ShieldCheck, Ruler, Clock, Banknote, SunMedium, Eye, CheckCircle2, Spar
 
 export const WhyUs = ({ t }) => {
   return (
-    <section id="why-us" className="py-24 relative overflow-hidden bg-brand-surface/40">
+    <section id="why-us" className="py-16 sm:py-24 relative overflow-hidden bg-brand-surface/40">
       {/* Ambient background glows */}
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-brand-amber/5 rounded-full blur-[140px] pointer-events-none" />
@@ -11,24 +11,24 @@ export const WhyUs = ({ t }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>{t.whyUs.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
             {t.whyUs.title}
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-300 text-sm sm:text-lg">
             {t.whyUs.subtitle}
           </p>
         </div>
 
         {/* Bento Grid Layout (Gcore video style frame 00:16-00:17) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           
           {/* Bento Card 1: 10 Yillik Kafolat (Spans 2 cols on md/lg) */}
-          <div className="md:col-span-2 glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+          <div className="md:col-span-2 glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
             <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-brand-red/10 rounded-full blur-2xl group-hover:bg-brand-red/20 transition-colors pointer-events-none" />
             
             <div className="flex items-center justify-between mb-6">
@@ -60,7 +60,7 @@ export const WhyUs = ({ t }) => {
           </div>
 
           {/* Bento Card 2: Lazerli O'lchov (Spans 1 col) */}
-          <div className="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+          <div className="glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
             <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform mb-6">
               <Ruler className="w-7 h-7" />
             </div>
@@ -78,7 +78,7 @@ export const WhyUs = ({ t }) => {
           </div>
 
           {/* Bento Card 3: Tezkor Montaj (Spans 1 col) */}
-          <div className="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+          <div className="glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
             <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform mb-6">
               <Clock className="w-7 h-7" />
             </div>
@@ -96,7 +96,7 @@ export const WhyUs = ({ t }) => {
           </div>
 
           {/* Bento Card 4: Zavod Narxi (Spans 2 cols on md/lg) */}
-          <div className="md:col-span-2 glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+          <div className="md:col-span-2 glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
             <div className="flex items-center justify-between mb-6">
               <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
                 <Banknote className="w-7 h-7" />
@@ -123,7 +123,7 @@ export const WhyUs = ({ t }) => {
           </div>
 
           {/* Bento Card 5: Ob-havoga Chidamlilik (Spans 1 col) */}
-          <div className="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+          <div className="glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
             <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform mb-6">
               <SunMedium className="w-7 h-7" />
             </div>
@@ -141,7 +141,7 @@ export const WhyUs = ({ t }) => {
           </div>
 
           {/* Bento Card 6: 3D Vizualizatsiya (Spans 2 cols on md/lg) */}
-          <div className="md:col-span-2 glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+          <div className="md:col-span-2 glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
             <div className="flex items-center justify-between mb-6">
               <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
                 <Eye className="w-7 h-7" />

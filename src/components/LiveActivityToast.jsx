@@ -113,7 +113,7 @@ export const LiveActivityToast = ({ onOpenLeadModal }) => {
 
   return (
     <div
-      className={`fixed bottom-4 left-4 z-40 max-w-sm sm:max-w-md w-[calc(100vw-2rem)] sm:w-auto transition-all duration-500 ease-out ${
+      className={`hidden sm:block fixed bottom-4 left-4 z-40 max-w-sm sm:max-w-md transition-all duration-500 ease-out ${
         isVisible
           ? 'translate-y-0 opacity-100 scale-100 pointer-events-auto'
           : 'translate-y-12 opacity-0 scale-95 pointer-events-none'

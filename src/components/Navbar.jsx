@@ -42,10 +42,10 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain filter drop-shadow" />
             </div>
             <div>
-              <span className="block font-display font-bold text-xl sm:text-2xl text-white tracking-tight leading-none group-hover:text-brand-red transition-colors">
+              <span className="block font-display font-bold text-lg sm:text-2xl text-white tracking-tight leading-none group-hover:text-brand-red transition-colors whitespace-nowrap">
                 TUNIKABOND <span className="text-brand-red">LIDER</span>
               </span>
-              <span className="block text-[10px] text-slate-400 uppercase tracking-widest font-medium mt-1">
+              <span className="hidden sm:block text-[10px] text-slate-400 uppercase tracking-widest font-medium mt-1">
                 Fasad & Tom Yechimlari
               </span>
             </div>
@@ -133,14 +133,15 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Right Controls: Only Day/Night toggle + Clean Menu Hamburger */}
           <div className="flex md:hidden items-center gap-2">
             {/* Mobile Day/Night toggle */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg bg-brand-surface border border-white/10 text-slate-300 hover:text-white"
+              className="p-2 rounded-xl bg-brand-surface border border-white/10 text-slate-300 hover:text-white active:scale-95 transition-all"
               title={theme === 'dark' ? "Kunduzgi rejim" : "Tungi rejim"}
+              aria-label="Kun va Tun rejimi"
             >
               {theme === 'dark' ? (
                 <Sun className="w-4 h-4 text-amber-400" />
@@ -149,36 +150,13 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               )}
             </button>
 
-            <button
-              onClick={onOpenAdmin}
-              className="p-1.5 rounded-lg bg-brand-surface border border-white/10 text-slate-300 hover:text-brand-red"
-              title="Admin Panel"
-            >
-              <Lock className="w-4 h-4" />
-            </button>
-
-            <div className="flex bg-brand-surface rounded-lg p-0.5 border border-white/10 text-[11px] font-bold">
-              {['uz', 'ru'].map((lng) => (
-                <button
-                  key={lng}
-                  onClick={() => setLang(lng)}
-                  className={`px-2 py-0.5 rounded transition-all uppercase ${
-                    currentLang === lng
-                      ? 'bg-brand-red text-white font-bold'
-                      : 'text-slate-400'
-                  }`}
-                >
-                  {lng}
-                </button>
-              ))}
-            </div>
-
+            {/* Hamburger button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-brand-surface border border-white/10 text-slate-200 hover:text-brand-red focus:outline-none"
-              aria-label="Toggle menu"
+              className="p-2 rounded-xl bg-brand-surface border border-white/10 text-slate-200 hover:text-brand-red active:scale-95 transition-all"
+              aria-label="Menyu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-brand-red" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
@@ -187,8 +165,28 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-brand-surface/95 backdrop-blur-xl border-b border-white/10 shadow-2xl px-4 pt-4 pb-6 mt-3 transition-all animate-fadeIn">
+        <div className="md:hidden bg-brand-surface/95 backdrop-blur-xl border-b border-white/10 shadow-2xl px-4 pt-4 pb-6 mt-3 transition-all animate-fadeIn rounded-2xl">
           <div className="flex flex-col gap-3">
+            {/* Language Selector Row inside Drawer */}
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10 mb-1">
+              <span className="text-xs text-slate-300 font-semibold">Til / Язык:</span>
+              <div className="flex bg-brand-surface rounded-lg p-0.5 border border-white/10 text-xs font-bold">
+                {['uz', 'ru', 'en'].map((lng) => (
+                  <button
+                    key={lng}
+                    onClick={() => setLang(lng)}
+                    className={`px-3 py-1 rounded transition-all uppercase ${
+                      currentLang === lng
+                        ? 'bg-brand-red text-white font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {lng}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (
@@ -196,7 +194,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-slate-200 hover:bg-white/5 hover:text-brand-red transition-colors font-medium"
+                  className="flex items-center gap-3 p-3 rounded-lg text-slate-200 hover:bg-white/5 hover:text-brand-red transition-colors font-medium text-sm"
                 >
                   <Icon className="w-4 h-4 text-brand-red" />
                   <span>{link.label}</span>
@@ -204,33 +202,20 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               );
             })}
 
-            <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
-              {/* Mobile theme toggle row */}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="w-full py-2.5 px-4 rounded-xl border border-white/10 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-between bg-white/5"
-              >
-                <span className="flex items-center gap-2">
-                  {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-sky-400" />}
-                  <span>{theme === 'dark' ? (t.nav?.themeDay || "Kunduzgi rejim") : (t.nav?.themeNight || "Tungi rejim")}</span>
-                </span>
-                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-brand-red/20 text-brand-red">
-                  {theme === 'dark' ? "Kun" : "Tun"}
-                </span>
-              </button>
-
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-2.5">
+              {/* Admin Panel button inside drawer */}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenAdmin();
                 }}
-                className="w-full py-2.5 px-4 rounded-xl border border-white/20 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 bg-white/5"
+                className="w-full py-2.5 px-4 rounded-xl border border-white/15 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 bg-white/5"
               >
                 <Lock className="w-4 h-4 text-brand-red" />
                 <span>Admin Boshqaruv Paneli (CMS)</span>
               </button>
 
+              {/* Order measurement CTA */}
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
