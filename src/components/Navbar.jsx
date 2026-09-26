@@ -24,89 +24,89 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
   const isLight = theme === 'light';
 
   return (
-    <header className="fixed top-3 sm:top-5 left-0 right-0 z-40 px-3 sm:px-6 pointer-events-none">
-      {/* Outer wrapper: flex column so pill + drawer stack vertically */}
-      <div className="max-w-5xl mx-auto pointer-events-auto flex flex-col gap-2">
+    <header className="fixed top-3 sm:top-4 left-0 right-0 z-40 px-3 sm:px-5 pointer-events-none">
+      <div className="max-w-[1100px] mx-auto pointer-events-auto flex flex-col gap-2">
 
-        {/* ══════════════ PILL NAVBAR ══════════════ */}
+        {/* ══ PILL BAR ══ */}
         <div
-          className={`w-full rounded-full relative overflow-hidden transition-all duration-300 ${
+          className={`w-full rounded-2xl overflow-hidden transition-all duration-300 ${
             isLight
               ? isScrolled
-                ? 'bg-white border border-black/10 shadow-xl py-2 px-4 sm:px-6'
-                : 'bg-white/92 backdrop-blur-lg border border-black/8 shadow-lg py-2.5 px-4 sm:px-6'
+                ? 'bg-white/98 border border-black/10 shadow-lg shadow-black/10'
+                : 'bg-white/95 backdrop-blur-xl border border-black/8 shadow-md'
               : isScrolled
-                ? 'bg-brand-surface/95 backdrop-blur-xl border border-brand-red/40 shadow-2xl shadow-black/50 py-2 px-4 sm:px-6'
-                : 'bg-brand-surface/80 backdrop-blur-lg border border-white/15 shadow-xl shadow-black/30 py-2.5 px-4 sm:px-6'
+                ? 'bg-[#0d1120]/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/60'
+                : 'bg-[#0d1120]/85 backdrop-blur-xl border border-white/8 shadow-xl shadow-black/40'
           }`}
         >
-          {/* Ambient bottom line */}
-          <div className="absolute bottom-0 left-10 right-10 h-[1.5px] bg-gradient-to-r from-transparent via-brand-red to-transparent opacity-60 pointer-events-none" />
+          {/* Red glow line bottom */}
+          <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-brand-red/60 to-transparent pointer-events-none" />
 
-          {/* Inner flex row */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center h-14 px-4 sm:px-5 gap-3">
 
-            {/* Logo */}
-            <a href="#" className="flex items-center gap-2.5 sm:gap-3 group">
-              <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red group-hover:scale-105 group-hover:border-brand-red transition-all ${isLight ? 'bg-black/4' : 'bg-white/5'}`}>
-                <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain" />
+            {/* ── Logo ── */}
+            <a href="#" className="flex items-center gap-2 group shrink-0">
+              <div className={`w-8 h-8 rounded-lg border border-brand-red/50 p-1 flex items-center justify-center group-hover:border-brand-red transition-all ${isLight ? 'bg-black/5' : 'bg-white/8'}`}>
+                <img src="/favi.svg" alt="Logo" className="w-full h-full object-contain" />
               </div>
-              <div>
-                <span className={`block font-display font-bold text-base sm:text-xl tracking-tight leading-none group-hover:text-brand-red transition-colors whitespace-nowrap ${isLight ? 'text-slate-900' : 'text-white'}`}>
+              <div className="leading-none">
+                <span className={`block font-display font-extrabold text-sm tracking-wide whitespace-nowrap group-hover:text-brand-red transition-colors ${isLight ? 'text-slate-900' : 'text-white'}`}>
                   TUNIKABOND <span className="text-brand-red">LIDER</span>
                 </span>
-                <span className={`hidden sm:block text-[10px] uppercase tracking-widest font-medium mt-0.5 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                  Fasad &amp; Tom Yechimlari
+                <span className={`hidden xl:block text-[9px] uppercase tracking-[0.15em] font-medium mt-0.5 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Fasad &amp; Tom
                 </span>
               </div>
             </a>
 
-            {/* Desktop nav links */}
-            <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
+            {/* ── Desktop nav (only xl, otherwise links are too cramped) ── */}
+            <nav className="hidden xl:flex items-center gap-1 mx-auto">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`text-sm font-semibold transition-colors hover:text-brand-red ${isLight ? 'text-slate-700' : 'text-slate-300'}`}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors hover:text-brand-red ${isLight ? 'text-slate-600 hover:bg-black/5' : 'text-slate-300 hover:bg-white/6'}`}
                 >
                   {link.label}
                 </a>
               ))}
             </nav>
 
-            {/* Desktop right controls */}
-            <div className="hidden md:flex items-center gap-2 xl:gap-3">
+            {/* Spacer for md/lg (no nav shown) */}
+            <div className="hidden md:flex xl:hidden flex-1" />
+
+            {/* ── Desktop right controls ── */}
+            <div className="hidden md:flex items-center gap-1.5 shrink-0 ml-auto xl:ml-0">
 
               {/* Admin */}
               {currentUser ? (
                 <button
                   onClick={onOpenAdmin}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-red text-white text-xs font-bold shadow-glow-red hover:scale-105 transition-all"
-                  title="Boshqaruv paneli"
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-brand-red text-white text-xs font-bold shadow-glow-red hover:scale-105 transition-all"
                 >
-                  <Shield className="w-3.5 h-3.5" />
+                  <Shield className="w-3 h-3" />
                   <span>CMS</span>
                 </button>
               ) : (
                 <button
                   onClick={onOpenAdmin}
-                  className={`p-2 rounded-lg transition-colors hover:text-brand-red ${isLight ? 'bg-black/4 text-slate-600 hover:bg-black/8' : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'}`}
+                  className={`p-1.5 rounded-lg transition-colors hover:text-brand-red ${isLight ? 'text-slate-500 hover:bg-black/6' : 'text-slate-400 hover:bg-white/8'}`}
                   title="Admin"
                 >
-                  <Lock className="w-4 h-4" />
+                  <Lock className="w-3.5 h-3.5" />
                 </button>
               )}
 
-              {/* Language switcher */}
-              <div className={`flex items-center rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-black/4 border-black/8' : 'bg-brand-surface border-white/10'}`}>
+              {/* Language */}
+              <div className={`flex items-center rounded-lg p-0.5 border text-[11px] font-bold ${isLight ? 'bg-black/4 border-black/8' : 'bg-white/6 border-white/10'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
                   <button
                     key={lng}
                     onClick={() => setLang(lng)}
-                    className={`px-2.5 py-1 rounded-md transition-all uppercase ${
+                    className={`px-2 py-1 rounded-md transition-all uppercase ${
                       currentLang === lng
-                        ? 'bg-brand-red text-white font-bold'
-                        : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
+                        ? 'bg-brand-red text-white'
+                        : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     {lng}
@@ -114,142 +114,103 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 ))}
               </div>
 
-              {/* Theme toggle */}
+              {/* Theme */}
               <button
                 type="button"
                 onClick={toggleTheme}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all hover:scale-105 active:scale-95 hover:border-brand-red/40 ${
-                  isLight
-                    ? 'bg-black/4 border-black/8 text-slate-700'
-                    : 'bg-brand-surface border-white/10 text-slate-300 hover:text-white'
+                className={`p-1.5 rounded-lg border transition-all hover:border-brand-red/50 active:scale-95 ${
+                  isLight ? 'bg-black/4 border-black/8 text-slate-600' : 'bg-white/6 border-white/10 text-slate-300'
                 }`}
-                title={isLight ? "Tungi rejimga o'tish" : "Kunduzgi rejimga o'tish"}
+                title={isLight ? "Tungi rejim" : "Kunduzgi rejim"}
               >
-                {isLight ? (
-                  <Moon className="w-4 h-4 text-indigo-500" />
-                ) : (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                )}
-                <span className="hidden xl:inline">
-                  {isLight ? (t.nav?.themeNight || 'Tun') : (t.nav?.themeDay || 'Kun')}
-                </span>
+                {isLight ? <Moon className="w-3.5 h-3.5 text-indigo-500" /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
               </button>
 
               {/* CTA */}
               <button
                 onClick={() => onOpenLeadModal(t.nav.requestMeasurement)}
-                className="inline-flex items-center justify-center px-4 py-2 text-xs font-bold text-white rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover hover:shadow-glow-red hover:scale-105 active:scale-95 transition-all"
+                className="px-3 py-1.5 text-xs font-bold text-white rounded-lg bg-gradient-to-r from-brand-red to-brand-redHover hover:shadow-glow-red hover:scale-105 active:scale-95 transition-all whitespace-nowrap"
               >
                 {t.nav.requestMeasurement}
               </button>
             </div>
 
-            {/* Mobile right controls */}
-            <div className="flex md:hidden items-center gap-1.5">
-              {/* Theme toggle */}
+            {/* ── Mobile right controls ── */}
+            <div className="flex md:hidden items-center gap-1.5 ml-auto">
               <button
                 type="button"
                 onClick={toggleTheme}
-                className={`p-2 rounded-xl border active:scale-95 transition-all ${
-                  isLight ? 'bg-black/4 border-black/8 text-slate-700' : 'bg-brand-surface border-white/10 text-slate-300'
-                }`}
-                aria-label="Kun/Tun rejimi"
+                className={`p-2 rounded-xl border active:scale-95 transition-all ${isLight ? 'bg-black/4 border-black/8 text-slate-600' : 'bg-white/6 border-white/10 text-slate-300'}`}
+                aria-label="Kun/Tun"
               >
-                {isLight ? (
-                  <Moon className="w-4 h-4 text-indigo-500" />
-                ) : (
-                  <Sun className="w-4 h-4 text-amber-400" />
-                )}
+                {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-400" />}
               </button>
 
-              {/* Hamburger */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 rounded-xl border active:scale-95 transition-all hover:text-brand-red ${
-                  isLight ? 'bg-black/4 border-black/8 text-slate-700' : 'bg-brand-surface border-white/10 text-slate-200'
-                }`}
+                className={`p-2 rounded-xl border active:scale-95 transition-all hover:text-brand-red ${isLight ? 'bg-black/4 border-black/8 text-slate-700' : 'bg-white/6 border-white/10 text-slate-200'}`}
                 aria-label="Menyu"
               >
-                {mobileMenuOpen
-                  ? <X className="w-5 h-5 text-brand-red" />
-                  : <Menu className="w-5 h-5" />
-                }
+                {mobileMenuOpen ? <X className="w-5 h-5 text-brand-red" /> : <Menu className="w-5 h-5" />}
               </button>
             </div>
 
-          </div>{/* end inner flex row */}
+          </div>{/* end h-14 row */}
         </div>{/* end PILL */}
 
-        {/* ══════════════ MOBILE DRAWER (sibling below pill) ══════════════ */}
+        {/* ══ MOBILE DRAWER ══ */}
         {mobileMenuOpen && (
-          <div
-            className={`md:hidden backdrop-blur-xl shadow-2xl rounded-2xl border px-4 pt-4 pb-5 animate-slideDown ${
-              isLight ? 'bg-white border-black/8' : 'bg-brand-surface/97 border-white/10'
-            }`}
-          >
-            {/* Language row */}
-            <div className={`flex items-center justify-between p-2.5 rounded-xl border mb-2 ${isLight ? 'bg-black/4 border-black/6' : 'bg-white/5 border-white/10'}`}>
-              <span className={`text-xs font-semibold ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>Til / Язык:</span>
-              <div className={`flex rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-black/5 border-black/8' : 'bg-brand-surface border-white/10'}`}>
+          <div className={`md:hidden rounded-2xl border shadow-2xl px-4 pt-3 pb-4 animate-slideDown ${
+            isLight ? 'bg-white border-black/8' : 'bg-[#0d1120]/97 border-white/10'
+          }`}>
+
+            {/* Language */}
+            <div className={`flex items-center justify-between px-2 py-2 rounded-xl border mb-2 ${isLight ? 'bg-black/3 border-black/6' : 'bg-white/5 border-white/10'}`}>
+              <span className={`text-xs font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Til:</span>
+              <div className={`flex rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-black/5 border-black/8' : 'bg-white/8 border-white/10'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
-                  <button
-                    key={lng}
-                    onClick={() => setLang(lng)}
-                    className={`px-3 py-1 rounded transition-all uppercase ${
-                      currentLang === lng
-                        ? 'bg-brand-red text-white font-bold'
-                        : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    {lng}
-                  </button>
+                  <button key={lng} onClick={() => setLang(lng)}
+                    className={`px-3 py-1 rounded uppercase transition-all ${currentLang === lng ? 'bg-brand-red text-white' : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'}`}
+                  >{lng}</button>
                 ))}
               </div>
             </div>
 
             {/* Nav links */}
-            <div className="flex flex-col gap-1">
+            <div className="grid grid-cols-2 gap-1">
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 return (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl hover:text-brand-red transition-colors font-medium text-sm ${
-                      isLight ? 'text-slate-700 hover:bg-black/4' : 'text-slate-200 hover:bg-white/5'
-                    }`}
+                  <a key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium hover:text-brand-red transition-colors ${isLight ? 'text-slate-700 hover:bg-black/4' : 'text-slate-200 hover:bg-white/5'}`}
                   >
-                    <Icon className="w-4 h-4 text-brand-red shrink-0" />
-                    <span>{link.label}</span>
+                    <Icon className="w-3.5 h-3.5 text-brand-red shrink-0" />
+                    <span className="truncate">{link.label}</span>
                   </a>
                 );
               })}
             </div>
 
-            {/* Bottom actions */}
+            {/* Actions */}
             <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isLight ? 'border-black/6' : 'border-white/10'}`}>
               <button
                 onClick={() => { setMobileMenuOpen(false); onOpenAdmin(); }}
-                className={`w-full py-2.5 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 ${
-                  isLight ? 'bg-black/4 border-black/8 text-slate-700' : 'bg-white/5 border-white/15 text-slate-200'
-                }`}
+                className={`w-full py-2 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 ${isLight ? 'bg-black/3 border-black/8 text-slate-700' : 'bg-white/5 border-white/12 text-slate-300'}`}
               >
                 <Lock className="w-4 h-4 text-brand-red" />
-                <span>Admin Boshqaruv Paneli (CMS)</span>
+                Admin / CMS Panel
               </button>
-
               <button
                 onClick={() => { setMobileMenuOpen(false); onOpenLeadModal(t.nav.requestMeasurement); }}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red"
               >
                 {t.nav.requestMeasurement}
               </button>
             </div>
           </div>
-        )}{/* end DRAWER */}
+        )}
 
-      </div>{/* end flex-col wrapper */}
+      </div>
     </header>
   );
 };
