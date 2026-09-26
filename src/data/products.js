@@ -16,7 +16,7 @@ export const products = [
     coating: "PVDF 3-qavatli polimer",
     warranty: "10 yil",
     badge: "Bestseller",
-    priceRange: "145,000 - 180,000 so'm / m²",
+    priceRange: "135,000 - 165,000 so'm / m²",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
@@ -59,7 +59,7 @@ export const products = [
     coating: "Mat Poliester / PVDF",
     warranty: "8 yil",
     badge: "Trend 2026",
-    priceRange: "125,000 - 155,000 so'm / m²",
+    priceRange: "115,000 - 145,000 so'm / m²",
     image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
@@ -99,7 +99,7 @@ export const products = [
     coating: "Flüoropolimer PVDF",
     warranty: "15 yil",
     badge: "Premium Standart",
-    priceRange: "220,000 - 290,000 so'm / m²",
+    priceRange: "235,000 - 310,000 so'm / m²",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
@@ -139,7 +139,7 @@ export const products = [
     coating: "Poliester / PVDF",
     warranty: "10 yil",
     badge: "Ommabop",
-    priceRange: "160,000 - 210,000 so'm / m²",
+    priceRange: "155,000 - 195,000 so'm / m²",
     image: "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
@@ -179,7 +179,7 @@ export const products = [
     coating: "Polimer qoplama",
     warranty: "10 yil",
     badge: "Dizayn Yechim",
-    priceRange: "80,000 - 130,000 so'm / metr",
+    priceRange: "75,000 - 120,000 so'm / metr",
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
@@ -219,7 +219,7 @@ export const products = [
     coating: "Sink + Polimer (RAL)",
     warranty: "15 yil",
     badge: "Mustahkam",
-    priceRange: "65,000 - 95,000 so'm / m²",
+    priceRange: "70,000 - 95,000 so'm / m²",
     image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [

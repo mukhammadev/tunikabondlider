@@ -7,24 +7,24 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [area, setArea] = useState(120);
   const [includeInstallation, setIncludeInstallation] = useState(true);
 
-  // Material unit prices (so'm per sq.m)
+  // Material unit prices (so'm per sq.m) - Amaldagi aniq bozor narxlari
   const materialPrices = {
-    tunikabond_standard: 135000,
-    tunikabond_premium: 165000,
-    alyukabond_standard: 185000,
-    alyukabond_fireproof: 255000,
-    profnastil: 80000
+    tunikabond_standard: 115000,
+    tunikabond_premium: 135000,
+    alyukabond_standard: 155000,
+    alyukabond_fireproof: 235000,
+    profnastil: 75000
   };
 
-  // Installation cost per sq.m
+  // Installation cost per sq.m (karkas, profil, montaj va usta xizmati)
   const installationRates = {
     cottage: 65000,
     commercial: 75000,
-    cornice: 55000,
+    cornice: 50000,
     roof: 45000
   };
 
-  const currentMatPrice = materialPrices[materialType] || 165000;
+  const currentMatPrice = materialPrices[materialType] || 135000;
   const currentInstallPrice = includeInstallation ? (installationRates[buildingType] || 65000) : 0;
   const totalPricePerSqm = currentMatPrice + currentInstallPrice;
   const calculatedTotal = totalPricePerSqm * area;

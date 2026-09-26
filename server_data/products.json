@@ -16,8 +16,17 @@
     "coating": "PVDF 3-qavatli polimer",
     "warranty": "10 yil",
     "badge": "Bestseller",
-    "priceRange": "145,000 - 180,000 so'm / m²",
-    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+    "priceRange": "135,000 - 165,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    "specs": {
+      "uz": [
+        { "label": "Metall qalinligi", "value": "0.45 mm (Yuqori mustahkamlik)" },
+        { "label": "Qoplama", "value": "PVDF polimer (quyoshda so'nmaydi)" },
+        { "label": "Kafolat muddati", "value": "10 yil rasmiy shartnoma bilan" },
+        { "label": "Qo'llanishi", "value": "Hovli uylari, kottedjlar, do'kon fasadlari, shiftlar" },
+        { "label": "Harorat diapazoni", "value": "-45°C dan +80°C gacha" }
+      ]
+    }
   },
   {
     "id": "tb-040-matte",
@@ -36,8 +45,44 @@
     "coating": "Mat Poliester / PVDF",
     "warranty": "8 yil",
     "badge": "Trend 2026",
-    "priceRange": "125,000 - 155,000 so'm / m²",
-    "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80"
+    "priceRange": "115,000 - 145,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+    "specs": {
+      "uz": [
+        { "label": "Metall qalinligi", "value": "0.40 mm" },
+        { "label": "Rangi", "value": "Grafit RAL 7016 / Qora RAL 9005" },
+        { "label": "Kafolat muddati", "value": "8 yil" },
+        { "label": "Qo'llanishi", "value": "Karnizlar, shiftlar, zamonaviy uy fasadlari" }
+      ]
+    }
+  },
+  {
+    "id": "ab-30-classic",
+    "category": "alyukabond",
+    "name": {
+      "uz": "Alyukabond Klassik Fasad Paneli (3 mm)",
+      "ru": "Алюкобонд Классический Фасадный (3 мм)",
+      "en": "Alucobond Classic Architectural (3 mm)"
+    },
+    "shortDesc": {
+      "uz": "Do'konlar, dorixonalar, avtosalonlar va ofislar uchun eng optimal, engil va elastik fasad yechimi.",
+      "ru": "Оптимальное, легкое и надежное решение для магазинов, аптек, автосалонов и офисов.",
+      "en": "The industry-standard lightweight composite panel for commercial storefronts, clinics, and showrooms."
+    },
+    "thickness": "3.0 mm (0.21 mm alyumin)",
+    "coating": "Poliester / PVDF",
+    "warranty": "10 yil",
+    "badge": "Ommabop",
+    "priceRange": "155,000 - 195,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=800&q=80",
+    "specs": {
+      "uz": [
+        { "label": "Umumiy qalinlik", "value": "3.0 mm" },
+        { "label": "Alyumin qavati", "value": "0.21 mm" },
+        { "label": "Ranglar xilligi", "value": "50 dan ortiq rang va teksturalar" },
+        { "label": "Kafolat muddati", "value": "10 yil" }
+      ]
+    }
   },
   {
     "id": "ab-40-fireproof",
@@ -56,8 +101,16 @@
     "coating": "Flüoropolimer PVDF",
     "warranty": "15 yil",
     "badge": "Premium Standart",
-    "priceRange": "220,000 - 290,000 so'm / m²",
-    "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"
+    "priceRange": "235,000 - 310,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
+    "specs": {
+      "uz": [
+        { "label": "Umumiy qalinlik", "value": "4.0 mm" },
+        { "label": "Alyumin qavati", "value": "0.40 mm har ikki tomondan" },
+        { "label": "Yong'in xavfsizligi", "value": "A2 / G1 (Olov tarqatmaydi)" },
+        { "label": "Kafolat muddati", "value": "15 yil" }
+      ]
+    }
   },
   {
     "id": "karniz-neoclassic",
@@ -76,8 +129,16 @@
     "coating": "Polimer qoplama",
     "warranty": "10 yil",
     "badge": "Dizayn Yechim",
-    "priceRange": "80,000 - 130,000 so'm / metr",
-    "image": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+    "priceRange": "75,000 - 120,000 so'm / metr",
+    "image": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    "specs": {
+      "uz": [
+        { "label": "Material", "value": "Sifatli ruxlangan tunika / alyumin" },
+        { "label": "Dizayn", "value": "Lazerli egish va individual naqshlar" },
+        { "label": "Himoya", "value": "100% zanglamas qoplama" },
+        { "label": "Kafolat", "value": "10 yil" }
+      ]
+    }
   },
   {
     "id": "roof-profnastil",
@@ -96,42 +157,14 @@
     "coating": "Sink + Polimer (RAL)",
     "warranty": "15 yil",
     "badge": "Mustahkam",
-    "priceRange": "65,000 - 95,000 so'm / m²",
-    "image": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    "id": "prod-1790425213",
-    "name": {
-      "uz": "Tunikabond",
-      "ru": "Tunikabond",
-      "en": "Tunikabond"
-    },
-    "shortDesc": {
-      "uz": "Juda ham qulay",
-      "ru": "Juda ham qulay",
-      "en": "Juda ham qulay"
-    },
-    "category": "tunikabond",
-    "thickness": "0.45 mm",
-    "coating": "PVDF polimer",
-    "warranty": "10 yil",
-    "badge": "Yangi",
-    "priceRange": "150,000 so'm / m²",
-    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    "priceRange": "70,000 - 95,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=800&q=80",
     "specs": {
       "uz": [
-        {
-          "label": "Qalinlik",
-          "value": "0.45 mm"
-        },
-        {
-          "label": "Qoplama",
-          "value": "PVDF polimer"
-        },
-        {
-          "label": "Kafolat",
-          "value": "10 yil"
-        }
+        { "label": "Profillar", "value": "PK-20, PK-35, Cherepitsa profili" },
+        { "label": "Metall qalinligi", "value": "0.45 mm dan 0.70 mm gacha" },
+        { "label": "Rux miqdori", "value": "140 - 275 g/m² (Zangga qarshi)" },
+        { "label": "Kafolat muddati", "value": "15 yil" }
       ]
     }
   }
