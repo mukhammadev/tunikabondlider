@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Menu, X, Send, Calculator, Palette, Layers, Info, HelpCircle, Lock, Shield } from 'lucide-react';
+import { Phone, Menu, X, Calculator, Palette, Layers, Info, HelpCircle, Lock, Shield } from 'lucide-react';
 
 export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, onOpenAdmin }) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -83,28 +83,6 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 <Lock className="w-4 h-4" />
               </button>
             )}
-
-            {/* Telegram Admin quick link */}
-            <a
-              href="https://t.me/Muhammadazez"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 hover:text-brand-red transition-colors py-1.5 px-3 rounded-lg border border-white/10 hover:border-brand-red/50 bg-white/5"
-              title="Admin bilan bog'lanish"
-            >
-              <Send className="w-3.5 h-3.5 text-[#29b6f6]" />
-              <span className="hidden xl:inline text-slate-400">Admin:</span>
-              <span className="font-bold">@Muhammadazez</span>
-            </a>
-
-            {/* Direct Call Link */}
-            <a 
-              href="tel:+998995333303"
-              className="flex items-center gap-2 text-xs font-semibold text-slate-200 hover:text-brand-red transition-colors py-1.5 px-3 rounded-lg border border-white/10 hover:border-brand-red/50 bg-white/5"
-            >
-              <Phone className="w-3.5 h-3.5 text-brand-red animate-pulse" />
-              <span>+998 (99) 533-33-03</span>
-            </a>
 
             {/* Language Switcher */}
             <div className="flex items-center bg-brand-surface rounded-lg p-1 border border-white/10 text-xs font-bold">
@@ -200,24 +178,6 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 <Lock className="w-4 h-4 text-brand-red" />
                 <span>Admin Boshqaruv Paneli (CMS)</span>
               </button>
-
-              <a 
-                href="https://t.me/Muhammadazez"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[#29b6f6]/40 text-[#29b6f6] font-semibold text-sm bg-[#0088cc]/10"
-              >
-                <Send className="w-4 h-4" />
-                <span>Admin bilan Telegram: @Muhammadazez</span>
-              </a>
-
-              <a 
-                href="tel:+998995333303"
-                className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-brand-red/40 text-brand-red font-semibold text-sm bg-brand-red/10"
-              >
-                <Phone className="w-4 h-4" />
-                <span>+998 (99) 533-33-03</span>
-              </a>
 
               <button
                 onClick={() => {
