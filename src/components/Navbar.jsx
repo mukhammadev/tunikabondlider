@@ -33,10 +33,10 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           
-          {/* Brand Logo with Tunikabond Red Accent */}
+          {/* Brand Logo with Original Tunikabond Icon */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-red to-brand-redHover flex items-center justify-center shadow-glow-red group-hover:scale-105 transition-transform">
-              <span className="font-display font-black text-white text-xl tracking-tighter">TL</span>
+            <div className="w-11 h-11 rounded-xl bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red group-hover:scale-105 group-hover:border-brand-red transition-all">
+              <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain filter drop-shadow" />
             </div>
             <div>
               <span className="block font-display font-bold text-xl sm:text-2xl text-white tracking-tight leading-none group-hover:text-brand-red transition-colors">

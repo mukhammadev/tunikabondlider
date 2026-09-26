@@ -15,8 +15,8 @@ export const Footer = ({ t }) => {
           {/* Brand Info */}
           <div className="space-y-4">
             <a href="#" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-red to-brand-redHover flex items-center justify-center shadow-glow-red">
-                <span className="font-display font-black text-white text-xl">TL</span>
+              <div className="w-11 h-11 rounded-xl bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red">
+                <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain filter drop-shadow" />
               </div>
               <div>
                 <span className="block font-display font-bold text-xl text-white">
