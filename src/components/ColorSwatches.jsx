@@ -1,0 +1,161 @@
+import React, { useState } from 'react';
+import { swatches } from '../data/swatches';
+import { Palette, Sparkles, Check, X, Shield, ArrowRight } from 'lucide-react';
+
+export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedSwatch, setSelectedSwatch] = useState(null);
+
+  const filteredSwatches = activeCategory === 'all'
+    ? swatches
+    : swatches.filter(item => item.category === activeCategory);
+
+  const categories = [
+    { id: 'all', label: t.swatches.all },
+    { id: 'wood', label: t.swatches.wood },
+    { id: 'metallic', label: t.swatches.metallic },
+    { id: 'ral', label: t.swatches.ral },
+    { id: 'special', label: t.swatches.special },
+  ];
+
+  return (
+    <section id="swatches" className="py-24 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-4">
+            <Palette className="w-3.5 h-3.5" />
+            <span>{t.swatches.badge}</span>
+          </div>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+            {t.swatches.title}
+          </h2>
+          <p className="text-slate-300 text-base sm:text-lg">
+            {t.swatches.subtitle}
+          </p>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                activeCategory === cat.id
+                  ? 'bg-brand-gold text-brand-dark shadow-glow'
+                  : 'bg-brand-surface/80 text-slate-300 hover:bg-brand-card hover:text-white border border-white/10'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Swatches Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {filteredSwatches.map((item) => {
+            const name = item.name[currentLang] || item.name.uz;
+            return (
+              <div
+                key={item.id}
+                onClick={() => setSelectedSwatch(item)}
+                className="glass-card rounded-2xl p-4 cursor-pointer group hover:scale-[1.03] transition-all flex flex-col justify-between"
+              >
+                <div>
+                  {/* Swatch Sample Box */}
+                  <div 
+                    className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow"
+                    style={{ background: item.bgGradient }}
+                  >
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-brand-dark/80 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/10">
+                      {item.code}
+                    </div>
+                  </div>
+
+                  <h3 className="font-bold text-sm sm:text-base text-white group-hover:text-brand-gold transition-colors leading-snug mb-1">
+                    {name}
+                  </h3>
+                  <p className="text-xs text-slate-400 font-medium mb-3">
+                    {item.texture}
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>{item.finish}</span>
+                  <span className="text-brand-gold font-bold">Ko'rish →</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+
+      {/* Swatch Detail Modal */}
+      {selectedSwatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/80 backdrop-blur-md animate-fadeIn">
+          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative">
+            
+            {/* Close button */}
+            <button
+              onClick={() => setSelectedSwatch(null)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white hover:bg-white/20 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Modal swatch header */}
+            <div 
+              className="w-full h-44 rounded-2xl mb-6 relative overflow-hidden shadow-inner border border-white/20 flex items-end p-4"
+              style={{ background: selectedSwatch.bgGradient }}
+            >
+              <div className="px-3 py-1 rounded-lg bg-brand-dark/80 backdrop-blur-md text-xs font-bold text-white border border-white/10">
+                {selectedSwatch.code}
+              </div>
+            </div>
+
+            <h3 className="font-display font-extrabold text-2xl text-white mb-2">
+              {selectedSwatch.name[currentLang] || selectedSwatch.name.uz}
+            </h3>
+
+            {/* Specs Table */}
+            <div className="space-y-3 mb-8 text-xs sm:text-sm">
+              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+                <span>{t.swatches.ralCode}</span>
+                <span className="font-bold text-white">{selectedSwatch.code}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+                <span>{t.swatches.coating}</span>
+                <span className="font-bold text-white">{selectedSwatch.coating}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+                <span>Faktura / Yuzasi:</span>
+                <span className="font-bold text-white">{selectedSwatch.finish}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+                <span>{t.swatches.application}</span>
+                <span className="font-bold text-white text-right max-w-[240px]">{selectedSwatch.application}</span>
+              </div>
+            </div>
+
+            {/* Action CTA */}
+            <button
+              onClick={() => {
+                const swatchName = selectedSwatch.name[currentLang] || selectedSwatch.name.uz;
+                onOpenLeadModalWithSwatch(`${swatchName} (${selectedSwatch.code})`);
+                setSelectedSwatch(null);
+              }}
+              className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-amber to-brand-gold text-brand-dark font-extrabold text-sm shadow-glow flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              <span>Ushbu rangda namuna so'rash</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
