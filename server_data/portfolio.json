@@ -40,5 +40,19 @@
     "area": "120 metr",
     "time": "6 ish kuni",
     "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    "id": "port-1790425849",
+    "title": {
+      "uz": "sadq",
+      "ru": "sadq",
+      "en": "sadq"
+    },
+    "category": "residential",
+    "location": "Toshkent shahri",
+    "material": "Tunikabond 0.45mm",
+    "area": "250 m²",
+    "time": "10 ish kuni",
+    "image": "/uploads/20260926_173048_d7ee1e65.jpeg"
   }
 ]

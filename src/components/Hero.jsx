@@ -71,7 +71,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                 <div className="w-10 h-10 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red">
                   <Building2 className="w-5 h-5" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white font-display">350+</div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-white font-display">2000+</div>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 font-medium">{t.hero.statProjects}</p>
             </div>
