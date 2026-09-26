@@ -80,3 +80,28 @@
 .animate-wiggle-smooth {
   animation: wiggle-smooth 0.4s ease-in-out infinite alternate;
 }
+
+@keyframes laserScan {
+  0% {
+    top: 5%;
+    opacity: 0.15;
+  }
+  50% {
+    top: 90%;
+    opacity: 0.75;
+  }
+  100% {
+    top: 5%;
+    opacity: 0.15;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+

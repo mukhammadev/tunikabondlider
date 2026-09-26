@@ -1,23 +1,5 @@
 [
   {
-    "id": "port-naves-1",
-    "category": "naves",
-    "title": {
-      "uz": "2 Ta Avtomobil Uchun Keng Hovli Navesi",
-      "ru": "Широкий навес во дворе для 2 автомобилей",
-      "en": "Spacious Courtyard Double Carport Canopy"
-    },
-    "masterId": "team-bobur",
-    "masterName": "Bobur Usta",
-    "masterRole": "Usta — Temir Karkas va Naves Montaji",
-    "masterPhoto": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
-    "location": "Toshkent sh., Yunusobod",
-    "material": "Tunikabond Premium 0.45mm + Temir Karkas",
-    "area": "140 m²",
-    "time": "5 ish kuni",
-    "image": "https://images.unsplash.com/photo-1541888946425-d0fbb1861563?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
     "id": "port-koziryok-1",
     "category": "koziryok",
     "title": {

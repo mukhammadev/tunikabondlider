@@ -18,6 +18,7 @@ import { BeforeAfter } from './components/BeforeAfter';
 import { TrustAndReviews } from './components/TrustAndReviews';
 import { TeamSection } from './components/TeamSection';
 import { BrandIntro } from './components/BrandIntro';
+import { LiveActivityToast } from './components/LiveActivityToast';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam } from './services/api';
@@ -260,6 +261,11 @@ export function App() {
 
       {/* Floating Call & Telegram Quick Action Buttons */}
       <QuickActions
+        onOpenLeadModal={handleOpenLeadModal}
+      />
+
+      {/* Real-time Customer Activity & Order Ticker (Magnetizing Social Proof) */}
+      <LiveActivityToast
         onOpenLeadModal={handleOpenLeadModal}
       />
 
