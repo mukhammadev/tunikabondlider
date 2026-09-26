@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Calculator as CalcIcon, Check, ArrowRight, Clock, Shield, Sparkles, Building, Layers, Printer, Send } from 'lucide-react';
+import { 
+  Calculator as CalcIcon, Check, ArrowRight, Clock, Shield, 
+  Sparkles, Building, Layers, Printer, Send, X, Phone, User, CheckCircle2 
+} from 'lucide-react';
+import { submitLead } from '../services/telegram';
 
 export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [buildingType, setBuildingType] = useState('cottage');
@@ -7,6 +11,13 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [area, setArea] = useState(120);
   const [includeInstallation, setIncludeInstallation] = useState(true);
   const [hasCalculated, setHasCalculated] = useState(false);
+
+  // Telegram phone modal state
+  const [telegramModalOpen, setTelegramModalOpen] = useState(false);
+  const [tgName, setTgName] = useState('');
+  const [tgPhone, setTgPhone] = useState('+998');
+  const [tgLoading, setTgLoading] = useState(false);
+  const [tgSuccess, setTgSuccess] = useState(false);
 
   // Material unit prices (so'm per sq.m) - Amaldagi aniq bozor narxlari
   const materialPrices = {
@@ -44,6 +55,76 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
       includeInstallation: includeInstallation
     };
     onOpenLeadModalWithCalc(calcData);
+  };
+
+  const handleTgPhoneChange = (e) => {
+    let val = e.target.value;
+    if (!val.startsWith('+998')) {
+      val = '+998';
+    }
+    setTgPhone(val);
+  };
+
+  const handleSendTelegramWithPhone = async (e) => {
+    e.preventDefault();
+    if (tgPhone.trim().length < 13) {
+      alert("Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX");
+      return;
+    }
+
+    setTgLoading(true);
+
+    const formattedCost = new Intl.NumberFormat('uz-UZ').format(calculatedTotal) + " so'm";
+    const bType = t.calculator.buildingTypes[buildingType];
+    const mType = t.calculator.materialTypes[materialType];
+
+    const calcData = {
+      buildingType: bType,
+      material: mType,
+      area: area,
+      cost: formattedCost,
+      includeInstallation: includeInstallation,
+      estimatedDays: estimatedDays
+    };
+
+    // 1. Submit lead to database / backend so admin gets full record
+    try {
+      await submitLead({
+        name: tgName.trim() || "Telegram orqali mijoz",
+        phone: tgPhone.trim(),
+        service: `Kalkulyator smetasi (${bType}, ${area} m²)`,
+        calcData: calcData,
+        source: "Kalkulyator (Telegram tugmasi)"
+      });
+    } catch (err) {
+      console.warn("Lead save error:", err);
+    }
+
+    setTgLoading(false);
+    setTgSuccess(true);
+
+    // 2. Open Telegram with pre-filled message including customer's phone number!
+    const tgText = 
+      `Assalomu alaykum @Muhammadazez!\n` +
+      `Kalkulyator orqali hisob-kitob qildim:\n\n` +
+      `👤 Mijoz: ${tgName.trim() || "Mijoz"}\n` +
+      `📞 Aloqa uchun telefon: ${tgPhone.trim()}\n` +
+      `🏢 Bino turi: ${bType}\n` +
+      `🧱 Material: ${mType}\n` +
+      `📐 Maydon: ${area} m²\n` +
+      `🛠 Montaj: ${includeInstallation ? "Kiritilgan" : "Faqat material"}\n` +
+      `💰 Hisoblangan narx: ${formattedCost}\n` +
+      `⏱ Bajarish muddati: ~${estimatedDays} ish kuni\n` +
+      `🛡 Rasmiy kafolat: 10 yil\n\n` +
+      `Iltimos, bepul lazerli o'lchov va konsultatsiya bo'yicha bog'lansangiz.`;
+
+    const tgUrl = `https://t.me/Muhammadazez?text=${encodeURIComponent(tgText)}`;
+    window.open(tgUrl, '_blank');
+
+    setTimeout(() => {
+      setTelegramModalOpen(false);
+      setTgSuccess(false);
+    }, 2500);
   };
 
   const handlePrintEstimate = () => {
@@ -412,25 +493,15 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                       <span>Smetani chop etish (PDF)</span>
                     </button>
 
-                    <a
-                      href={`https://t.me/Muhammadazez?text=${encodeURIComponent(
-                        `Assalomu alaykum @Muhammadazez!\n` +
-                        `Kalkulyator orqali hisob-kitob qildim:\n` +
-                        `🏢 Bino: ${t.calculator.buildingTypes[buildingType]}\n` +
-                        `🧱 Material: ${t.calculator.materialTypes[materialType]}\n` +
-                        `📐 Maydon: ${area} m²\n` +
-                        `💰 Narx: ${new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} so'm\n` +
-                        `⏱ Muddat: ~${estimatedDays} kun\n\n` +
-                        `Iltimos, bepul o'lchov uchun bog'lansangiz.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => setTelegramModalOpen(true)}
                       className="py-2.5 px-3 rounded-xl bg-[#0088cc]/20 hover:bg-[#0088cc]/30 border border-[#0088cc]/40 text-[#29b6f6] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                      title="Hisobni Telegram orqali adminga yuborish"
+                      title="Hisobni telefon raqamingiz bilan Telegram orqali adminga yuborish"
                     >
                       <Send className="w-3.5 h-3.5" />
                       <span>Telegramga yuborish</span>
-                    </a>
+                    </button>
                   </div>
 
                   <p className="text-[11px] text-slate-400 text-center mt-4 leading-normal">
@@ -445,6 +516,126 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
         </div>
 
       </div>
+
+      {/* --- TELEGRAM PHONE & ORDER MODAL --- */}
+      {telegramModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+          onClick={() => setTelegramModalOpen(false)}
+        >
+          <div 
+            className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-7 border border-brand-red/30 shadow-glow-red relative bg-brand-surface/95 animate-scaleUp text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setTelegramModalOpen(false)}
+              className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Yopish"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {tgSuccess ? (
+              <div className="text-center py-6 space-y-4">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center border border-emerald-500/30">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="font-display font-bold text-xl text-white">
+                  Ma'lumotlar muvaffaqiyatli saqlandi!
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Smeta va telefon raqamingiz admin bazasiga yozildi hamda Telegram chat ochilmoqda...
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSendTelegramWithPhone} className="space-y-4 sm:space-y-5">
+                {/* Modal Title & Icon */}
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#0088cc]/20 border border-[#0088cc]/40 flex items-center justify-center text-[#29b6f6] shrink-0">
+                    <Send className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-lg text-white">
+                      Telegramga smetani yuborish
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Admin aloqaga chiqishi uchun raqamingizni kiriting
+                    </p>
+                  </div>
+                </div>
+
+                {/* Calculation Quick Pill */}
+                <div className="p-3.5 rounded-2xl bg-brand-dark/70 border border-white/10 text-xs space-y-1.5">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Bino & Maydon:</span>
+                    <strong className="text-white font-medium">
+                      {t.calculator.buildingTypes[buildingType]} • {area} m²
+                    </strong>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Tanlangan Material:</span>
+                    <strong className="text-slate-200 font-medium">
+                      {t.calculator.materialTypes[materialType]}
+                    </strong>
+                  </div>
+                  <div className="flex justify-between text-slate-400 pt-1 border-t border-white/5">
+                    <span>Jami taxminiy narx:</span>
+                    <strong className="text-brand-red font-bold font-mono text-sm">
+                      {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} so'm
+                    </strong>
+                  </div>
+                </div>
+
+                {/* Name Input */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-brand-red" />
+                    <span>Ismingiz (ixtiyoriy)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={tgName}
+                    onChange={(e) => setTgName(e.target.value)}
+                    placeholder="Masalan: Azizbek"
+                    className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red text-sm"
+                  />
+                </div>
+
+                {/* Phone Input (Required) */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-brand-red" />
+                    <span>Telefon raqamingiz <span className="text-brand-red">*</span></span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={tgPhone}
+                    onChange={handleTgPhoneChange}
+                    placeholder="+998 (90) 123-45-67"
+                    className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red text-sm font-semibold font-mono"
+                  />
+                  <span className="text-[11px] text-slate-400 mt-1 block">
+                    Admin hisob-kitob bo'yicha sizga qo'ng'iroq qiladi yoki Telegramdan aloqaga chiqadi.
+                  </span>
+                </div>
+
+                {/* Submit button */}
+                <button
+                  type="submit"
+                  disabled={tgLoading}
+                  className="w-full py-3.5 px-6 rounded-xl bg-[#0088cc] hover:bg-[#0077b5] text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>{tgLoading ? "Yuborilmoqda..." : "Telegram orqali adminga yuborish"}</span>
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 };

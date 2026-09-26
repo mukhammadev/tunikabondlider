@@ -1,5 +1,22 @@
 [
   {
+    "id": "lead-4",
+    "timestamp": "2026-09-26T18:26:44.069179",
+    "status": "new",
+    "name": "Muhammad",
+    "phone": "+998770080811",
+    "service": "Kalkulyator smetasi (Hovli / Kottedj, 120 m²)",
+    "calcData": {
+      "buildingType": "Hovli / Kottedj",
+      "material": "Tunikabond Premium (0.45 mm - Mat/Wood)",
+      "area": 120,
+      "cost": "24,000,000 so'm",
+      "includeInstallation": true,
+      "estimatedDays": 8
+    },
+    "source": "Kalkulyator (Telegram tugmasi)"
+  },
+  {
     "id": "lead-3",
     "timestamp": "2026-09-26T18:19:43.794933",
     "status": "new",
