@@ -66,20 +66,20 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
 
         {success ? (
           <div className="py-8 text-center animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-brand-gold/20 text-brand-gold flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-brand-red/20 text-brand-red flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <h3 className="font-display font-extrabold text-2xl text-white mb-2">
               Arizangiz qabul qilindi!
             </h3>
             <p className="text-slate-300 text-sm max-w-sm mx-auto">
-              Mutaxassisimiz 15 daqiqa ichida siz bilan bog'lanib, o'lchov olish vaqtini kelishib oladi.
+              Mutaxassisimiz va admin <strong className="text-brand-red font-bold">@Muhammadazez</strong> tez orada siz bilan bog'lanadi.
             </p>
           </div>
         ) : (
           <div>
             
-            <div className="flex items-center gap-2 text-xs font-bold text-brand-gold uppercase tracking-wider mb-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-brand-red uppercase tracking-wider mb-2">
               <Ruler className="w-4 h-4" />
               <span>Bepul o'lchov va smeta</span>
             </div>
@@ -89,10 +89,10 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
             </h3>
 
             {initialData?.calcData && (
-              <div className="p-3.5 rounded-xl bg-brand-gold/10 border border-brand-gold/30 mb-6 text-xs text-slate-200">
-                <span className="font-bold text-brand-gold block mb-1">Hisoblangan xarajat:</span>
+              <div className="p-3.5 rounded-xl bg-brand-red/10 border border-brand-red/30 mb-6 text-xs text-slate-200">
+                <span className="font-bold text-brand-red block mb-1">Hisoblangan xarajat:</span>
                 <div>Hajmi: <strong className="text-white">{initialData.calcData.area} m²</strong> | Material: <strong className="text-white">{initialData.calcData.material}</strong></div>
-                <div>Taxminiy summa: <strong className="text-brand-amber font-bold">{initialData.calcData.cost}</strong></div>
+                <div>Taxminiy summa: <strong className="text-brand-red font-bold">{initialData.calcData.cost}</strong></div>
               </div>
             )}
 
@@ -111,7 +111,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   placeholder="Jasur Aliyev"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
                 />
               </div>
 
@@ -125,7 +125,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   placeholder="+998 (90) 123-45-67"
                   value={phone}
                   onChange={handlePhoneChange}
-                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-sm font-semibold tracking-wide"
+                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm font-semibold tracking-wide"
                 />
               </div>
 
@@ -138,14 +138,14 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   placeholder="Masalan: Yunusobod 14-mavze, kottedj"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-brand-amber to-brand-gold text-brand-dark font-extrabold text-sm shadow-glow hover:shadow-glow-lg flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 mt-6"
+                className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red hover:shadow-glow-red-lg flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 mt-6"
               >
                 {loading ? (
                   <span>Yuborilmoqda...</span>
@@ -158,7 +158,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
               </button>
 
               <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 pt-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-brand-gold" />
+                <ShieldCheck className="w-3.5 h-3.5 text-brand-red" />
                 <span>100% Bepul va majburiyatlarsiz</span>
               </div>
             </form>

@@ -12,10 +12,12 @@ export default {
           surface: '#111827',
           card: '#1F2937',
           border: '#374151',
+          red: '#C40000',
+          redHover: '#9E0000',
+          redLight: '#E53935',
           gold: '#F59E0B',
-          goldHover: '#D97706',
           amber: '#FBBF24',
-          accent: '#E11D48',
+          accent: '#C40000',
           blue: '#2563EB',
         }
       },
@@ -24,9 +26,24 @@ export default {
         display: ['Outfit', 'sans-serif'],
       },
       boxShadow: {
-        'glow': '0 0 25px -5px rgba(245, 158, 11, 0.3)',
-        'glow-lg': '0 0 40px -10px rgba(245, 158, 11, 0.4)',
-        'soft': '0 10px 30px -10px rgba(0, 0, 0, 0.3)',
+        'glow-red': '0 0 25px -5px rgba(196, 0, 0, 0.45)',
+        'glow-red-lg': '0 0 40px -8px rgba(196, 0, 0, 0.6)',
+        'glow': '0 0 25px -5px rgba(196, 0, 0, 0.4)',
+        'soft': '0 10px 30px -10px rgba(0, 0, 0, 0.4)',
+      },
+      keyframes: {
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-4deg)' },
+          '50%': { transform: 'rotate(4deg)' },
+        },
+        pulseGlow: {
+          '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(196, 0, 0, 0.7)' },
+          '50%': { transform: 'scale(1.05)', boxShadow: '0 0 0 12px rgba(196, 0, 0, 0)' },
+        }
+      },
+      animation: {
+        wiggle: 'wiggle 0.3s ease-in-out infinite',
+        pulseGlow: 'pulseGlow 2s infinite',
       }
     },
   },

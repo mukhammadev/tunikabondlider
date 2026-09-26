@@ -56,6 +56,7 @@ def send_to_telegram(lead_data):
     text += f"👤 *Mijoz:* {name}\n"
     text += f"📞 *Telefon:* `{phone}`\n"
     text += f"🛠 *Xizmat:* {service}\n"
+    text += f"👨‍💼 *Mas'ul Admin:* @Muhammadazez\n"
 
     if calc:
         text += f"\n📊 *Kalkulyator Hisob-kitobi:*\n"

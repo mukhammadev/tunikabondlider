@@ -15,7 +15,7 @@ export const FAQ = ({ currentLang, t }) => {
         
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <HelpCircle className="w-3.5 h-3.5" />
             <span>{t.faq.badge}</span>
           </div>
@@ -37,15 +37,15 @@ export const FAQ = ({ currentLang, t }) => {
             return (
               <div 
                 key={i}
-                className="glass-card rounded-2xl overflow-hidden border border-white/10 transition-colors"
+                className="glass-card rounded-2xl overflow-hidden border border-white/10 transition-colors hover:border-brand-red/40"
               >
                 <button
                   type="button"
                   onClick={() => toggle(i)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-display font-bold text-base sm:text-lg text-white hover:text-brand-gold transition-colors"
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-display font-bold text-base sm:text-lg text-white hover:text-brand-red transition-colors"
                 >
                   <span>{q}</span>
-                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 text-brand-gold">
+                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 text-brand-red">
                     {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </div>
                 </button>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ShieldCheck, ArrowRight, CheckCircle2, Phone, Calendar } from 'lucide-react';
+import { X, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export const ProductModal = ({ product, currentLang, onClose, onOrderProduct }) => {
   if (!product) return null;
@@ -30,10 +30,10 @@ export const ProductModal = ({ product, currentLang, onClose, onOrderProduct }) 
           <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-70" />
           
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-            <span className="px-3 py-1 rounded-full bg-brand-gold text-brand-dark font-black text-xs">
+            <span className="px-3 py-1 rounded-full bg-brand-red text-white font-black text-xs">
               {product.badge}
             </span>
-            <span className="px-3 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/15 text-xs text-brand-gold font-bold flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/15 text-xs text-brand-red font-bold flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4" />
               <span>{product.warranty} rasmiy kafolat</span>
             </span>
@@ -64,12 +64,12 @@ export const ProductModal = ({ product, currentLang, onClose, onOrderProduct }) 
         </div>
 
         {/* Price and Action Button */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-brand-surface border border-brand-gold/30 shadow-inner">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-brand-surface border border-brand-red/30 shadow-inner">
           <div>
             <span className="block text-[11px] uppercase tracking-wider text-slate-400 font-bold">
               Zavod narxi:
             </span>
-            <div className="font-display font-black text-xl sm:text-2xl text-brand-gold">
+            <div className="font-display font-black text-xl sm:text-2xl text-brand-red">
               {product.priceRange}
             </div>
           </div>
@@ -79,7 +79,7 @@ export const ProductModal = ({ product, currentLang, onClose, onOrderProduct }) 
               onOrderProduct(name);
               onClose();
             }}
-            className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-amber to-brand-gold text-brand-dark font-extrabold text-sm shadow-glow hover:shadow-glow-lg flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all"
+            className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red hover:shadow-glow-red-lg flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all"
           >
             <span>Ushbu mahsulotga buyurtma berish</span>
             <ArrowRight className="w-4 h-4" />

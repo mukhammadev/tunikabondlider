@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { products } from '../data/products';
-import { Layers, ShieldCheck, ArrowRight, Eye, CheckCircle2 } from 'lucide-react';
+import { Layers, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export const Products = ({ currentLang, t, onSelectProduct }) => {
   const [activeTab, setActiveTab] = useState('all');
@@ -23,7 +23,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <Layers className="w-3.5 h-3.5" />
             <span>{t.products.badge}</span>
           </div>
@@ -43,7 +43,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeTab === tab.id
-                  ? 'bg-brand-gold text-brand-dark shadow-glow'
+                  ? 'bg-brand-red text-white shadow-glow-red font-bold'
                   : 'bg-brand-dark/70 text-slate-300 hover:text-white hover:bg-brand-surface border border-white/10'
               }`}
             >
@@ -61,7 +61,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
             return (
               <div
                 key={product.id}
-                className="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group hover:border-brand-gold/50"
+                className="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group hover:border-brand-red/50"
               >
                 <div>
                   {/* Image container */}
@@ -75,7 +75,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-60" />
                     
                     {/* Badge */}
-                    <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-brand-gold text-brand-dark text-xs font-black shadow-md">
+                    <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-brand-red text-white text-xs font-black shadow-md">
                       {product.badge}
                     </div>
 
@@ -83,7 +83,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
                       <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10">
                         {product.thickness}
                       </span>
-                      <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1 text-brand-gold">
+                      <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1 text-brand-red">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>{product.warranty}</span>
                       </span>
@@ -92,7 +92,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
 
                   {/* Body Content */}
                   <div className="p-6">
-                    <h3 className="font-display font-bold text-xl text-white group-hover:text-brand-gold transition-colors mb-2 leading-snug">
+                    <h3 className="font-display font-bold text-xl text-white group-hover:text-brand-red transition-colors mb-2 leading-snug">
                       {name}
                     </h3>
                     <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
@@ -119,17 +119,17 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
                     <span className="block text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
                       Zavod narxi:
                     </span>
-                    <span className="font-display font-extrabold text-base text-brand-gold">
+                    <span className="font-display font-extrabold text-base text-brand-red">
                       {product.priceRange}
                     </span>
                   </div>
 
                   <button
                     onClick={() => onSelectProduct(product)}
-                    className="w-full py-3 px-4 rounded-xl bg-brand-surface hover:bg-brand-gold hover:text-brand-dark border border-white/10 hover:border-brand-gold text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 group/btn"
+                    className="w-full py-3 px-4 rounded-xl bg-brand-surface hover:bg-brand-red hover:text-white border border-white/10 hover:border-brand-red text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 group/btn"
                   >
                     <span>{t.products.detailsBtn}</span>
-                    <ArrowRight className="w-4 h-4 text-brand-gold group-hover/btn:text-brand-dark group-hover/btn:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 text-brand-red group-hover/btn:text-white group-hover/btn:translate-x-1 transition-transform" />
                   </button>
                 </div>
 

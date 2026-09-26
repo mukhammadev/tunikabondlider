@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { swatches } from '../data/swatches';
-import { Palette, Sparkles, Check, X, Shield, ArrowRight } from 'lucide-react';
+import { Palette, X, ArrowRight } from 'lucide-react';
 
 export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -24,7 +24,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <Palette className="w-3.5 h-3.5" />
             <span>{t.swatches.badge}</span>
           </div>
@@ -44,7 +44,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
               onClick={() => setActiveCategory(cat.id)}
               className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeCategory === cat.id
-                  ? 'bg-brand-gold text-brand-dark shadow-glow'
+                  ? 'bg-brand-red text-white shadow-glow-red font-bold'
                   : 'bg-brand-surface/80 text-slate-300 hover:bg-brand-card hover:text-white border border-white/10'
               }`}
             >
@@ -61,12 +61,12 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
               <div
                 key={item.id}
                 onClick={() => setSelectedSwatch(item)}
-                className="glass-card rounded-2xl p-4 cursor-pointer group hover:scale-[1.03] transition-all flex flex-col justify-between"
+                className="glass-card rounded-2xl p-4 cursor-pointer group hover:scale-[1.03] transition-all flex flex-col justify-between hover:border-brand-red/50"
               >
                 <div>
                   {/* Swatch Sample Box */}
                   <div 
-                    className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow"
+                    className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow-red"
                     style={{ background: item.bgGradient }}
                   >
                     <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-brand-dark/80 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/10">
@@ -74,7 +74,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-sm sm:text-base text-white group-hover:text-brand-gold transition-colors leading-snug mb-1">
+                  <h3 className="font-bold text-sm sm:text-base text-white group-hover:text-brand-red transition-colors leading-snug mb-1">
                     {name}
                   </h3>
                   <p className="text-xs text-slate-400 font-medium mb-3">
@@ -84,7 +84,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
 
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
                   <span>{item.finish}</span>
-                  <span className="text-brand-gold font-bold">Ko'rish →</span>
+                  <span className="text-brand-red font-bold">Ko'rish →</span>
                 </div>
               </div>
             );
@@ -147,7 +147,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
                 onOpenLeadModalWithSwatch(`${swatchName} (${selectedSwatch.code})`);
                 setSelectedSwatch(null);
               }}
-              className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-amber to-brand-gold text-brand-dark font-extrabold text-sm shadow-glow flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
               <span>Ushbu rangda namuna so'rash</span>
               <ArrowRight className="w-4 h-4" />

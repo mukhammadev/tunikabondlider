@@ -48,13 +48,13 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   return (
     <section id="calculator" className="py-24 relative overflow-hidden bg-brand-surface/40">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-brand-gold/5 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <CalcIcon className="w-3.5 h-3.5" />
             <span>{t.calculator.badge}</span>
           </div>
@@ -75,7 +75,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
             {/* 1. Building Type Selector */}
             <div>
               <label className="block text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-                <Building className="w-4 h-4 text-brand-gold" />
+                <Building className="w-4 h-4 text-brand-red" />
                 <span>{t.calculator.buildingType}</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-2 gap-3">
@@ -86,12 +86,12 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     onClick={() => setBuildingType(key)}
                     className={`p-3.5 rounded-xl border text-left font-medium text-xs sm:text-sm transition-all flex items-center justify-between ${
                       buildingType === key
-                        ? 'bg-brand-gold/15 border-brand-gold text-white font-bold shadow-sm'
+                        ? 'bg-brand-red/15 border-brand-red text-white font-bold shadow-sm'
                         : 'bg-brand-dark/50 border-white/10 text-slate-300 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <span>{label}</span>
-                    {buildingType === key && <Check className="w-4 h-4 text-brand-gold flex-shrink-0" />}
+                    {buildingType === key && <Check className="w-4 h-4 text-brand-red flex-shrink-0" />}
                   </button>
                 ))}
               </div>
@@ -100,7 +100,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
             {/* 2. Material Selector */}
             <div>
               <label className="block text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-brand-gold" />
+                <Layers className="w-4 h-4 text-brand-red" />
                 <span>{t.calculator.materialType}</span>
               </label>
               <div className="space-y-2.5">
@@ -111,12 +111,12 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     onClick={() => setMaterialType(key)}
                     className={`w-full p-3.5 rounded-xl border text-left font-medium text-xs sm:text-sm transition-all flex items-center justify-between ${
                       materialType === key
-                        ? 'bg-brand-gold/15 border-brand-gold text-white font-bold'
+                        ? 'bg-brand-red/15 border-brand-red text-white font-bold'
                         : 'bg-brand-dark/50 border-white/10 text-slate-300 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <span>{label}</span>
-                    {materialType === key && <Check className="w-4 h-4 text-brand-gold flex-shrink-0" />}
+                    {materialType === key && <Check className="w-4 h-4 text-brand-red flex-shrink-0" />}
                   </button>
                 ))}
               </div>
@@ -135,7 +135,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     max="3000"
                     value={area}
                     onChange={(e) => setArea(Math.max(10, Math.min(3000, Number(e.target.value) || 10)))}
-                    className="w-16 bg-transparent text-right font-display font-bold text-brand-gold text-base focus:outline-none"
+                    className="w-16 bg-transparent text-right font-display font-bold text-brand-red text-base focus:outline-none"
                   />
                   <span className="text-xs text-slate-400 font-bold">{t.calculator.sqm}</span>
                 </div>
@@ -148,7 +148,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                 step="5"
                 value={area}
                 onChange={(e) => setArea(Number(e.target.value))}
-                className="w-full h-2.5 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-gold"
+                className="w-full h-2.5 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-red"
               />
 
               <div className="flex justify-between text-[11px] text-slate-500 mt-2 font-medium">
@@ -161,12 +161,12 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
             {/* 4. Installation Toggle */}
             <div className="pt-2">
-              <label className="flex items-center gap-3 p-3.5 rounded-xl bg-brand-dark/60 border border-white/10 cursor-pointer hover:border-brand-gold/30 transition-colors">
+              <label className="flex items-center gap-3 p-3.5 rounded-xl bg-brand-dark/60 border border-white/10 cursor-pointer hover:border-brand-red/30 transition-colors">
                 <input
                   type="checkbox"
                   checked={includeInstallation}
                   onChange={(e) => setIncludeInstallation(e.target.checked)}
-                  className="w-5 h-5 rounded border-white/20 text-brand-gold focus:ring-brand-gold bg-brand-card cursor-pointer accent-brand-gold"
+                  className="w-5 h-5 rounded border-white/20 text-brand-red focus:ring-brand-red bg-brand-card cursor-pointer accent-brand-red"
                 />
                 <span className="text-xs sm:text-sm text-slate-200 font-medium">
                   {t.calculator.includeInstallation}
@@ -178,10 +178,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
           {/* Results Summary Box (5 cols) */}
           <div className="lg:col-span-5 sticky top-28">
-            <div className="glass-panel p-6 sm:p-8 rounded-3xl border-brand-gold/30 shadow-glow relative overflow-hidden">
+            <div className="glass-panel p-6 sm:p-8 rounded-3xl border-brand-red/30 shadow-glow-red relative overflow-hidden">
               
               {/* Highlight badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-gold/15 text-brand-gold text-xs font-bold mb-6">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red/15 text-brand-red text-xs font-bold mb-6">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Tezkor hisob-kitob</span>
               </div>
@@ -191,7 +191,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                 <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">
                   {t.calculator.estimatedCost}
                 </span>
-                <div className="font-display font-extrabold text-3xl sm:text-4xl text-white gold-gradient-text tracking-tight">
+                <div className="font-display font-extrabold text-3xl sm:text-4xl text-white red-gradient-text tracking-tight">
                   {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} <span className="text-lg text-slate-300 font-medium">so'm</span>
                 </div>
                 <p className="text-xs text-slate-400 mt-2">
@@ -203,7 +203,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               <div className="space-y-3.5 mb-8 text-xs sm:text-sm">
                 <div className="flex items-center justify-between text-slate-300">
                   <span className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-brand-gold" />
+                    <Clock className="w-4 h-4 text-brand-red" />
                     <span>{t.calculator.estimatedTime}</span>
                   </span>
                   <span className="font-bold text-white">~{estimatedDays} {t.calculator.days}</span>
@@ -211,7 +211,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
                 <div className="flex items-center justify-between text-slate-300">
                   <span className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-brand-gold" />
+                    <Shield className="w-4 h-4 text-brand-red" />
                     <span>Rasmiy kafolat:</span>
                   </span>
                   <span className="font-bold text-white">10 yil shartnoma bilan</span>
@@ -219,10 +219,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
                 <div className="flex items-center justify-between text-slate-300">
                   <span className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-gold" />
+                    <Check className="w-4 h-4 text-brand-red" />
                     <span>Mutaxassis o'lchovi:</span>
                   </span>
-                  <span className="font-bold text-brand-gold">100% Bepul</span>
+                  <span className="font-bold text-brand-red">100% Bepul</span>
                 </div>
               </div>
 
@@ -230,7 +230,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               <button
                 type="button"
                 onClick={handleOrderWithEstimate}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-amber to-brand-gold text-brand-dark font-extrabold text-sm sm:text-base shadow-glow hover:shadow-glow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm sm:text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
                 <span>{t.calculator.orderWithCalc}</span>
                 <ArrowRight className="w-5 h-5" />

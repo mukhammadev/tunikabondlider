@@ -41,7 +41,7 @@ export const WhyUs = ({ t }) => {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold uppercase tracking-wider mb-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>{t.whyUs.badge}</span>
           </div>
@@ -60,12 +60,12 @@ export const WhyUs = ({ t }) => {
             return (
               <div 
                 key={i} 
-                className="glass-card p-8 rounded-3xl group hover:border-brand-gold/50 transition-all hover:translate-y-[-4px]"
+                className="glass-card p-8 rounded-3xl group hover:border-brand-red/50 transition-all hover:translate-y-[-4px]"
               >
-                <div className="w-14 h-14 rounded-2xl bg-brand-gold/15 flex items-center justify-center text-brand-gold mb-6 group-hover:scale-110 group-hover:bg-brand-gold group-hover:text-brand-dark transition-all shadow-glow">
+                <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red mb-6 group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all shadow-glow-red">
                   <Icon className="w-7 h-7" />
                 </div>
-                <h3 className="font-display font-bold text-xl text-white mb-3 group-hover:text-brand-gold transition-colors">
+                <h3 className="font-display font-bold text-xl text-white mb-3 group-hover:text-brand-red transition-colors">
                   {item.title}
                 </h3>
                 <p className="text-slate-300 text-sm leading-relaxed">
