@@ -1,8 +1,18 @@
 [
   {
+    "id": "lead-2",
+    "timestamp": "2026-09-26T17:14:12.328669",
+    "status": "cancelled",
+    "name": "Mukhammadjan Mamadalıyev",
+    "phone": "+998770080811",
+    "service": "Tunikabond Fasad",
+    "message": "Magazin oka",
+    "source": "Bog'lanish bo'limi formasi"
+  },
+  {
     "id": "lead-1",
     "timestamp": "2026-09-26T17:06:30.412967",
-    "status": "new",
+    "status": "completed",
     "name": "Ali Valiyev",
     "phone": "+998901234567",
     "product": "Premium Shifer",

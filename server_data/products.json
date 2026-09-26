@@ -60,26 +60,6 @@
     "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"
   },
   {
-    "id": "ab-30-classic",
-    "category": "alyukabond",
-    "name": {
-      "uz": "Alyukabond Klassik Fasad Paneli (3 mm)",
-      "ru": "Алюкобонд Классический Фасадный (3 мм)",
-      "en": "Alucobond Classic Architectural (3 mm)"
-    },
-    "shortDesc": {
-      "uz": "Do'konlar, dorixonalar, avtosalonlar va ofislar uchun eng optimal, engil va elastik fasad yechimi.",
-      "ru": "Оптимальное, легкое и надежное решение для магазинов, аптек, автосалонов и офисов.",
-      "en": "The industry-standard lightweight composite panel for commercial storefronts, clinics, and showrooms."
-    },
-    "thickness": "3.0 mm (0.21 mm alyumin)",
-    "coating": "Poliester / PVDF",
-    "warranty": "10 yil",
-    "badge": "Ommabop",
-    "priceRange": "160,000 - 210,000 so'm / m²",
-    "image": "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=800&q=80"
-  },
-  {
     "id": "karniz-neoclassic",
     "category": "cornice",
     "name": {
@@ -118,5 +98,41 @@
     "badge": "Mustahkam",
     "priceRange": "65,000 - 95,000 so'm / m²",
     "image": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "prod-1790425213",
+    "name": {
+      "uz": "Tunikabond",
+      "ru": "Tunikabond",
+      "en": "Tunikabond"
+    },
+    "shortDesc": {
+      "uz": "Juda ham qulay",
+      "ru": "Juda ham qulay",
+      "en": "Juda ham qulay"
+    },
+    "category": "tunikabond",
+    "thickness": "0.45 mm",
+    "coating": "PVDF polimer",
+    "warranty": "10 yil",
+    "badge": "Yangi",
+    "priceRange": "150,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    "specs": {
+      "uz": [
+        {
+          "label": "Qalinlik",
+          "value": "0.45 mm"
+        },
+        {
+          "label": "Qoplama",
+          "value": "PVDF polimer"
+        },
+        {
+          "label": "Kafolat",
+          "value": "10 yil"
+        }
+      ]
+    }
   }
 ]

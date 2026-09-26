@@ -15,6 +15,11 @@ app = Flask(__name__, static_folder="dist")
 DATA_DIR = os.path.join(os.path.dirname(__file__), "server_data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "public", "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+DIST_UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "dist", "uploads")
+os.makedirs(DIST_UPLOAD_FOLDER, exist_ok=True)
+
 ADMINS_FILE = os.path.join(DATA_DIR, "admins.json")
 LEADS_FILE = os.path.join(DATA_DIR, "leads.json")
 PRODUCTS_FILE = os.path.join(DATA_DIR, "products.json")
@@ -464,18 +469,95 @@ def modify_lead(lead_id):
         return jsonify({"success": True, "message": "Ariza holati yangilandi"}), 200
 
 
+@app.route("/api/leads/export", methods=["GET"])
+def export_leads():
+    leads = load_json(LEADS_FILE, [])
+    import io
+    import csv
+    from flask import Response
+    
+    output = io.StringIO()
+    # Write UTF-8 BOM so Excel opens with proper encoding
+    output.write('\ufeff')
+    writer = csv.writer(output)
+    writer.writerow(["ID", "Sana va Vaqt", "Holati", "Mijoz Ismi", "Telefon", "Mahsulot / Xizmat", "Xabar", "Bino Rasmi", "Manba"])
+    
+    for l in leads:
+        writer.writerow([
+            l.get("id", ""),
+            str(l.get("timestamp", ""))[:19].replace("T", " "),
+            l.get("status", ""),
+            l.get("name", ""),
+            l.get("phone", ""),
+            l.get("service") or l.get("product") or "",
+            l.get("message", ""),
+            l.get("photoUrl", ""),
+            l.get("source", "")
+        ])
+    
+    filename = f"tunikabond_leads_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+
+# --- UPLOAD API ---
+
+@app.route("/api/upload/", methods=["POST", "OPTIONS"])
+def upload_file():
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+        
+    if "file" not in request.files:
+        return jsonify({"error": "Fayl yuborilmadi"}), 400
+        
+    file = request.files["file"]
+    if not file or file.filename == "":
+        return jsonify({"error": "Fayl tanlanmadi"}), 400
+        
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in [".jpg", ".jpeg", ".png", ".webp", ".svg", ".pdf"]:
+        return jsonify({"error": "Faqat rasm yoki PDF fayllar qabul qilinadi"}), 400
+        
+    safe_name = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}{ext}"
+    target_path = os.path.join(UPLOAD_FOLDER, safe_name)
+    file.save(target_path)
+    
+    # Also mirror to dist/uploads so built static server finds it immediately
+    dist_target = os.path.join(DIST_UPLOAD_FOLDER, safe_name)
+    try:
+        import shutil
+        shutil.copy2(target_path, dist_target)
+    except Exception as e:
+        logger.error(f"Error copying upload to dist: {e}")
+        
+    return jsonify({
+        "success": True, 
+        "url": f"/uploads/{safe_name}",
+        "filename": safe_name
+    }), 200
+
+
+@app.route("/uploads/<path:filename>")
+def serve_uploads(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+
 def send_telegram_notification(lead_data):
     name = lead_data.get("name", "Noma'lum mijoz")
     phone = lead_data.get("phone", "-")
-    service = lead_data.get("service", "-")
+    service = lead_data.get("service") or lead_data.get("product") or "-"
     source = lead_data.get("source", "Veb-sayt")
     message = lead_data.get("message", "")
     calc = lead_data.get("calcData")
+    photo_url = lead_data.get("photoUrl", "")
 
     text = f"🔥 *YANGI BUYURTMA: Tunikabond Lider* 🔥\n\n"
     text += f"👤 *Mijoz:* {name}\n"
     text += f"📞 *Telefon:* `{phone}`\n"
-    text += f"🛠 *Xizmat:* {service}\n"
+    text += f"🛠 *Xizmat/Mahsulot:* {service}\n"
     text += f"👨‍💼 *Mas'ul Admin:* @Muhammadazez\n"
 
     if calc:
@@ -483,10 +565,13 @@ def send_telegram_notification(lead_data):
         text += f" • Bino turi: {calc.get('buildingType', '-')}\n"
         text += f" • Maydoni: {calc.get('area', '-')} m²\n"
         text += f" • Material: {calc.get('material', '-')}\n"
-        text += f" • Narx: {calc.get('cost', '-')}\n"
+        text += f" • Taxminiy summa: {calc.get('cost', '-')}\n"
 
     if message:
         text += f"💬 *Qo'shimcha izoh:* {message}\n"
+
+    if photo_url:
+        text += f"🖼 *Bino rasmi:* {photo_url}\n"
 
     text += f"📍 *Manba:* {source}\n"
     text += f"⏰ *Vaqt:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
@@ -494,6 +579,26 @@ def send_telegram_notification(lead_data):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return False
 
+    # Try sending with Photo if local file exists
+    if photo_url and photo_url.startswith("/uploads/"):
+        fname = photo_url.replace("/uploads/", "")
+        local_fpath = os.path.join(UPLOAD_FOLDER, fname)
+        if os.path.exists(local_fpath):
+            photo_url_api = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
+            try:
+                with open(local_fpath, "rb") as f:
+                    resp = requests.post(
+                        photo_url_api, 
+                        data={"chat_id": TELEGRAM_CHAT_ID, "caption": text, "parse_mode": "Markdown"}, 
+                        files={"photo": f}, 
+                        timeout=10
+                    )
+                    if resp.status_code == 200:
+                        return True
+            except Exception as e:
+                logger.error(f"Telegram photo send error, falling back to message: {e}")
+
+    # Fallback to standard text message
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     try:
         requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=6)

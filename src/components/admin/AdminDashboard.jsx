@@ -3,12 +3,13 @@ import {
   apiGetStats, apiGetLeads, apiUpdateLead, apiDeleteLead,
   apiGetProducts, apiCreateProduct, apiUpdateProduct, apiDeleteProduct,
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
-  apiGetAdmins, apiRegister
+  apiGetAdmins, apiRegister, apiUploadFile
 } from '../../services/api';
 import { 
   LayoutDashboard, Inbox, Package, Briefcase, Users, LogOut, 
   Plus, Trash2, Edit3, CheckCircle2, Clock, Phone, Send, X, 
-  ExternalLink, Search, RefreshCw, Shield, AlertCircle
+  ExternalLink, Search, RefreshCw, Shield, AlertCircle,
+  Upload, Download, FileText, Image as ImageIcon
 } from 'lucide-react';
 
 export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }) => {
@@ -19,6 +20,7 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
   const [portfolioList, setPortfolioList] = useState([]);
   const [adminsList, setAdminsList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Modals for CRUD
   const [productModalOpen, setProductModalOpen] = useState(false);
@@ -387,6 +389,15 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                   <span className="text-xs text-slate-300">
                     Yangi arizalar: <strong className="text-brand-red font-bold">{leads.filter(l => l.status === 'new').length} ta</strong>
                   </span>
+                  <a
+                    href="/api/leads/export"
+                    download
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all"
+                    title="Barcha arizalarni Excel formatida yuklab olish"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Excel (.csv)</span>
+                  </a>
                 </div>
               </div>
 
@@ -443,6 +454,22 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                             <p className="text-xs text-slate-300 italic pt-1">
                               💬 "{lead.message}"
                             </p>
+                          )}
+
+                          {lead.photoUrl && (
+                            <div className="pt-2 flex items-center gap-2">
+                              <span className="text-[11px] text-slate-400">Biriktirilgan rasm:</span>
+                              <a
+                                href={lead.photoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-brand-red/20 text-brand-red font-bold text-xs border border-brand-red/30 transition-colors"
+                              >
+                                <ImageIcon className="w-3.5 h-3.5" />
+                                <span>Rasmni ko'rish</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </div>
                           )}
                         </div>
 
@@ -772,15 +799,45 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-                  Rasm URL manzili
+                  Mahsulot Rasmi (URL yoki Qurilmadan yuklash)
                 </label>
-                <input
-                  type="url"
-                  value={productForm.image}
-                  onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={productForm.image}
+                    onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                    placeholder="https://... yoki yonidagi tugma orqali fayl tanlang"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                  <label className="cursor-pointer px-4 py-2.5 rounded-xl bg-brand-red/20 hover:bg-brand-red/30 border border-brand-red/40 text-xs font-bold text-white flex items-center gap-1.5 transition-colors shrink-0">
+                    <Upload className="w-4 h-4 text-brand-red" />
+                    <span>{uploadingImage ? "Yuklanmoqda..." : "Fayl"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setUploadingImage(true);
+                          const res = await apiUploadFile(file);
+                          setUploadingImage(false);
+                          if (res.success) {
+                            setProductForm(prev => ({ ...prev, image: res.url }));
+                          } else {
+                            alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                {productForm.image && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <img src={productForm.image} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-white/20" />
+                    <span className="text-[11px] text-slate-400 truncate max-w-xs">{productForm.image}</span>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -897,15 +954,45 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-                  Rasm URL manzili
+                  Loyiha Rasmi (URL yoki Qurilmadan yuklash)
                 </label>
-                <input
-                  type="url"
-                  value={portfolioForm.image}
-                  onChange={(e) => setPortfolioForm({ ...portfolioForm, image: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={portfolioForm.image}
+                    onChange={(e) => setPortfolioForm({ ...portfolioForm, image: e.target.value })}
+                    placeholder="https://... yoki yonidagi tugma orqali fayl tanlang"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                  <label className="cursor-pointer px-4 py-2.5 rounded-xl bg-brand-red/20 hover:bg-brand-red/30 border border-brand-red/40 text-xs font-bold text-white flex items-center gap-1.5 transition-colors shrink-0">
+                    <Upload className="w-4 h-4 text-brand-red" />
+                    <span>{uploadingImage ? "Yuklanmoqda..." : "Fayl"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setUploadingImage(true);
+                          const res = await apiUploadFile(file);
+                          setUploadingImage(false);
+                          if (res.success) {
+                            setPortfolioForm(prev => ({ ...prev, image: res.url }));
+                          } else {
+                            alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                {portfolioForm.image && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <img src={portfolioForm.image} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-white/20" />
+                    <span className="text-[11px] text-slate-400 truncate max-w-xs">{portfolioForm.image}</span>
+                  </div>
+                )}
               </div>
 
               <button

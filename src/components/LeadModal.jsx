@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { submitLead } from '../services/telegram';
+import { apiUploadFile } from '../services/api';
 import confetti from 'canvas-confetti';
-import { X, Send, CheckCircle2, ShieldCheck, Ruler } from 'lucide-react';
+import { X, Send, CheckCircle2, ShieldCheck, Ruler, Camera, Image as ImageIcon } from 'lucide-react';
 
 export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   if (!isOpen) return null;
@@ -9,6 +10,9 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+998');
   const [note, setNote] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [photoName, setPhotoName] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -34,6 +38,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
       service: initialData?.service || "Bepul o'lchash va konsultatsiya",
       calcData: initialData?.calcData,
       message: note,
+      photoUrl,
       source: initialData?.source || "Modal oynasi"
     });
     setLoading(false);
@@ -140,6 +145,49 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   onChange={(e) => setNote(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
                 />
+              </div>
+
+              {/* Optional Photo Attachment */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>Bino yoki uy rasmi (ixtiyoriy)</span>
+                  {uploadingPhoto && <span className="text-[10px] text-brand-red animate-pulse">Yuklanmoqda...</span>}
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-white/20 hover:border-brand-red/60 bg-white/5 cursor-pointer transition-colors text-xs text-slate-300">
+                    <Camera className="w-4 h-4 text-brand-red" />
+                    <span className="truncate">{photoName ? photoName : "Rasmni tanlang yoki suratga oling"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setPhotoName(file.name);
+                          setUploadingPhoto(true);
+                          const res = await apiUploadFile(file);
+                          setUploadingPhoto(false);
+                          if (res.success) {
+                            setPhotoUrl(res.url);
+                          } else {
+                            alert(res.error || "Rasm yuklashda xatolik");
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                  {photoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => { setPhotoUrl(''); setPhotoName(''); }}
+                      className="p-2 rounded-xl bg-white/10 hover:bg-brand-red/30 text-slate-300 hover:text-white transition-colors"
+                      title="Rasmni o'chirish"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <button

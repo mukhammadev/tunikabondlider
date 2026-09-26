@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator as CalcIcon, Check, ArrowRight, Clock, Shield, Sparkles, Building, Layers } from 'lucide-react';
+import { Calculator as CalcIcon, Check, ArrowRight, Clock, Shield, Sparkles, Building, Layers, Printer, Send } from 'lucide-react';
 
 export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [buildingType, setBuildingType] = useState('cottage');
@@ -43,6 +43,67 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
       includeInstallation: includeInstallation
     };
     onOpenLeadModalWithCalc(calcData);
+  };
+
+  const handlePrintEstimate = () => {
+    const formattedCost = new Intl.NumberFormat('uz-UZ').format(calculatedTotal) + " so'm";
+    const formattedPerSqm = new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm) + " so'm / m²";
+    const bType = t.calculator.buildingTypes[buildingType];
+    const mType = t.calculator.materialTypes[materialType];
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+    printWin.document.write(`
+      <html>
+        <head>
+          <title>Tunikabond Lider – Rasmiy Smeta</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #1e293b; max-width: 650px; margin: auto; }
+            .header { border-bottom: 2px solid #C40000; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+            .logo { font-size: 22px; font-weight: 900; color: #0f172a; }
+            .logo span { color: #C40000; }
+            .badge { background: #fee2e2; color: #C40000; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: bold; }
+            .title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #0f172a; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 14px; }
+            th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+            th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; }
+            .total-row { background: #fef2f2; font-weight: bold; font-size: 16px; color: #C40000; }
+            .note { font-size: 12px; color: #64748b; margin-top: 20px; line-height: 1.6; }
+            .contact { margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 13px; line-height: 1.6; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo">TUNIKABOND <span>LIDER</span></div>
+            <div class="badge">Dastlabki Smeta</div>
+          </div>
+          <div class="title">Bino Fasad va Tom Qoplami Taxminiy Smetasi</div>
+          <table>
+            <tr><th>Ko'rsatkich</th><th>Tafsilot</th></tr>
+            <tr><td>Bino turi</td><td><strong>${bType}</strong></td></tr>
+            <tr><td>Tanlangan Material</td><td><strong>${mType}</strong></td></tr>
+            <tr><td>Umumiy maydon</td><td><strong>${area} m²</strong></td></tr>
+            <tr><td>Montaj xizmati</td><td>${includeInstallation ? "Kiritilgan" : "Kiritilmagan"}</td></tr>
+            <tr><td>1 m² o'rtacha narxi</td><td>${formattedPerSqm}</td></tr>
+            <tr><td>Bajarish muddati</td><td>~${estimatedDays} ish kuni</td></tr>
+            <tr><td>Kafolat muddati</td><td>10 yil shartnoma asosida</td></tr>
+            <tr class="total-row"><td>Jami Taxminiy Qiymat:</td><td>${formattedCost}</td></tr>
+          </table>
+          <div class="contact">
+            <strong>Kompaniya bilan bog'lanish:</strong><br/>
+            Telefon: +998 (99) 533-33-03 | Telegram: @Muhammadazez<br/>
+            Veb-sayt: https://tunikabondlider.uz
+          </div>
+          <div class="note">
+            * Mazkur hisob-kitob dastlabki smeta hisoblanadi. Yakuniy aniq narx mutaxassisimiz bino joyiga borib bepul o'lchov olganidan so'ng belgilanadi.
+          </div>
+          <script>
+            window.onload = function() { window.print(); }
+          </script>
+        </body>
+      </html>
+    `);
+    printWin.document.close();
   };
 
   return (
@@ -235,6 +296,39 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                 <span>{t.calculator.orderWithCalc}</span>
                 <ArrowRight className="w-5 h-5" />
               </button>
+
+              {/* Secondary utility actions */}
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <button
+                  type="button"
+                  onClick={handlePrintEstimate}
+                  className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  title="Smetani PDF / Qog'ozga chop etish"
+                >
+                  <Printer className="w-3.5 h-3.5 text-brand-red" />
+                  <span>Smetani chop etish (PDF)</span>
+                </button>
+
+                <a
+                  href={`https://t.me/Muhammadazez?text=${encodeURIComponent(
+                    `Assalomu alaykum @Muhammadazez!\n` +
+                    `Kalkulyator orqali hisob-kitob qildim:\n` +
+                    `🏢 Bino: ${t.calculator.buildingTypes[buildingType]}\n` +
+                    `🧱 Material: ${t.calculator.materialTypes[materialType]}\n` +
+                    `📐 Maydon: ${area} m²\n` +
+                    `💰 Narx: ${new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} so'm\n` +
+                    `⏱ Muddat: ~${estimatedDays} kun\n\n` +
+                    `Iltimos, bepul o'lchov uchun bog'lansangiz.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-2.5 px-3 rounded-xl bg-[#0088cc]/20 hover:bg-[#0088cc]/30 border border-[#0088cc]/40 text-[#29b6f6] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                  title="Hisobni Telegram orqali adminga yuborish"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Telegramga yuborish</span>
+                </a>
+              </div>
 
               <p className="text-[11px] text-slate-400 text-center mt-4 leading-normal">
                 {t.calculator.consultationNotice}

@@ -14,6 +14,8 @@ import { Footer } from './components/Footer';
 import { ProductModal } from './components/ProductModal';
 import { LeadModal } from './components/LeadModal';
 import { QuickActions } from './components/QuickActions';
+import { BeforeAfter } from './components/BeforeAfter';
+import { TrustAndReviews } from './components/TrustAndReviews';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio } from './services/api';
@@ -164,9 +166,19 @@ export function App() {
           items={portfolioList}
         />
 
+        {/* 4.1 Interactive Before & After Facade Slider */}
+        <BeforeAfter
+          onOpenLeadModal={handleOpenLeadModal}
+        />
+
         {/* 5. Why Choose Us (6 Pillars) */}
         <WhyUs
           t={t}
+        />
+
+        {/* 5.1 Official Warranty & Customer Reviews */}
+        <TrustAndReviews
+          onOpenLeadModal={handleOpenLeadModal}
         />
 
         {/* 6. Process / Workflow (4 Steps) */}

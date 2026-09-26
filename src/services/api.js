@@ -233,3 +233,24 @@ export const apiDeletePortfolio = async (itemId) => {
   } catch {}
   return true;
 };
+
+// --- FILE UPLOAD API ---
+export const apiUploadFile = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const res = await fetch('/api/upload/', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return { success: true, url: data.url, filename: data.filename };
+    }
+    return { success: false, error: data.error || "Fayl yuklashda xatolik" };
+  } catch (err) {
+    return { success: false, error: "Server bilan bog'lanishda xatolik" };
+  }
+};
+
+export const apiExportLeadsUrl = () => '/api/leads/export';

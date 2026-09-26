@@ -31,10 +31,23 @@ export const submitLead = async (leadData) => {
     text += ` • Taxminiy narx: ${calcData.cost || '-'}\n`;
   }
   if (message) text += `💬 *Qo'shimcha izoh:* ${message}\n`;
+  if (leadData.photoUrl) text += `🖼 *Bino rasmi:* ${leadData.photoUrl}\n`;
   if (source) text += `📍 *Manba:* ${source}\n`;
   text += `⏰ *Vaqt:* ${new Date().toLocaleString('uz-UZ')}\n`;
 
-  // Try backend proxy if available, or Telegram webhook
+  // 1. Send via Backend API first (handles JSON file persistence, telegram bot, and photo files)
+  try {
+    const apiRes = await fetch('/api/leads/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(leadData)
+    });
+    if (apiRes.ok) return { success: true };
+  } catch (err) {
+    console.warn('Backend leads API unavailable, falling back:', err);
+  }
+
+  // 2. Direct Telegram webhook fallback
   const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
   const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID;
 
@@ -56,18 +69,6 @@ export const submitLead = async (leadData) => {
     } catch (err) {
       console.error('Telegram dispatch error:', err);
     }
-  }
-
-  // If backend endpoint exists:
-  try {
-    const apiRes = await fetch('/api/leads/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leadData)
-    });
-    if (apiRes.ok) return { success: true };
-  } catch {
-    // Backend might not be running locally
   }
 
   // Simulate success for local testing / demo if network fails
