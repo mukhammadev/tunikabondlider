@@ -3,72 +3,44 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════
-   DESIGN TOKENS — Dark Mode (default)
+   DESIGN TOKENS
    ═══════════════════════════════════════════════════════════ */
 :root {
-  --brand-dark: 11 15 25;        /* #0B0F19 */
-  --brand-surface: 17 24 39;     /* #111827 */
-  --brand-card: 31 41 55;        /* #1F2937 */
-  --brand-border: 55 65 81;      /* #374151 */
-
-  /* Text tokens */
-  --text-primary: 248 250 252;   /* slate-50 */
-  --text-secondary: 203 213 225; /* slate-300 */
-  --text-muted: 148 163 184;     /* slate-400 */
-
-  /* Surface tokens */
-  --surface-overlay: rgba(17, 24, 39, 0.75);
-  --surface-card: rgba(31, 41, 55, 0.5);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-faint: rgba(255, 255, 255, 0.05);
-  --input-bg: rgba(11, 15, 25, 0.8);
+  --brand-dark: 11 15 25;
+  --brand-surface: 17 24 39;
+  --brand-card: 31 41 55;
+  --brand-border: 55 65 81;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DESIGN TOKENS — Light Mode
-   ═══════════════════════════════════════════════════════════ */
 html.light {
-  --brand-dark: 248 250 252;     /* #F8FAFC */
-  --brand-surface: 255 255 255;  /* #FFFFFF */
-  --brand-card: 241 245 249;     /* #F1F5F9 */
-  --brand-border: 203 213 225;   /* #CBD5E1 */
-
-  --text-primary: 15 23 42;      /* slate-900 */
-  --text-secondary: 51 65 85;    /* slate-700 */
-  --text-muted: 100 116 139;     /* slate-500 */
-
-  --surface-overlay: rgba(255, 255, 255, 0.92);
-  --surface-card: rgba(241, 245, 249, 0.95);
-  --border-subtle: rgba(0, 0, 0, 0.07);
-  --border-faint: rgba(0, 0, 0, 0.04);
-  --input-bg: rgba(248, 250, 252, 0.95);
+  --brand-dark: 248 250 252;
+  --brand-surface: 255 255 255;
+  --brand-card: 241 245 249;
+  --brand-border: 203 213 225;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   BASE STYLES
+   BASE
    ═══════════════════════════════════════════════════════════ */
 @layer base {
-  html {
-    scroll-behavior: smooth;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
+  html { scroll-behavior: smooth; }
 
   body {
     @apply bg-brand-dark antialiased;
-    color: rgb(var(--text-primary));
+    color: #f8fafc;
     transition: background-color 0.3s ease, color 0.3s ease;
     background-image:
-      radial-gradient(at 0% 0%, rgba(196, 0, 0, 0.08) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.05) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(196,0,0,0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(37,99,235,0.05) 0px, transparent 50%);
   }
 
   html.light body {
+    color: #0f172a;
     background-image:
-      radial-gradient(at 0% 0%, rgba(196, 0, 0, 0.04) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(196, 0, 0, 0.025) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(196,0,0,0.04) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(196,0,0,0.02) 0px, transparent 50%);
   }
 
-  /* ── Custom Scrollbar ── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: #0B0F19; }
   html.light ::-webkit-scrollbar-track { background: #F1F5F9; }
@@ -78,34 +50,31 @@ html.light {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   UTILITY CLASSES
+   UTILITIES
    ═══════════════════════════════════════════════════════════ */
 @layer utilities {
-
-  /* ── Glass Surfaces ── */
   .glass-panel {
-    background: var(--surface-overlay);
+    background: rgba(17,24,39,0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-subtle);
+    border: 1px solid rgba(255,255,255,0.08);
     transition: background 0.3s ease, border-color 0.3s ease;
   }
 
   .glass-card {
-    background: var(--surface-card);
+    background: rgba(31,41,55,0.5);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-subtle);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255,255,255,0.07);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
   }
 
   .glass-card:hover {
-    background: var(--surface-overlay);
-    border-color: rgba(196, 0, 0, 0.5);
-    box-shadow: 0 10px 30px -10px rgba(196, 0, 0, 0.25);
+    background: rgba(31,41,55,0.85);
+    border-color: rgba(196,0,0,0.5);
+    box-shadow: 0 10px 30px -10px rgba(196,0,0,0.25);
   }
 
-  /* ── Gradient Text ── */
   .red-gradient-text {
     background: linear-gradient(135deg, #FF6B6B 0%, #C40000 60%, #9E0000 100%);
     -webkit-background-clip: text;
@@ -129,153 +98,223 @@ html.light {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LIGHT MODE — COMPREHENSIVE OVERRIDES
-   Token-driven: everything follows --text-*, --surface-*, --border-*
+   LIGHT MODE — GLOBAL OVERRIDES
+   Strategy: Target EVERY dark-only utility class used sitewide
    ═══════════════════════════════════════════════════════════ */
 
-/* ── Typography ── */
-html.light .text-white { color: #0F172A !important; }
-html.light .text-slate-50 { color: #0F172A; }
-html.light .text-slate-100 { color: #0F172A; }
-html.light .text-slate-200 { color: #1E293B; }
-html.light .text-slate-300 { color: #334155; }
-html.light .text-slate-400 { color: #64748B; }
-html.light .text-slate-500 { color: #94A3B8; }
-html.light .text-slate-600 { color: #CBD5E1; }
+/* ── Glass surfaces ── */
+html.light .glass-panel {
+  background: rgba(255,255,255,0.93) !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.06) !important;
+}
+html.light .glass-card {
+  background: rgba(255,255,255,0.96) !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 2px 12px -2px rgba(0,0,0,0.05) !important;
+}
+html.light .glass-card:hover {
+  background: #FFFFFF !important;
+  border-color: rgba(196,0,0,0.3) !important;
+  box-shadow: 0 12px 28px -5px rgba(196,0,0,0.12) !important;
+}
 
-/* Keep white text on red/colored backgrounds */
-html.light .bg-brand-red *,
-html.light [class*="bg-brand-red"] *,
-html.light [class*="from-brand-red"] *,
+/* ── Text colors — THE MAIN FIX ──
+   Rule: every text-white → dark text UNLESS it's inside a red button/badge (keep-white)
+   Note: text-white on gradient buttons is inside elements that have red bg, so we exclude those
+*/
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+/* But keep white text on actual colored backgrounds */
+html.light [class*="bg-brand-red"] .text-white,
+html.light [class*="from-brand-red"] .text-white,
+html.light [class*="bg-gradient"] .text-white,
+html.light .bg-\[\#0088cc\] .text-white,
+html.light button[class*="from-brand-red"] .text-white,
+html.light a[class*="from-brand-red"] .text-white,
 html.light .keep-white,
-html.light .keep-white * { color: #FFFFFF !important; }
+html.light .keep-white * {
+  color: #FFFFFF !important;
+}
 
-/* Gradient red CTAs always stay white text */
-html.light [class*="from-brand-redLight"],
-html.light [class*="from-brand-red"] { color: #FFFFFF !important; }
+/* Slate text scale */
+html.light .text-slate-50  { color: #0f172a !important; }
+html.light .text-slate-100 { color: #0f172a !important; }
+html.light .text-slate-200 { color: #1e293b !important; }
+html.light .text-slate-300 { color: #334155 !important; }
+html.light .text-slate-400 { color: #64748b !important; }
+html.light .text-slate-500 { color: #94a3b8 !important; }
+html.light .text-slate-600 { color: #cbd5e1 !important; }
 
-/* Keep colored text on badges and icons */
-html.light .text-brand-red { color: #C40000 !important; }
+/* Preserve brand accent colors */
+html.light .text-brand-red   { color: #C40000 !important; }
 html.light .text-emerald-400 { color: #059669 !important; }
 html.light .text-emerald-300 { color: #10B981 !important; }
-html.light .text-amber-400 { color: #D97706 !important; }
-html.light .text-sky-400 { color: #0284C7 !important; }
-html.light .text-sky-500 { color: #0369A1 !important; }
-html.light .text-rose-400 { color: #E11D48 !important; }
+html.light .text-emerald-500 { color: #047857 !important; }
+html.light .text-amber-400   { color: #D97706 !important; }
+html.light .text-amber-500   { color: #B45309 !important; }
+html.light .text-sky-400     { color: #0284C7 !important; }
+html.light .text-rose-400    { color: #E11D48 !important; }
+html.light .text-indigo-500  { color: #4338CA !important; }
+html.light .text-\[\#29b6f6\] { color: #0288D1 !important; }
+html.light .text-\[\#0088cc\] { color: #0077B6 !important; }
 
 /* ── Borders ── */
 html.light .border-white\/5  { border-color: rgba(0,0,0,0.04) !important; }
+html.light .border-white\/8  { border-color: rgba(0,0,0,0.06) !important; }
 html.light .border-white\/10 { border-color: rgba(0,0,0,0.08) !important; }
-html.light .border-white\/15 { border-color: rgba(0,0,0,0.1) !important; }
+html.light .border-white\/12 { border-color: rgba(0,0,0,0.09) !important; }
+html.light .border-white\/15 { border-color: rgba(0,0,0,0.10) !important; }
 html.light .border-white\/20 { border-color: rgba(0,0,0,0.12) !important; }
+html.light .border-white\/25 { border-color: rgba(0,0,0,0.14) !important; }
 html.light .border-white\/30 { border-color: rgba(0,0,0,0.15) !important; }
 
 /* ── Backgrounds ── */
-html.light .bg-white\/\[0\.03\]   { background-color: rgba(0,0,0,0.02) !important; }
-html.light .bg-white\/5           { background-color: rgba(0,0,0,0.04) !important; }
-html.light .bg-white\/10          { background-color: rgba(0,0,0,0.06) !important; }
-html.light .bg-brand-surface\/30  { background-color: rgba(248,250,252,0.5) !important; }
-html.light .bg-brand-surface\/40  { background-color: rgba(248,250,252,0.7) !important; }
-html.light .bg-brand-surface\/80  { background-color: rgba(255,255,255,0.9) !important; }
-html.light .bg-brand-surface\/90  { background-color: rgba(255,255,255,0.96) !important; }
-html.light .bg-brand-surface\/95  { background-color: rgba(255,255,255,0.98) !important; }
-html.light .bg-brand-dark\/50     { background-color: rgba(241,245,249,0.8) !important; }
-html.light .bg-brand-dark\/60     { background-color: rgba(241,245,249,0.9) !important; }
-html.light .bg-brand-dark\/80     { background-color: rgba(248,250,252,0.95) !important; }
-html.light .bg-brand-dark\/85     { background-color: rgba(248,250,252,0.92) !important; }
-html.light .bg-brand-dark\/\[0\.9\] { background-color: rgba(248,250,252,0.95) !important; }
-html.light .bg-\[\#0F141F\]\/90   { background-color: rgba(248,250,252,0.96) !important; }
+/* white/opacity → inverted black/opacity */
+html.light .bg-white\/\[0\.03\] { background-color: rgba(0,0,0,0.02) !important; }
+html.light .bg-white\/5         { background-color: rgba(0,0,0,0.03) !important; }
+html.light .bg-white\/8         { background-color: rgba(0,0,0,0.04) !important; }
+html.light .bg-white\/10        { background-color: rgba(0,0,0,0.05) !important; }
+html.light .bg-white\/\[0\.06\] { background-color: rgba(0,0,0,0.04) !important; }
 
-/* Dark page backgrounds in light mode → near-white */
-html.light .bg-brand-dark { background-color: #F8FAFC !important; }
-html.light .bg-brand-surface { background-color: #FFFFFF !important; }
-html.light .bg-brand-card { background-color: #F1F5F9 !important; }
+/* brand-dark with opacity → light gray */
+html.light .bg-brand-dark\/40  { background-color: rgba(226,232,240,0.6) !important; }
+html.light .bg-brand-dark\/50  { background-color: rgba(241,245,249,0.8) !important; }
+html.light .bg-brand-dark\/60  { background-color: rgba(241,245,249,0.9) !important; }
+html.light .bg-brand-dark\/70  { background-color: rgba(248,250,252,0.95) !important; }
+html.light .bg-brand-dark\/80  { background-color: rgba(248,250,252,0.97) !important; }
+html.light .bg-brand-dark\/85  { background-color: rgba(248,250,252,0.98) !important; }
+html.light .bg-brand-dark\/90  { background-color: rgba(255,255,255,0.99) !important; }
+html.light .bg-brand-dark\/\[0\.9\]  { background-color: rgba(255,255,255,0.99) !important; }
+html.light .bg-brand-dark      { background-color: #f8fafc !important; }
 
-/* ── Glass Overrides ── */
-html.light .glass-panel {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border: 1px solid rgba(0, 0, 0, 0.07) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06) !important;
-}
+/* brand-surface with opacity */
+html.light .bg-brand-surface\/30 { background-color: rgba(248,250,252,0.5) !important; }
+html.light .bg-brand-surface\/40 { background-color: rgba(248,250,252,0.7) !important; }
+html.light .bg-brand-surface\/80 { background-color: rgba(255,255,255,0.9) !important; }
+html.light .bg-brand-surface\/90 { background-color: rgba(255,255,255,0.95) !important; }
+html.light .bg-brand-surface\/95 { background-color: rgba(255,255,255,0.98) !important; }
+html.light .bg-brand-surface     { background-color: #FFFFFF !important; }
 
-html.light .glass-card {
-  background: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(0, 0, 0, 0.07) !important;
-  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.05) !important;
-}
+html.light .bg-brand-card { background-color: #f1f5f9 !important; }
 
-html.light .glass-card:hover {
-  background: #FFFFFF !important;
-  border-color: rgba(196, 0, 0, 0.3) !important;
-  box-shadow: 0 12px 28px -5px rgba(196, 0, 0, 0.12) !important;
-}
+/* Arbitrary dark hex bg's used in site */
+html.light .bg-\[\#0d1120\]\/85,
+html.light .bg-\[\#0d1120\]\/97,
+html.light .bg-\[\#0F141F\]\/90 { background-color: rgba(248,250,252,0.96) !important; }
 
-/* ── Navbar ── */
-html.light header {
-  border-color: rgba(0,0,0,0.08) !important;
-}
-
-/* ── Inputs & Forms ── */
+/* ── Inputs and form elements ── */
 html.light input,
 html.light textarea,
 html.light select {
-  background-color: #F8FAFC !important;
+  background-color: #ffffff !important;
   border-color: rgba(0,0,0,0.12) !important;
-  color: #0F172A !important;
+  color: #0f172a !important;
 }
-
 html.light input::placeholder,
-html.light textarea::placeholder { color: #94A3B8 !important; }
-
+html.light textarea::placeholder { color: #94a3b8 !important; }
 html.light input:focus,
 html.light textarea:focus,
 html.light select:focus {
-  border-color: #C40000 !important;
-  box-shadow: 0 0 0 2px rgba(196,0,0,0.12) !important;
-  background-color: #FFFFFF !important;
+  border-color: rgba(196,0,0,0.5) !important;
+  box-shadow: 0 0 0 2px rgba(196,0,0,0.1) !important;
+  outline: none !important;
+  background-color: #ffffff !important;
 }
-
-/* ── Section Backgrounds ── */
-html.light section { background-color: transparent; }
+html.light input[type="range"] {
+  accent-color: #C40000;
+}
 
 /* ── Footer ── */
 html.light footer {
-  background-color: rgba(241,245,249,0.95) !important;
+  background-color: rgba(241,245,249,0.98) !important;
   border-color: rgba(0,0,0,0.06) !important;
 }
+html.light footer .text-slate-200 { color: #374151 !important; }
+html.light footer .text-slate-300 { color: #374151 !important; }
+html.light footer .text-slate-400 { color: #6b7280 !important; }
+html.light footer .text-slate-500 { color: #9ca3af !important; }
+html.light footer .bg-white\/5   { background-color: rgba(0,0,0,0.04) !important; }
+html.light footer .hover\:bg-brand-red:hover { background-color: #C40000 !important; color: white !important; }
 
-/* ── Dividers & separators ── */
-html.light .border-t.border-white\/10,
-html.light .border-b.border-white\/10 {
-  border-color: rgba(0,0,0,0.06) !important;
+/* ── Section headings (h1, h2, h3 inside sections) ── */
+html.light section h1.text-white,
+html.light section h2.text-white,
+html.light section h3.text-white,
+html.light section h4.text-white {
+  color: #0f172a !important;
 }
 
-/* ── Gradient text stays visible in light mode ── */
+/* ── Telegram/social card special backgrounds in footer ── */
+html.light .bg-\[\#0088cc\]\/10 { background-color: rgba(0,136,204,0.08) !important; }
+html.light .bg-\[\#0088cc\]\/20 { background-color: rgba(0,136,204,0.15) !important; }
+html.light a.border-\[\#29b6f6\]\/30 { border-color: rgba(2,136,209,0.25) !important; }
+
+/* ── Hero secondary CTA button ── */
+html.light a[href="#products"].border-white\/10,
+html.light a.border-white\/10 {
+  border-color: rgba(0,0,0,0.1) !important;
+  background-color: rgba(241,245,249,0.8) !important;
+}
+
+/* ── Text on red gradient backgrounds stays white ── */
+html.light a[class*="from-brand-red"],
+html.light button[class*="from-brand-red"],
+html.light a[class*="from-brand-redLight"],
+html.light button[class*="from-brand-redLight"] {
+  color: #ffffff !important;
+}
+html.light a[class*="from-brand-red"] *,
+html.light button[class*="from-brand-red"] *,
+html.light a[class*="from-brand-redLight"] *,
+html.light button[class*="from-brand-redLight"] * {
+  color: #ffffff !important;
+}
+
+/* ── red-gradient-text stays readable ── */
 html.light .red-gradient-text {
-  background: linear-gradient(135deg, #E53935 0%, #C40000 60%, #9E0000 100%);
+  background: linear-gradient(135deg, #B91C1C 0%, #C40000 50%, #991B1B 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Calculator dark bg pills in light mode */
-html.light .bg-brand-dark {
-  background-color: #F1F5F9 !important;
-  border-color: rgba(0,0,0,0.08) !important;
+/* ── silver-gradient-text → dark in light mode ── */
+html.light .silver-gradient-text {
+  background: linear-gradient(135deg, #374151 0%, #1e293b 50%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Range slider track */
-html.light input[type="range"] {
-  background: #E2E8F0 !important;
+/* ── Process step number ── */
+html.light .text-slate-600 { color: #d1d5db !important; }
+
+/* ── Available slot badge ── */
+html.light .bg-brand-surface\/90 {
+  background-color: rgba(255,255,255,0.95) !important;
+}
+
+/* ── Scrollspy: border-t/b separators ── */
+html.light .border-t.border-white\/10 { border-color: rgba(0,0,0,0.06) !important; }
+html.light .border-b.border-white\/10 { border-color: rgba(0,0,0,0.06) !important; }
+
+/* ── FAQ accordion ── */
+html.light .border-b.border-white\/8  { border-color: rgba(0,0,0,0.06) !important; }
+
+/* ── Architectural grid overlay in Hero — hidden in light ── */
+html.light section > .absolute .bg-\[linear-gradient\(to_right\,\#1f293710_1px\,transparent_1px\)\,linear-gradient\(to_bottom\,\#1f293710_1px\,transparent_1px\)\] {
+  opacity: 0.3;
 }
 
 /* ═══════════════════════════════════════════════════════════
    KEYFRAME ANIMATIONS
    ═══════════════════════════════════════════════════════════ */
-
 @keyframes wiggle-smooth {
   0%, 100% { transform: rotate(-5deg) scale(1.05); }
-  50%       { transform: rotate(5deg)  scale(1.05); }
+  50%       { transform: rotate(5deg) scale(1.05); }
 }
 .animate-wiggle-smooth {
   animation: wiggle-smooth 0.4s ease-in-out infinite alternate;
@@ -294,16 +333,12 @@ html.light input[type="range"] {
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0);   }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.animate-fadeIn {
-  animation: fadeIn 0.25s ease-out both;
-}
+.animate-fadeIn { animation: fadeIn 0.25s ease-out both; }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0);    }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.animate-slideDown {
-  animation: slideDown 0.2s ease-out both;
-}
+.animate-slideDown { animation: slideDown 0.2s ease-out both; }
