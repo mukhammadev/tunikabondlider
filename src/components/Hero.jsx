@@ -45,6 +45,15 @@ export const Hero = ({ t, onOpenLeadModal }) => {
 
         {/* Sweeping Precision Laser Scan Line */}
         <div className="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand-red/60 to-transparent shadow-[0_0_15px_#C40000] animate-[laserScan_6s_ease-in-out_infinite] opacity-60" />
+
+        {/* Angled Atmospheric Light Beam (Gcore video style) */}
+        <div 
+          className="absolute -top-24 -right-10 w-[500px] h-[500px] opacity-40 pointer-events-none rotate-12"
+          style={{
+            background: 'radial-gradient(ellipse at 80% 20%, rgba(245, 158, 11, 0.3) 0%, rgba(196, 0, 0, 0.2) 30%, transparent 70%)',
+            filter: 'blur(50px)'
+          }}
+        />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

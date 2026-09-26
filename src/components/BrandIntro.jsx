@@ -1,30 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Shield, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 /**
- * Architectural Composite Shutter & Laser Facade Reveal
- * Realistic mechanical opening inspired by luxury architectural facade studios (Awwwards standard).
- * Replaces fake percent loading bars with a genuine physical split-panel reveal.
+ * Gcore-inspired Minimalist Luxury Intro Reveal (Awwwards video style):
+ * 1. Concentric pulsing ring in deep black space
+ * 2. Smooth morph & expansion into Tunikabond Lider emblem & typography
+ * 3. Fluid upward curtain wipe reveal (translateY(-100%)) with luxury cubic-bezier easing
  */
 export const BrandIntro = ({ onComplete }) => {
-  const [stage, setStage] = useState('sealed'); // 'sealed' -> 'cutting' -> 'parting' -> 'complete'
+  const [phase, setPhase] = useState('ring'); // 'ring' -> 'logo' -> 'wipe' -> 'done'
 
   useEffect(() => {
-    // Stage 1: Laser seam ignition at 250ms
+    // Phase 1: Ring pulses, then morphs into logo at 450ms
     const t1 = setTimeout(() => {
-      setStage('cutting');
-    }, 250);
+      setPhase('logo');
+    }, 450);
 
-    // Stage 2: Mechanical shutter parting at 850ms
+    // Phase 2: Upward curtain wipe begins at 1000ms
     const t2 = setTimeout(() => {
-      setStage('parting');
-    }, 850);
+      setPhase('wipe');
+    }, 1000);
 
-    // Stage 3: Fully unmount at 1800ms
+    // Phase 3: Complete & unmount at 1700ms
     const t3 = setTimeout(() => {
-      setStage('complete');
+      setPhase('done');
       if (onComplete) onComplete();
-    }, 1800);
+    }, 1700);
 
     return () => {
       clearTimeout(t1);
@@ -33,168 +34,107 @@ export const BrandIntro = ({ onComplete }) => {
     };
   }, [onComplete]);
 
-  // Fast skip on click or keypress
-  const handleImmediateOpen = () => {
-    if (stage !== 'parting' && stage !== 'complete') {
-      setStage('parting');
+  // Click or touch immediately triggers upward wipe
+  const handleSkip = () => {
+    if (phase !== 'wipe' && phase !== 'done') {
+      setPhase('wipe');
       setTimeout(() => {
-        setStage('complete');
+        setPhase('done');
         if (onComplete) onComplete();
-      }, 700);
+      }, 650);
     }
   };
 
-  if (stage === 'complete') return null;
+  if (phase === 'done') return null;
 
-  const isParting = stage === 'parting';
-  const isCutting = stage === 'cutting' || stage === 'parting';
+  const isWiping = phase === 'wipe';
+  const showLogo = phase === 'logo' || phase === 'wipe';
 
   return (
     <div
-      onClick={handleImmediateOpen}
-      className={`fixed inset-0 z-[9999] overflow-hidden select-none cursor-pointer transition-opacity duration-500 ${
-        isParting ? 'pointer-events-none' : 'pointer-events-auto'
-      }`}
-      aria-label="Tunikabond Lider arxitektura panellari ochilishi"
+      onClick={handleSkip}
+      className="fixed inset-0 z-[9999] overflow-hidden select-none cursor-pointer"
+      style={{
+        transform: isWiping ? 'translateY(-100%)' : 'translateY(0%)',
+        transition: 'transform 0.75s cubic-bezier(0.86, 0, 0.07, 1)',
+        willChange: 'transform',
+      }}
+      aria-label="Tunikabond Lider brendining ochilish animatsiyasi"
     >
-      {/* ================= LEFT ARCHITECTURAL SHUTTER PANEL ================= */}
-      <div
-        className="absolute top-0 left-0 bottom-0 w-1/2 bg-[#080B11] border-r border-brand-red/30 z-20 flex flex-col justify-between p-6 sm:p-12 overflow-hidden shadow-[25px_0_50px_rgba(0,0,0,0.8)]"
-        style={{
-          transform: isParting ? 'translateX(-102%)' : 'translateX(0%)',
-          transition: 'transform 0.95s cubic-bezier(0.77, 0, 0.175, 1)',
-          willChange: 'transform',
-          backgroundImage: `
-            linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%),
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-          `,
-          backgroundSize: '100% 100%, 32px 32px, 32px 32px',
-        }}
-      >
-        {/* Brushed metal sheen overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent pointer-events-none" />
-
-        {/* Top-left corner technical mark */}
-        <div className="flex items-center gap-2 text-slate-500 font-mono text-[10px] tracking-widest uppercase">
-          <span className="w-2 h-2 rounded-full bg-brand-red animate-ping" />
-          <span>FASAD TIZIMLARI • STANDART ISO 9001</span>
-        </div>
-
-        {/* Left half branding text */}
-        <div className="my-auto self-end text-right pr-4 sm:pr-8">
-          <span className="text-[11px] font-mono tracking-[0.25em] text-brand-red uppercase block mb-1">
-            Premium Fasad & Naves
-          </span>
-          <div className="text-3xl sm:text-5xl md:text-6xl font-black font-display text-white tracking-wider">
-            TUNIKABOND
-          </div>
-        </div>
-
-        {/* Bottom indicator */}
-        <div className="text-slate-500 text-[11px] font-medium flex items-center gap-2">
-          <Shield className="w-3.5 h-3.5 text-brand-red" />
-          <span>10 Yillik Kafolatlangan Sifat</span>
-        </div>
-      </div>
-
-      {/* ================= RIGHT ARCHITECTURAL SHUTTER PANEL ================= */}
-      <div
-        className="absolute top-0 right-0 bottom-0 w-1/2 bg-[#080B11] border-l border-brand-red/30 z-20 flex flex-col justify-between p-6 sm:p-12 overflow-hidden shadow-[-25px_0_50px_rgba(0,0,0,0.8)]"
-        style={{
-          transform: isParting ? 'translateX(102%)' : 'translateX(0%)',
-          transition: 'transform 0.95s cubic-bezier(0.77, 0, 0.175, 1)',
-          willChange: 'transform',
-          backgroundImage: `
-            linear-gradient(225deg, rgba(255,255,255,0.03) 0%, transparent 60%),
-            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
-          `,
-          backgroundSize: '100% 100%, 32px 32px, 32px 32px',
-        }}
-      >
-        {/* Brushed metal sheen overlay */}
-        <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/[0.02] to-transparent pointer-events-none" />
-
-        {/* Top-right skip hint */}
-        <div className="self-end flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-white text-xs font-semibold transition-all">
-          <span>Ochish</span>
-          <ArrowRight className="w-3.5 h-3.5 text-brand-red" />
-        </div>
-
-        {/* Right half branding text */}
-        <div className="my-auto self-start pl-4 sm:pr-8">
-          <span className="text-[11px] font-mono tracking-[0.25em] text-slate-400 uppercase block mb-1">
-            Zavod Narxlari
-          </span>
-          <div className="text-3xl sm:text-5xl md:text-6xl font-black font-display text-brand-red tracking-wider">
-            LIDER
-          </div>
-        </div>
-
-        {/* Bottom indicator */}
-        <div className="self-end text-slate-500 font-mono text-[11px] tracking-wider">
-          O'ZBEKISTON BO'YICHA #1
-        </div>
-      </div>
-
-      {/* ================= CENTER VERTICAL LASER CUT SEAM ================= */}
-      <div
-        className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none transition-all duration-300 ${
-          isParting ? 'opacity-0 scale-y-125' : 'opacity-100 scale-y-100'
-        }`}
-      >
-        {/* Glowing laser line */}
-        <div
-          className={`w-[2px] h-full bg-gradient-to-b from-transparent via-white to-transparent transition-all duration-500 ${
-            isCutting
-              ? 'shadow-[0_0_20px_#ff2222,0_0_40px_#ff2222,0_0_60px_#ffffff]'
-              : 'shadow-none opacity-40'
-          }`}
+      {/* Background Matte Dark Void */}
+      <div className="absolute inset-0 bg-[#080B10] flex flex-col items-center justify-center p-6">
+        
+        {/* Subtle Warm Halo in Center */}
+        <div 
+          className="absolute w-[450px] h-[450px] rounded-full bg-brand-red/15 blur-[120px] pointer-events-none transition-opacity duration-700"
+          style={{ opacity: showLogo ? 0.6 : 0.2 }}
         />
 
-        {/* Laser beam spark point moving down */}
-        {isCutting && (
-          <div
-            className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_30px_#ff0000,0_0_50px_#ffffff] animate-ping"
-          />
-        )}
-      </div>
+        {/* Skip button in top right */}
+        <button
+          type="button"
+          onClick={handleSkip}
+          className="absolute top-6 right-6 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold border border-white/10 transition-all z-20"
+        >
+          <span>O'tkazish</span>
+          <ArrowRight className="w-3.5 h-3.5 text-brand-red" />
+        </button>
 
-      {/* ================= CENTER METALLIC EMBLEM MEDALLION ================= */}
-      <div
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col items-center pointer-events-none transition-all duration-700 ease-out ${
-          isParting ? 'opacity-0 scale-125 blur-sm' : 'opacity-100 scale-100'
-        }`}
-      >
-        <div className="relative flex items-center justify-center">
-          {/* Subtle glowing halo */}
-          <div className="absolute w-36 h-36 rounded-full bg-brand-red/30 blur-2xl animate-pulse" />
-
-          {/* Precision outer metallic ring */}
-          <div className="absolute w-28 h-28 rounded-full border border-brand-red/50 shadow-[0_0_25px_rgba(196,0,0,0.4)]" />
-
-          {/* Emblem container */}
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-[#1c2433] via-[#0c1017] to-black border-2 border-brand-red shadow-glow-red flex items-center justify-center p-3 relative overflow-hidden">
-            {/* Real specular shimmer beam sweeping across */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_1.8s_infinite]" />
-
-            <img
-              src="/favi.svg"
-              alt="Tunikabond Lider Emblem"
-              className="w-12 h-12 sm:w-16 sm:h-16 object-contain drop-shadow-[0_4px_12px_rgba(196,0,0,0.8)]"
-              onError={(e) => {
-                e.target.style.display = 'none';
-              }}
-            />
+        {/* Central Animation Stage */}
+        <div className="relative flex flex-col items-center justify-center z-10">
+          
+          {/* 1. Pulsing Concentric Rings (Phase: Ring) */}
+          <div 
+            className={`relative flex items-center justify-center transition-all duration-500 ${
+              showLogo ? 'scale-110 opacity-0 absolute pointer-events-none' : 'scale-100 opacity-100'
+            }`}
+          >
+            {/* Outer expanding ring */}
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 animate-ping opacity-30 absolute" />
+            
+            {/* Concentric middle ring with red glow */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.4)] flex items-center justify-center">
+              {/* Inner solid white core dot */}
+              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white shadow-[0_0_15px_#ffffff]" />
+            </div>
           </div>
+
+          {/* 2. Logo & Brand Typography Reveal (Phase: Logo) */}
+          <div 
+            className={`flex flex-col items-center gap-4 transition-all duration-500 ease-out ${
+              showLogo ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-3 pointer-events-none'
+            }`}
+          >
+            {/* Logo Emblem Icon */}
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/15 p-3 flex items-center justify-center shadow-[0_0_30px_rgba(196,0,0,0.5)]">
+              <img
+                src="/favi.svg"
+                alt="Tunikabond Lider"
+                className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(196,0,0,0.8)]"
+              />
+            </div>
+
+            {/* Typography */}
+            <div className="text-center space-y-1">
+              <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-widest flex items-center justify-center gap-2">
+                <span>TUNIKABOND</span>
+                <span className="text-brand-red font-black">LIDER</span>
+              </h1>
+              <p className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.25em] text-slate-400">
+                Arxitektura • Fasad • Naves
+              </p>
+            </div>
+          </div>
+
         </div>
 
-        {/* Sub-label under medallion */}
-        <div className="mt-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-brand-red/40 backdrop-blur-md text-[11px] font-bold text-slate-300 shadow-lg">
-          <Sparkles className="w-3 h-3 text-brand-red" />
-          <span>Zamonaviy Fasad Arxitekturasi</span>
+        {/* Bottom subtle brand tagline */}
+        <div className="absolute bottom-8 text-center">
+          <span className="text-[10px] font-mono tracking-widest uppercase text-slate-500">
+            Premium Fasad Tizimlari
+          </span>
         </div>
+
       </div>
     </div>
   );
