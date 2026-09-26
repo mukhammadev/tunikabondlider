@@ -1,12 +1,70 @@
 export const portfolio = [
   {
-    id: 1,
-    category: "residential",
+    id: "port-naves-1",
+    category: "naves",
     title: {
-      uz: "Toshkent shahridagi 3 qavatli zamonaviy kottedj fasadi",
-      ru: "Фасад 3-этажного современного коттеджа в г. Ташкент",
-      en: "3-Storey Contemporary Villa Facade in Tashkent"
+      uz: "2 Ta Avtomobil Uchun Keng Hovli Navesi",
+      ru: "Широкий навес во дворе для 2 автомобилей",
+      en: "Spacious Courtyard Double Carport Canopy"
     },
+    masterId: "team-bobur",
+    masterName: "Bobur Usta",
+    masterRole: "Usta — Temir Karkas va Naves Montaji",
+    masterPhoto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
+    location: "Toshkent sh., Yunusobod",
+    material: "Tunikabond Premium 0.45mm + Temir Karkas",
+    area: "140 m²",
+    time: "5 ish kuni",
+    image: "https://images.unsplash.com/photo-1541888946425-d0fbb1861563?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: "port-koziryok-1",
+    category: "koziryok",
+    title: {
+      uz: "Kirish Zinapoyasi va Eshik Usti Konsol Koziryogi",
+      ru: "Консольный козырек над парадной лестницей и дверью",
+      en: "Cantilever Entrance & Staircase Modern Awning"
+    },
+    masterId: "team-sanjar",
+    masterName: "Sanjar Usta",
+    masterRole: "Usta — Koziryok va Fasad Bezaklari",
+    masterPhoto: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=600&q=80",
+    location: "Toshkent sh., Mirobod tumani",
+    material: "Alyukabond A2 + Spot yoritgichlar",
+    area: "25 m²",
+    time: "3 ish kuni",
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: "port-darvoza-1",
+    category: "darvozaxona",
+    title: {
+      uz: "Zamonaviy Katta Hovli Darvozaxonasi va Peshtoqi",
+      ru: "Современная въездная группа и портал ворот",
+      en: "Contemporary Residence Entrance Gateway & Soffits"
+    },
+    masterId: "team-akmal",
+    masterName: "Akmal Usta",
+    masterRole: "Usta — Darvozaxona va Kirish Arkalari",
+    masterPhoto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80",
+    location: "Toshkent viloyati, Yangiyo'l",
+    material: "Tunikabond Mat-Antratsit + Oltin Eman",
+    area: "65 m²",
+    time: "4 ish kuni",
+    image: "https://images.unsplash.com/photo-1512915922686-57c11dde9b6b?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: "port-fasad-1",
+    category: "fasad",
+    title: {
+      uz: "3 Qavatli Zamonaviy Kottedj Ventfasadi",
+      ru: "Вентилируемый фасад 3-этажного современного коттеджа",
+      en: "3-Storey Contemporary Villa Ventilated Facade"
+    },
+    masterId: "team-dilshod",
+    masterName: "Dilshod Usta",
+    masterRole: "Katta Usta — Fasad va Alyukabond",
+    masterPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
     location: "Toshkent, Mirzo Ulug'bek",
     material: "Tunikabond Oltin Eman (0.45mm) + Grafit 7016",
     area: "340 m²",
@@ -14,13 +72,17 @@ export const portfolio = [
     image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80"
   },
   {
-    id: 2,
-    category: "commercial",
+    id: "port-fasad-2",
+    category: "fasad",
     title: {
-      uz: "Biznes markaz va savdo majmuasi tashqi fasadi",
+      uz: "Biznes Markaz va Savdo Majmuasi Tashqi Fasadi",
       ru: "Вентилируемый фасад торгового и бизнес-центра",
       en: "Commercial & Business Center Ventilated Facade"
     },
+    masterId: "team-boss",
+    masterName: "Muhammadaziz Mirzayev",
+    masterRole: "Firma Boshlig'i & Bosh Muhandis",
+    masterPhoto: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
     location: "Toshkent, Chilonzor",
     material: "Alyukabond A2 Olovga chidamli (4mm)",
     area: "820 m²",
@@ -28,59 +90,21 @@ export const portfolio = [
     image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1000&q=80"
   },
   {
-    id: 3,
+    id: "port-cornice-1",
     category: "cornices",
     title: {
-      uz: "Zamonaviy neoklassik karniz va terassa shift dizayni",
+      uz: "Neoklassik Karniz va Terassa Shift Dizayni",
       ru: "Неоклассический карниз и подшивка потолка террасы",
       en: "Neoclassic Cornice & Terrace Ceiling Soffits"
     },
+    masterId: "team-asst",
+    masterName: "Rustam Karimov",
+    masterRole: "Boshliq Yordamchisi & Obyekt Nazoratchisi",
+    masterPhoto: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80",
     location: "Toshkent viloyati, Qibray",
     material: "Tunikabond Dark Walnut + LED chiziqlar",
     area: "120 metr",
     time: "6 ish kuni",
     image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 4,
-    category: "residential",
-    title: {
-      uz: "High-Tech uslubidagi hovli uyi va darvoza atrofi qoplamasi",
-      ru: "Облицовка дома в стиле хай-тек и въездной группы",
-      en: "High-Tech Private Residence & Entrance Gateway"
-    },
-    location: "Toshkent, Yunusobod",
-    material: "Tunikabond Grafit Mat + Kumush Metallik",
-    area: "260 m²",
-    time: "11 ish kuni",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 5,
-    category: "commercial",
-    title: {
-      uz: "Avtosalon va servis markazi fasadi",
-      ru: "Фасад автосалона и сервисного комплекса",
-      en: "Automotive Showroom & Service Center Facade"
-    },
-    location: "Toshkent, Sergeli",
-    material: "Alyukabond Kumush (3mm) + Qizil aksent",
-    area: "580 m²",
-    time: "18 ish kuni",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80"
-  },
-  {
-    id: 6,
-    category: "cornices",
-    title: {
-      uz: "Hovli va naves tomining sifatli profnastil qoplamasi",
-      ru: "Кровля навеса и двора качественным профнастилом",
-      en: "Heavy-Duty Canopy & Courtyard Metal Roofing"
-    },
-    location: "Toshkent, Shayxontohur",
-    material: "Profnastil PK-35 (0.50mm Shokolad 8017)",
-    area: "190 m²",
-    time: "7 ish kuni",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=1000&q=80"
   }
 ];

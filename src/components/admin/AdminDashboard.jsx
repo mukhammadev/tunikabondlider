@@ -190,12 +190,16 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     setEditingPortfolio(null);
     setPortfolioForm({
       titleUz: '',
-      category: 'residential',
+      category: 'naves',
+      masterId: '',
+      masterName: '',
+      masterPhoto: '',
+      masterRole: '',
       location: 'Toshkent shahri',
       material: 'Tunikabond 0.45mm',
-      area: '250 m²',
-      time: '10 ish kuni',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80'
+      area: '140 m²',
+      time: '5 ish kuni',
+      image: 'https://images.unsplash.com/photo-1541888946425-d0fbb1861563?auto=format&fit=crop&w=1000&q=80'
     });
     setPortfolioModalOpen(true);
   };
@@ -204,7 +208,11 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     setEditingPortfolio(item);
     setPortfolioForm({
       titleUz: item.title?.uz || item.title || '',
-      category: item.category || 'residential',
+      category: item.category || 'naves',
+      masterId: item.masterId || '',
+      masterName: item.masterName || '',
+      masterPhoto: item.masterPhoto || '',
+      masterRole: item.masterRole || '',
       location: item.location || '',
       material: item.material || '',
       area: item.area || '',
@@ -219,6 +227,10 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     const portfolioPayload = {
       title: { uz: portfolioForm.titleUz, ru: portfolioForm.titleUz, en: portfolioForm.titleUz },
       category: portfolioForm.category,
+      masterId: portfolioForm.masterId || '',
+      masterName: portfolioForm.masterName || '',
+      masterPhoto: portfolioForm.masterPhoto || '',
+      masterRole: portfolioForm.masterRole || '',
       location: portfolioForm.location,
       material: portfolioForm.material,
       area: portfolioForm.area,
@@ -737,8 +749,13 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                       </h3>
 
                       <div className="space-y-1 text-xs text-slate-300 mb-4">
+                        <div>📁 Yo'nalish: <strong className="text-brand-red font-bold uppercase">{item.category}</strong></div>
                         <div>🛠 Material: {item.material}</div>
                         <div>📐 Hajmi: {item.area} | ⏱ Muddat: {item.time}</div>
+                        <div className="flex items-center gap-1.5 pt-1 text-slate-200">
+                          <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Mas'ul usta: <strong className="text-white">{item.masterName || "Biriktirilmagan"}</strong></span>
+                        </div>
                       </div>
                     </div>
 
@@ -1085,15 +1102,17 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
-                    Kategoriya
+                    Katalog Kategoriya *
                   </label>
                   <select
                     value={portfolioForm.category}
                     onChange={(e) => setPortfolioForm({ ...portfolioForm, category: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                    className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red font-semibold"
                   >
-                    <option value="residential">Xonadonlar</option>
-                    <option value="commercial">Tijoriy binolar</option>
+                    <option value="naves">Naveslar</option>
+                    <option value="koziryok">Koziryoklar</option>
+                    <option value="darvozaxona">Darvozaxonalar</option>
+                    <option value="fasad">Fasadlar (Tunikabond & Alyukabond)</option>
                     <option value="cornices">Karniz va Shift</option>
                   </select>
                 </div>
@@ -1110,6 +1129,35 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                     className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
                   />
                 </div>
+              </div>
+
+              {/* Master assignment dropdown */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1 flex items-center justify-between">
+                  <span>Mas'ul Usta (Biriktirish) *</span>
+                  <span className="text-[11px] text-brand-red">katalogda va usta profilida aks etadi</span>
+                </label>
+                <select
+                  value={portfolioForm.masterId || ''}
+                  onChange={(e) => {
+                    const selectedM = teamList.find(m => m.id === e.target.value);
+                    setPortfolioForm({
+                      ...portfolioForm,
+                      masterId: e.target.value,
+                      masterName: selectedM ? selectedM.name : '',
+                      masterPhoto: selectedM ? selectedM.photo : '',
+                      masterRole: selectedM ? selectedM.role : ''
+                    });
+                  }}
+                  className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-brand-red/40 text-white text-sm focus:outline-none focus:border-brand-red font-bold"
+                >
+                  <option value="">Ustani tanlang...</option>
+                  {teamList.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} ({m.label || m.role})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

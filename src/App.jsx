@@ -39,6 +39,7 @@ export function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [leadModalOpen, setLeadModalOpen] = useState(false);
   const [leadModalData, setLeadModalData] = useState(null);
+  const [activeMasterId, setActiveMasterId] = useState(null);
 
   // Admin CMS state
   const [currentUser, setCurrentUser] = useState(() => getStoredUser());
@@ -185,6 +186,13 @@ export function App() {
           currentLang={currentLang}
           t={t}
           items={portfolioList}
+          onSelectMaster={(masterIdOrName) => {
+            setActiveMasterId(masterIdOrName);
+            const teamEl = document.getElementById('team');
+            if (teamEl) {
+              teamEl.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
         />
 
         {/* 4.1 Interactive Before & After Facade Slider */}
@@ -192,10 +200,12 @@ export function App() {
           onOpenLeadModal={handleOpenLeadModal}
         />
 
-        {/* 4.2 Bizning Professional Jamoa & Ustalar (Naves, Darvozaxona, Koziryok, Fasad) */}
+        {/* 4.2 Bizning Professional Jamoa & Ustalar */}
         <TeamSection
           t={t}
           teamMembers={teamList}
+          portfolioList={portfolioList}
+          activeMasterId={activeMasterId}
           onOpenLeadModalWithMaster={handleOpenMasterModal}
         />
 
