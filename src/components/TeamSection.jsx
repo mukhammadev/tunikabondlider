@@ -13,8 +13,6 @@ export const TeamSection = ({
   activeMasterId = null
 }) => {
   const [activeFilter, setActiveFilter] = useState('all');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const [selectedMaster, setSelectedMaster] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
 
@@ -48,29 +46,53 @@ export const TeamSection = ({
     return true;
   });
 
-  const maxIndex = Math.max(0, filteredMembers.length - 1);
+  const scrollContainerRef = useRef(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
 
-  // Auto-rotating animation effect (rotates every 4.5 seconds if not paused)
+  // Helper to ensure infinite seamless loop without gaps
+  const getInfiniteMembers = () => {
+    if (filteredMembers.length === 0) return [];
+    if (filteredMembers.length === 1) return [filteredMembers[0], filteredMembers[0], filteredMembers[0], filteredMembers[0]];
+    if (filteredMembers.length === 2) return [...filteredMembers, ...filteredMembers, ...filteredMembers];
+    return [...filteredMembers, ...filteredMembers];
+  };
+
+  const infiniteMembers = getInfiniteMembers();
+
+  // Continuous auto-rotation via requestAnimationFrame (no sudden stops, no rewind jumps)
   useEffect(() => {
-    if (isPaused || filteredMembers.length <= 1) return;
+    const el = scrollContainerRef.current;
+    if (!el || filteredMembers.length === 0) return;
 
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1 > maxIndex ? 0 : prev + 1));
-    }, 4500);
+    let animId;
+    const speed = 0.85; // Silliq va bemalol o'qiladigan doimiy harakat
 
-    return () => clearInterval(timer);
-  }, [isPaused, filteredMembers.length, maxIndex]);
+    const step = () => {
+      if (!isPaused && !isInteracting && el) {
+        el.scrollLeft += speed;
+        // Yarim qismiga borganda, ikkinchi nusxa boshiga silliq va ko'rinmas o'tadi
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft -= el.scrollWidth / 2;
+        }
+      }
+      animId = requestAnimationFrame(step);
+    };
 
-  useEffect(() => {
-    setCurrentIndex(0);
-  }, [activeFilter]);
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [isPaused, isInteracting, filteredMembers.length]);
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -360, behavior: 'smooth' });
+    }
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 360, behavior: 'smooth' });
+    }
   };
 
   const filterTabs = [
@@ -146,11 +168,15 @@ export const TeamSection = ({
           ))}
         </div>
 
-        {/* Auto-rotating Carousel Container */}
+        {/* Continuous Infinite Auto-rotating Carousel Container */}
         <div 
-          className="relative"
+          className="relative group/carousel"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsInteracting(true)}
+          onTouchEnd={() => {
+            setTimeout(() => setIsInteracting(false), 2000);
+          }}
         >
           {filteredMembers.length === 0 ? (
             <div className="text-center py-16 text-slate-400 glass-panel rounded-3xl">
@@ -158,22 +184,22 @@ export const TeamSection = ({
             </div>
           ) : (
             <div className="relative overflow-hidden rounded-3xl">
-              {/* Slider grid */}
+              
+              {/* Seamless Infinite Gliding Track */}
               <div 
-                className="flex transition-transform duration-700 ease-out"
-                style={{
-                  transform: `translateX(-${currentIndex * (100 / Math.min(filteredMembers.length, 3))}%)`
-                }}
+                ref={scrollContainerRef}
+                className="flex overflow-x-auto scrollbar-none py-3 select-none cursor-grab active:cursor-grabbing"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {filteredMembers.map((member) => {
+                {infiniteMembers.map((member, idx) => {
                   const isBoss = member.label?.toLowerCase().includes('boshlig');
                   const isAssistant = member.label?.toLowerCase().includes('yordamchi');
                   const worksCount = getMasterWorks(member).length;
 
                   return (
                     <div
-                      key={member.id}
-                      className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 p-3"
+                      key={`${member.id}-${idx}`}
+                      className="w-[300px] sm:w-[350px] lg:w-[380px] flex-shrink-0 p-3"
                     >
                       <div 
                         onClick={() => setSelectedMaster(member)}
@@ -184,12 +210,12 @@ export const TeamSection = ({
                           <img
                             src={member.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"}
                             alt={member.name}
-                            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                            className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 pointer-events-none"
                             onError={(e) => {
                               e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
                             }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-80" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-80 pointer-events-none" />
 
                           {/* Role Badge */}
                           <div className="absolute top-3.5 left-3.5">
@@ -262,45 +288,30 @@ export const TeamSection = ({
           )}
 
           {/* Slider Navigation Arrows */}
-          {filteredMembers.length > 3 && (
-            <div className="flex items-center justify-between pointer-events-none absolute inset-y-0 -left-4 -right-4 z-20">
-              <button
-                type="button"
-                onClick={handlePrev}
-                className="pointer-events-auto p-3 rounded-full bg-brand-dark/90 hover:bg-brand-red text-white border border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95"
-                title="Oldingi"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                className="pointer-events-auto p-3 rounded-full bg-brand-dark/90 hover:bg-brand-red text-white border border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95"
-                title="Keyingi"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
+          <div className="flex items-center justify-between pointer-events-none absolute inset-y-0 -left-3 -right-3 sm:-left-5 sm:-right-5 z-20">
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="pointer-events-auto p-3 rounded-full bg-brand-surface/90 hover:bg-brand-red text-white border border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95"
+              title="Oldingi usta"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="pointer-events-auto p-3 rounded-full bg-brand-surface/90 hover:bg-brand-red text-white border border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95"
+              title="Keyingi usta"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
 
-          {/* Dots Indicator */}
-          {filteredMembers.length > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-8">
-              {Array.from({ length: Math.min(filteredMembers.length, 6) }).map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentIndex(idx)}
-                  className={`h-2 rounded-full transition-all ${
-                    currentIndex === idx 
-                      ? 'w-8 bg-brand-red' 
-                      : 'w-2 bg-white/20 hover:bg-white/40'
-                  }`}
-                  aria-label={`Slide ${idx + 1}`}
-                />
-              ))}
-            </div>
-          )}
-
+          {/* Micro status indicator */}
+          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-400 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring</span>
+          </div>
         </div>
 
       </div>

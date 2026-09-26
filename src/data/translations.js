@@ -11,7 +11,9 @@ export const translations = {
       faq: "FAQ",
       contact: "Aloqa",
       callUs: "Qo'ng'iroq qilish",
-      requestMeasurement: "Bepul o'lchash"
+      requestMeasurement: "Bepul o'lchash",
+      themeDay: "Kun",
+      themeNight: "Tun"
     },
     hero: {
       badge: "O'zbekistonda №1 Premium Fasad Yechimlari",
@@ -182,7 +184,9 @@ export const translations = {
       faq: "FAQ",
       contact: "Контакты",
       callUs: "Позвонить",
-      requestMeasurement: "Бесплатный замер"
+      requestMeasurement: "Бесплатный замер",
+      themeDay: "День",
+      themeNight: "Ночь"
     },
     hero: {
       badge: "Фасадные решения №1 в Узбекистане",
@@ -353,7 +357,9 @@ export const translations = {
       faq: "FAQ",
       contact: "Contact",
       callUs: "Call Us",
-      requestMeasurement: "Free Measurement"
+      requestMeasurement: "Free Measurement",
+      themeDay: "Day",
+      themeNight: "Night"
     },
     hero: {
       badge: "Top Facade Solutions in Uzbekistan",

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,10 +9,10 @@ export default {
     extend: {
       colors: {
         brand: {
-          dark: '#0B0F19',
-          surface: '#111827',
-          card: '#1F2937',
-          border: '#374151',
+          dark: 'rgb(var(--brand-dark) / <alpha-value>)',
+          surface: 'rgb(var(--brand-surface) / <alpha-value>)',
+          card: 'rgb(var(--brand-card) / <alpha-value>)',
+          border: 'rgb(var(--brand-border) / <alpha-value>)',
           red: '#C40000',
           redHover: '#9E0000',
           redLight: '#E53935',

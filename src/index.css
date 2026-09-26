@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-dark: 11 15 25;       /* #0B0F19 */
+  --brand-surface: 17 24 39;    /* #111827 */
+  --brand-card: 31 41 55;       /* #1F2937 */
+  --brand-border: 55 65 81;     /* #374151 */
+}
+
+html.light {
+  --brand-dark: 248 250 252;    /* #F8FAFC */
+  --brand-surface: 255 255 255; /* #FFFFFF */
+  --brand-card: 241 245 249;    /* #F1F5F9 */
+  --brand-border: 226 232 240;  /* #E2E8F0 */
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -9,10 +23,17 @@
   }
 
   body {
-    @apply bg-brand-dark text-slate-100 antialiased;
+    @apply bg-brand-dark text-slate-100 antialiased transition-colors duration-300;
     background-image: 
       radial-gradient(at 0% 0%, rgba(196, 0, 0, 0.08) 0px, transparent 50%),
       radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.05) 0px, transparent 50%);
+  }
+
+  html.light body {
+    color: #0F172A;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(196, 0, 0, 0.04) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.03) 0px, transparent 50%);
   }
 
   /* Custom scrollbar */
@@ -22,9 +43,15 @@
   ::-webkit-scrollbar-track {
     background: #0B0F19;
   }
+  html.light ::-webkit-scrollbar-track {
+    background: #F1F5F9;
+  }
   ::-webkit-scrollbar-thumb {
     background: #1F2937;
     border-radius: 4px;
+  }
+  html.light ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #C40000;
@@ -72,6 +99,80 @@
   }
 }
 
+/* Light mode overrides for clean contrast */
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.04);
+}
+
+html.light .glass-card:hover {
+  background: #FFFFFF;
+  border-color: rgba(196, 0, 0, 0.4);
+  box-shadow: 0 12px 28px -5px rgba(196, 0, 0, 0.12);
+}
+
+html.light .text-white:not([class*="bg-brand-red"]):not([class*="from-brand-red"]):not(.keep-white) {
+  color: #0F172A;
+}
+
+html.light .text-slate-100 {
+  color: #0F172A;
+}
+
+html.light .text-slate-200 {
+  color: #1E293B;
+}
+
+html.light .text-slate-300 {
+  color: #334155;
+}
+
+html.light .text-slate-400 {
+  color: #64748B;
+}
+
+html.light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html.light .border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+html.light .border-white\/15 {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+html.light .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
+html.light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+html.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+html.light .bg-brand-red,
+html.light [class*="bg-brand-red"],
+html.light [class*="from-brand-red"],
+html.light .keep-white {
+  color: #FFFFFF !important;
+}
+
+html.light [class*="from-brand-red"] * {
+  color: #FFFFFF !important;
+}
+
 @keyframes wiggle-smooth {
   0%, 100% { transform: rotate(-5deg) scale(1.05); }
   50% { transform: rotate(5deg) scale(1.05); }
@@ -104,4 +205,3 @@
     transform: translateX(200%);
   }
 }
-

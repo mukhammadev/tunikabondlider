@@ -28,6 +28,26 @@ export function App() {
     return localStorage.getItem('tl_lang') || 'uz';
   });
 
+  // Day & Night mode (Kun va Tun) state
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('tl_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('tl_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Splash Brand Intro animation on site load & refresh
   const [showBrandIntro, setShowBrandIntro] = useState(true);
 
@@ -150,6 +170,8 @@ export function App() {
         onOpenLeadModal={handleOpenLeadModal}
         currentUser={currentUser}
         onOpenAdmin={handleOpenAdmin}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
       {/* Main Content Sections */}

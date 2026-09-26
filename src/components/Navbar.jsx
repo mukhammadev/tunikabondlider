@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Menu, X, Calculator, Palette, Layers, Info, HelpCircle, Lock, Shield } from 'lucide-react';
+import { Phone, Menu, X, Calculator, Palette, Layers, Info, HelpCircle, Lock, Shield, Sun, Moon } from 'lucide-react';
 
-export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, onOpenAdmin }) => {
+export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, onOpenAdmin, theme, toggleTheme }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -104,6 +104,26 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               ))}
             </div>
 
+            {/* Kun / Tun Rejimi (Day / Night Mode Toggle) */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-surface border border-white/10 hover:border-brand-red/40 text-xs font-bold text-slate-300 hover:text-white transition-all hover:scale-105 active:scale-95"
+              title={theme === 'dark' ? "Kunduzgi rejimga o'tish (Light mode)" : "Tungi rejimga o'tish (Dark mode)"}
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span className="hidden xl:inline">{t.nav?.themeDay || "Kun"}</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-4 h-4 text-sky-500" />
+                  <span className="hidden xl:inline">{t.nav?.themeNight || "Tun"}</span>
+                </>
+              )}
+            </button>
+
             {/* Primary Action Button */}
             <button
               onClick={() => onOpenLeadModal(t.nav.requestMeasurement)}
@@ -115,6 +135,20 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Day/Night toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-lg bg-brand-surface border border-white/10 text-slate-300 hover:text-white"
+              title={theme === 'dark' ? "Kunduzgi rejim" : "Tungi rejim"}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-sky-500" />
+              )}
+            </button>
+
             <button
               onClick={onOpenAdmin}
               className="p-1.5 rounded-lg bg-brand-surface border border-white/10 text-slate-300 hover:text-brand-red"
@@ -171,6 +205,21 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
             })}
 
             <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
+              {/* Mobile theme toggle row */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="w-full py-2.5 px-4 rounded-xl border border-white/10 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-between bg-white/5"
+              >
+                <span className="flex items-center gap-2">
+                  {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-sky-400" />}
+                  <span>{theme === 'dark' ? (t.nav?.themeDay || "Kunduzgi rejim") : (t.nav?.themeNight || "Tungi rejim")}</span>
+                </span>
+                <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-brand-red/20 text-brand-red">
+                  {theme === 'dark' ? "Kun" : "Tun"}
+                </span>
+              </button>
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
