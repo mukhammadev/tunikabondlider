@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 import { Layers, ShieldCheck, ArrowRight } from 'lucide-react';
 
-export const Products = ({ currentLang, t, onSelectProduct }) => {
+export const Products = ({ currentLang, t, onSelectProduct, items }) => {
   const [activeTab, setActiveTab] = useState('all');
 
+  const productsToUse = items && items.length > 0 ? items : defaultProducts;
+
   const filteredProducts = activeTab === 'all'
-    ? products
-    : products.filter(p => p.category === activeTab);
+    ? productsToUse
+    : productsToUse.filter(p => p.category === activeTab);
 
   const tabs = [
     { id: 'all', label: t.products.all },
@@ -55,8 +57,8 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
         {/* Product Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.map((product) => {
-            const name = product.name[currentLang] || product.name.uz;
-            const desc = product.shortDesc[currentLang] || product.shortDesc.uz;
+            const name = typeof product.name === 'object' ? (product.name[currentLang] || product.name.uz) : product.name;
+            const desc = typeof product.shortDesc === 'object' ? (product.shortDesc[currentLang] || product.shortDesc.uz) : product.shortDesc;
 
             return (
               <div
@@ -76,7 +78,7 @@ export const Products = ({ currentLang, t, onSelectProduct }) => {
                     
                     {/* Badge */}
                     <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-brand-red text-white text-xs font-black shadow-md">
-                      {product.badge}
+                      {product.badge || "Yangi"}
                     </div>
 
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end text-xs font-bold text-white">

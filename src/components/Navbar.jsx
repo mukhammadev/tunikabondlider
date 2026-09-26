@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Menu, X, Send, Calculator, Palette, Layers, Info, HelpCircle } from 'lucide-react';
+import { Phone, Menu, X, Send, Calculator, Palette, Layers, Info, HelpCircle, Lock, Shield } from 'lucide-react';
 
-export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal }) => {
+export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, onOpenAdmin }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -25,7 +25,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal }) => {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
       isScrolled 
         ? 'bg-brand-dark/95 backdrop-blur-md border-b border-white/10 shadow-lg py-3' 
         : 'bg-transparent py-5'
@@ -64,6 +64,26 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal }) => {
           {/* Right Controls: Phone + Admin + Language + CTA */}
           <div className="hidden md:flex items-center gap-3 xl:gap-4">
             
+            {/* Admin entry point */}
+            {currentUser ? (
+              <button
+                onClick={onOpenAdmin}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-red text-white text-xs font-bold shadow-glow-red hover:scale-105 transition-all"
+                title="Boshqaruv paneli"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>CMS Panel</span>
+              </button>
+            ) : (
+              <button
+                onClick={onOpenAdmin}
+                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                title="Admin sifatida kirish"
+              >
+                <Lock className="w-4 h-4" />
+              </button>
+            )}
+
             {/* Telegram Admin quick link */}
             <a
               href="https://t.me/Muhammadazez"
@@ -114,6 +134,14 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal }) => {
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={onOpenAdmin}
+              className="p-1.5 rounded-lg bg-brand-surface border border-white/10 text-slate-300 hover:text-brand-red"
+              title="Admin Panel"
+            >
+              <Lock className="w-4 h-4" />
+            </button>
+
             <div className="flex bg-brand-surface rounded-lg p-0.5 border border-white/10 text-[11px] font-bold">
               {['uz', 'ru'].map((lng) => (
                 <button
@@ -162,6 +190,17 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal }) => {
             })}
 
             <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAdmin();
+                }}
+                className="w-full py-2.5 px-4 rounded-xl border border-white/20 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 bg-white/5"
+              >
+                <Lock className="w-4 h-4 text-brand-red" />
+                <span>Admin Boshqaruv Paneli (CMS)</span>
+              </button>
+
               <a 
                 href="https://t.me/Muhammadazez"
                 target="_blank"

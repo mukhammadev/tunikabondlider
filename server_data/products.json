@@ -1,0 +1,122 @@
+[
+  {
+    "id": "tb-045-wood",
+    "category": "tunikabond",
+    "name": {
+      "uz": "Tunikabond Premium Yog'och Teksturali (0.45 mm)",
+      "ru": "Туникабонд Премиум Текстура Дерева (0.45 мм)",
+      "en": "Tunikabond Premium Wood Grain (0.45 mm)"
+    },
+    "shortDesc": {
+      "uz": "Tabiiy eman va yong'oq yog'ochi ko'rinishidagi super chidamli fasad paneli. Quyosh va namlikdan aslo qo'rqmaydi.",
+      "ru": "Высокопрочная фасадная панель с реалистичной текстурой дуба и ореха. Абсолютно не боится ультрафиолета и влаги.",
+      "en": "High-durability facade panel featuring realistic natural oak & walnut grain. 100% resistant to UV and weathering."
+    },
+    "thickness": "0.45 mm",
+    "coating": "PVDF 3-qavatli polimer",
+    "warranty": "10 yil",
+    "badge": "Bestseller",
+    "priceRange": "145,000 - 180,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "tb-040-matte",
+    "category": "tunikabond",
+    "name": {
+      "uz": "Tunikabond Mat Grafit & Qora (0.40 mm)",
+      "ru": "Туникабонд Матовый Графит & Черный (0.40 мм)",
+      "en": "Tunikabond Matte Graphite & Black (0.40 mm)"
+    },
+    "shortDesc": {
+      "uz": "Zamonaviy Minimalizm va High-Tech uslubidagi binolar uchun zamonaviy mat qoplamali tunikabond.",
+      "ru": "Современный матовый туникабонд для зданий в стиле минимализм и хай-тек.",
+      "en": "Sleek matte finished tunikabond tailored for contemporary minimalist and high-tech architecture."
+    },
+    "thickness": "0.40 mm",
+    "coating": "Mat Poliester / PVDF",
+    "warranty": "8 yil",
+    "badge": "Trend 2026",
+    "priceRange": "125,000 - 155,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "ab-40-fireproof",
+    "category": "alyukabond",
+    "name": {
+      "uz": "Alyukabond A2 Olovga Chidamli Kompozit (4 mm)",
+      "ru": "Алюкобонд А2 Огнестойкий Композит (4 мм)",
+      "en": "Alucobond A2 Fire-Retardant Composite (4 mm)"
+    },
+    "shortDesc": {
+      "uz": "Tijoriy binolar, biznes markazlar va ko'p qavatli obyektlar uchun yong'inga qarshi A2 toifali alyumin kompozit paneli.",
+      "ru": "Алюминиевая композитная панель класса негорючести А2 для коммерческих и высотных зданий.",
+      "en": "Class A2 non-combustible aluminum composite panel engineered for commercial towers and public complexes."
+    },
+    "thickness": "4.0 mm (0.40 mm alyumin)",
+    "coating": "Flüoropolimer PVDF",
+    "warranty": "15 yil",
+    "badge": "Premium Standart",
+    "priceRange": "220,000 - 290,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "ab-30-classic",
+    "category": "alyukabond",
+    "name": {
+      "uz": "Alyukabond Klassik Fasad Paneli (3 mm)",
+      "ru": "Алюкобонд Классический Фасадный (3 мм)",
+      "en": "Alucobond Classic Architectural (3 mm)"
+    },
+    "shortDesc": {
+      "uz": "Do'konlar, dorixonalar, avtosalonlar va ofislar uchun eng optimal, engil va elastik fasad yechimi.",
+      "ru": "Оптимальное, легкое и надежное решение для магазинов, аптек, автосалонов и офисов.",
+      "en": "The industry-standard lightweight composite panel for commercial storefronts, clinics, and showrooms."
+    },
+    "thickness": "3.0 mm (0.21 mm alyumin)",
+    "coating": "Poliester / PVDF",
+    "warranty": "10 yil",
+    "badge": "Ommabop",
+    "priceRange": "160,000 - 210,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "karniz-neoclassic",
+    "category": "cornice",
+    "name": {
+      "uz": "Neoklassik va Zamonaviy Fasad Karnizlari",
+      "ru": "Неоклассические и Современные Карнизы",
+      "en": "Neoclassic & Modern Architectural Cornices"
+    },
+    "shortDesc": {
+      "uz": "Tom va devor tutashuvini bezovchi, yomg'ir suvini bino fasadiga oqishidan himoyalovchi bejirim karnizlar.",
+      "ru": "Элегантные карнизы, защищающие фасад от подтеков дождевой воды и придающие законченный премиальный вид.",
+      "en": "Precision-engineered cornices protecting the facade from rainwater runoff while providing stately curb appeal."
+    },
+    "thickness": "0.45 - 0.50 mm",
+    "coating": "Polimer qoplama",
+    "warranty": "10 yil",
+    "badge": "Dizayn Yechim",
+    "priceRange": "80,000 - 130,000 so'm / metr",
+    "image": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": "roof-profnastil",
+    "category": "roofing",
+    "name": {
+      "uz": "Profnastil PK-20 / PK-35 va Tom Yopish Tizimi",
+      "ru": "Профнастил ПК-20 / ПК-35 и Кровельные Системы",
+      "en": "Corrugated Roofing Sheets PK-20 / PK-35"
+    },
+    "shortDesc": {
+      "uz": "Yuqori qovurg'ali, qor va shamol bosimiga bardosh beruvchi uzoq muddatli tom yopish profnastili.",
+      "ru": "Надежный профнастил с высоким ребром жесткости, устойчивый к снеговым и ветровым нагрузкам.",
+      "en": "Heavy-duty profiled roofing sheets designed for maximum snow and wind load bearing capabilities."
+    },
+    "thickness": "0.45 - 0.70 mm",
+    "coating": "Sink + Polimer (RAL)",
+    "warranty": "15 yil",
+    "badge": "Mustahkam",
+    "priceRange": "65,000 - 95,000 so'm / m²",
+    "image": "https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&w=800&q=80"
+  }
+]
