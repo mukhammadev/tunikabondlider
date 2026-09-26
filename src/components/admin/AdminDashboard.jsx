@@ -3,21 +3,23 @@ import {
   apiGetStats, apiGetLeads, apiUpdateLead, apiDeleteLead,
   apiGetProducts, apiCreateProduct, apiUpdateProduct, apiDeleteProduct,
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
+  apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
   apiGetAdmins, apiRegister, apiUploadFile
 } from '../../services/api';
 import { 
   LayoutDashboard, Inbox, Package, Briefcase, Users, LogOut, 
   Plus, Trash2, Edit3, CheckCircle2, Clock, Phone, Send, X, 
   ExternalLink, Search, RefreshCw, Shield, AlertCircle,
-  Upload, Download, FileText, Image as ImageIcon
+  Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck
 } from 'lucide-react';
 
 export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }) => {
-  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | admins
+  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | admins
   const [stats, setStats] = useState(null);
   const [leads, setLeads] = useState([]);
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
+  const [teamList, setTeamList] = useState([]);
   const [adminsList, setAdminsList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -49,6 +51,20 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80'
   });
 
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
+  const [editingTeamMember, setEditingTeamMember] = useState(null);
+  const [teamForm, setTeamForm] = useState({
+    name: '',
+    role: 'Usta Mutaxassis',
+    label: 'Naves Ustasi',
+    experience: '6+ yil tajriba',
+    completedProjects: '300+ obyekt',
+    phone: '+998 99 533-33-03',
+    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    bio: "Tunikabond Lider korxonasining rasmiy ustasi. 10 yillik kafolat bilan sifatli montaj.",
+    specialties: ['naves']
+  });
+
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [adminForm, setAdminForm] = useState({
     username: '',
@@ -60,18 +76,20 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
   // Load all initial data
   const loadData = async () => {
     setLoading(true);
-    const [st, ld, pr, pf, ad] = await Promise.all([
+    const [st, ld, pr, pf, ad, tm] = await Promise.all([
       apiGetStats(),
       apiGetLeads(),
       apiGetProducts(),
       apiGetPortfolio(),
-      apiGetAdmins()
+      apiGetAdmins(),
+      apiGetTeam()
     ]);
     setStats(st);
     setLeads(ld);
     setProductsList(pr);
     setPortfolioList(pf);
     setAdminsList(ad);
+    setTeamList(tm);
     setLoading(false);
   };
 
@@ -229,6 +247,81 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     }
   };
 
+  // --- TEAM & MASTERS CRUD ---
+  const handleOpenTeamCreate = () => {
+    setEditingTeamMember(null);
+    setTeamForm({
+      name: '',
+      role: 'Usta Mutaxassis — Zamonaviy Naveslar',
+      label: 'Naves Ustasi',
+      experience: '6+ yil tajriba',
+      completedProjects: '300+ obyekt',
+      phone: '+998 99 533-33-03',
+      photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+      bio: "Tunikabond Lider korxonasining rasmiy ustasi. 10 yillik kafolat bilan sifatli montaj.",
+      specialties: ['naves']
+    });
+    setTeamModalOpen(true);
+  };
+
+  const handleOpenTeamEdit = (member) => {
+    setEditingTeamMember(member);
+    setTeamForm({
+      name: member.name || '',
+      role: member.role || '',
+      label: member.label || 'Naves Ustasi',
+      experience: member.experience || '',
+      completedProjects: member.completedProjects || '',
+      phone: member.phone || '',
+      photo: member.photo || '',
+      bio: member.bio || '',
+      specialties: member.specialties || ['naves']
+    });
+    setTeamModalOpen(true);
+  };
+
+  const handleSaveTeamMember = async (e) => {
+    e.preventDefault();
+    if (!teamForm.name) {
+      alert("Iltimos, usta ismini kiriting");
+      return;
+    }
+
+    const payload = {
+      ...teamForm,
+      works: editingTeamMember?.works || [
+        {
+          id: `w-${Date.now()}-1`,
+          title: `${teamForm.label} — Namuna Loyihasi`,
+          category: teamForm.label.includes('Naves') ? 'Naves' : teamForm.label.includes('Darvoza') ? 'Darvozaxona' : teamForm.label.includes('Kozir') ? 'Koziryok' : 'Fasad',
+          image: teamForm.photo || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
+          location: 'Toshkent shahri',
+          desc: 'Yuqori sifatli materiallar va 10 yillik kafolat bilan topshirilgan obyekt.'
+        }
+      ]
+    };
+
+    if (editingTeamMember) {
+      await apiUpdateTeamMember(editingTeamMember.id, payload);
+      setTeamList(teamList.map(m => m.id === editingTeamMember.id ? { ...m, ...payload } : m));
+    } else {
+      const res = await apiCreateTeamMember(payload);
+      if (res.member) {
+        setTeamList([...teamList, res.member]);
+      }
+    }
+    setTeamModalOpen(false);
+    if (onDataChanged) onDataChanged();
+  };
+
+  const handleDeleteTeamMember = async (memberId) => {
+    if (window.confirm("Haqiqatan ham ushbu ustani o'chirmoqchimisiz?")) {
+      await apiDeleteTeamMember(memberId);
+      setTeamList(teamList.filter(m => m.id !== memberId));
+      if (onDataChanged) onDataChanged();
+    }
+  };
+
   // --- ADMIN REGISTRATION ---
   const handleRegisterAdmin = async (e) => {
     e.preventDefault();
@@ -345,6 +438,21 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                 <span>Portfolio / Obyektlar</span>
               </div>
               <span className="text-xs text-slate-400">{portfolioList.length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('team')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'team' 
+                  ? 'bg-brand-red text-white shadow-glow-red' 
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Hammer className="w-4 h-4" />
+                <span>Jamoa & Ustalar</span>
+              </div>
+              <span className="text-xs text-slate-400">{teamList.length}</span>
             </button>
 
             <button
@@ -656,7 +764,87 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
             </div>
           )}
 
-          {/* TAB 4: ADMINS LIST & REGISTER */}
+          {/* TAB 4: TEAM & CRAFTSMEN */}
+          {activeTab === 'team' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-display font-extrabold text-2xl text-white">
+                    Jamoa va Ustalar ({teamList.length})
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    Firma rahbariyati, naves, darvozaxona, koziryok va fasad ustalari
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleOpenTeamCreate}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all self-start sm:self-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Yangi usta qo'shish</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {teamList.map((member) => (
+                  <div key={member.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 bg-brand-surface/70">
+                    <div>
+                      <div className="relative h-48 rounded-xl overflow-hidden mb-3 bg-brand-surface">
+                        <img 
+                          src={member.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"} 
+                          alt="" 
+                          className="w-full h-full object-cover object-top" 
+                        />
+                        <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-brand-red text-white text-[11px] font-black shadow-md">
+                          {member.label || member.role}
+                        </span>
+                        <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-white text-[10px] font-bold">
+                          {member.completedProjects || "300+ obyekt"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <h3 className="font-display font-bold text-base text-white">
+                          {member.name}
+                        </h3>
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      </div>
+
+                      <p className="text-xs font-semibold text-slate-300 mb-2">
+                        {member.role}
+                      </p>
+
+                      <div className="space-y-1 text-xs text-slate-400 mb-4">
+                        <div>🎖 Tajriba: <strong className="text-white">{member.experience}</strong></div>
+                        <div>📞 Tel: <strong className="text-white">{member.phone || "+998 99 533-33-03"}</strong></div>
+                        <div>🛠 Namunaviy ishlar: <strong className="text-brand-red">{member.works?.length || 0} ta</strong></div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                      <button
+                        onClick={() => handleOpenTeamEdit(member)}
+                        className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Tahrirlash</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteTeamMember(member.id)}
+                        className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors"
+                        title="O'chirish"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: ADMINS LIST & REGISTER */}
           {activeTab === 'admins' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -1000,6 +1188,178 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                 className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red hover:shadow-glow-red-lg transition-all"
               >
                 {editingPortfolio ? "O'zgarishlarni saqlash" : "Loyihani qo'shish"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- TEAM MEMBER CREATE/EDIT MODAL --- */}
+      {teamModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setTeamModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="font-display font-extrabold text-2xl text-white mb-4">
+              {editingTeamMember ? "Usta ma'lumotlarini tahrirlash" : "Yangi Usta / Xodim qo'shish"}
+            </h3>
+
+            <form onSubmit={handleSaveTeamMember} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Ism va Familiya *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={teamForm.name}
+                  onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
+                  placeholder="Masalan: Dilshodbek Usta"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Label / Toifa *
+                  </label>
+                  <select
+                    value={teamForm.label}
+                    onChange={(e) => setTeamForm({ ...teamForm, label: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  >
+                    <option value="Naves Ustasi">Naves Ustasi</option>
+                    <option value="Darvozaxona Ustasi">Darvozaxona Ustasi</option>
+                    <option value="Koziryok Ustasi">Koziryok Ustasi</option>
+                    <option value="Bosh Usta">Bosh Usta</option>
+                    <option value="Firma Boshlig'i">Firma Boshlig'i</option>
+                    <option value="Boshliq Yordamchisi">Boshliq Yordamchisi</option>
+                    <option value="Fasad & Alyukabond">Fasad & Alyukabond</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Ish tajribasi
+                  </label>
+                  <input
+                    type="text"
+                    value={teamForm.experience}
+                    onChange={(e) => setTeamForm({ ...teamForm, experience: e.target.value })}
+                    placeholder="7+ yil tajriba"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Mutaxassislik / Kasbi
+                </label>
+                <input
+                  type="text"
+                  value={teamForm.role}
+                  onChange={(e) => setTeamForm({ ...teamForm, role: e.target.value })}
+                  placeholder="Katta Usta — Tunikabond va Alyukabond Montaji"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Topshirgan obyektlar soni
+                  </label>
+                  <input
+                    type="text"
+                    value={teamForm.completedProjects}
+                    onChange={(e) => setTeamForm({ ...teamForm, completedProjects: e.target.value })}
+                    placeholder="350+ obyekt"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Telefon raqami
+                  </label>
+                  <input
+                    type="text"
+                    value={teamForm.phone}
+                    onChange={(e) => setTeamForm({ ...teamForm, phone: e.target.value })}
+                    placeholder="+998 99 533-33-03"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Usta Rasmi (URL yoki Qurilmadan yuklash)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={teamForm.photo}
+                    onChange={(e) => setTeamForm({ ...teamForm, photo: e.target.value })}
+                    placeholder="https://... yoki yonidagi tugma orqali rasm tanlang"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                  <label className="cursor-pointer px-4 py-2.5 rounded-xl bg-brand-red/20 hover:bg-brand-red/30 border border-brand-red/40 text-xs font-bold text-white flex items-center gap-1.5 transition-colors shrink-0">
+                    <Upload className="w-4 h-4 text-brand-red" />
+                    <span>{uploadingImage ? "Yuklanmoqda..." : "Fayl"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setUploadingImage(true);
+                          const res = await apiUploadFile(file);
+                          setUploadingImage(false);
+                          if (res.success) {
+                            setTeamForm(prev => ({ ...prev, photo: res.url }));
+                          } else {
+                            alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                {teamForm.photo && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <img src={teamForm.photo} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-white/20" />
+                    <span className="text-[11px] text-slate-400 truncate max-w-xs">{teamForm.photo}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Usta haqida qisqacha ma'lumot
+                </label>
+                <textarea
+                  rows="3"
+                  value={teamForm.bio}
+                  onChange={(e) => setTeamForm({ ...teamForm, bio: e.target.value })}
+                  placeholder="Naves va fasad bo'yicha ko'p yillik tajribaga ega..."
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red hover:shadow-glow-red-lg transition-all"
+              >
+                {editingTeamMember ? "O'zgarishlarni saqlash" : "Ustani qo'shish"}
               </button>
             </form>
           </div>

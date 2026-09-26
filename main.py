@@ -24,6 +24,7 @@ ADMINS_FILE = os.path.join(DATA_DIR, "admins.json")
 LEADS_FILE = os.path.join(DATA_DIR, "leads.json")
 PRODUCTS_FILE = os.path.join(DATA_DIR, "products.json")
 PORTFOLIO_FILE = os.path.join(DATA_DIR, "portfolio.json")
+TEAM_FILE = os.path.join(DATA_DIR, "team.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003209002534")
@@ -712,6 +713,59 @@ def modify_portfolio_item(item_id):
         return jsonify({"success": True, "message": "Loyiha yangilandi"}), 200
 
 
+# --- TEAM CRUD ENDPOINTS ---
+
+@app.route("/api/team/", methods=["GET", "POST", "OPTIONS"])
+def handle_team():
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    team = load_json(TEAM_FILE, [])
+
+    if request.method == "GET":
+        return jsonify(team), 200
+
+    data = request.get_json() or {}
+    if not data.get("name"):
+        return jsonify({"error": "Usta yoki xodim ismi kiritilishi shart"}), 400
+
+    new_member = {
+        "id": f"team-{int(datetime.now().timestamp())}",
+        **data
+    }
+    team.append(new_member)
+    save_json(TEAM_FILE, team)
+    return jsonify({"success": True, "member": new_member}), 201
+
+
+@app.route("/api/team/<member_id>", methods=["PUT", "DELETE", "OPTIONS"])
+def modify_team_member(member_id):
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    team = load_json(TEAM_FILE, [])
+
+    if request.method == "DELETE":
+        new_team = [m for m in team if str(m.get("id")) != str(member_id)]
+        save_json(TEAM_FILE, new_team)
+        return jsonify({"success": True, "message": "Xodim o'chirildi"}), 200
+
+    if request.method == "PUT":
+        data = request.get_json() or {}
+        found = False
+        for m in team:
+            if str(m.get("id")) == str(member_id):
+                m.update(data)
+                found = True
+                break
+
+        if not found:
+            return jsonify({"error": "Xodim topilmadi"}), 404
+
+        save_json(TEAM_FILE, team)
+        return jsonify({"success": True, "message": "Xodim ma'lumotlari yangilandi"}), 200
+
+
 # --- STATS ENDPOINT ---
 
 @app.route("/api/stats/", methods=["GET"])
@@ -720,6 +774,7 @@ def get_stats():
     products = load_json(PRODUCTS_FILE, [])
     portfolio = load_json(PORTFOLIO_FILE, [])
     admins = load_json(ADMINS_FILE, [])
+    team = load_json(TEAM_FILE, [])
 
     new_leads = len([l for l in leads if l.get("status") == "new"])
 
@@ -728,7 +783,8 @@ def get_stats():
         "newLeads": new_leads,
         "totalProducts": len(products),
         "totalProjects": len(portfolio),
-        "totalAdmins": len(admins)
+        "totalAdmins": len(admins),
+        "totalTeam": len(team)
     }), 200
 
 

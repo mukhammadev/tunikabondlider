@@ -6,6 +6,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [materialType, setMaterialType] = useState('tunikabond_premium');
   const [area, setArea] = useState(120);
   const [includeInstallation, setIncludeInstallation] = useState(true);
+  const [hasCalculated, setHasCalculated] = useState(false);
 
   // Material unit prices (so'm per sq.m) - Amaldagi aniq bozor narxlari
   const materialPrices = {
@@ -158,28 +159,45 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               </div>
             </div>
 
-            {/* 2. Material Selector */}
+            {/* 2. Material Selector with 1m² prices */}
             <div>
               <label className="block text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
                 <Layers className="w-4 h-4 text-brand-red" />
                 <span>{t.calculator.materialType}</span>
+                <span className="text-[11px] font-normal text-slate-400 ml-auto">(1 m² narxlari)</span>
               </label>
               <div className="space-y-2.5">
-                {Object.entries(t.calculator.materialTypes).map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setMaterialType(key)}
-                    className={`w-full p-3.5 rounded-xl border text-left font-medium text-xs sm:text-sm transition-all flex items-center justify-between ${
-                      materialType === key
-                        ? 'bg-brand-red/15 border-brand-red text-white font-bold'
-                        : 'bg-brand-dark/50 border-white/10 text-slate-300 hover:border-white/20 hover:text-white'
-                    }`}
-                  >
-                    <span>{label}</span>
-                    {materialType === key && <Check className="w-4 h-4 text-brand-red flex-shrink-0" />}
-                  </button>
-                ))}
+                {Object.entries(t.calculator.materialTypes).map(([key, label]) => {
+                  const unitPrice = materialPrices[key] || 135000;
+                  const isSelected = materialType === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setMaterialType(key)}
+                      className={`w-full p-3.5 rounded-xl border text-left font-medium text-xs sm:text-sm transition-all flex items-center justify-between gap-3 ${
+                        isSelected
+                          ? 'bg-brand-red/15 border-brand-red text-white font-bold shadow-sm'
+                          : 'bg-brand-dark/50 border-white/10 text-slate-300 hover:border-white/20 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isSelected ? 'bg-brand-red' : 'bg-slate-600'}`} />
+                        <span className="truncate">{label}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border ${
+                          isSelected 
+                            ? 'bg-brand-red text-white border-brand-red' 
+                            : 'bg-white/5 text-slate-300 border-white/10'
+                        }`}>
+                          {new Intl.NumberFormat('uz-UZ').format(unitPrice)} so'm / m²
+                        </span>
+                        {isSelected && <Check className="w-4 h-4 text-brand-red flex-shrink-0" />}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -222,18 +240,58 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
             {/* 4. Installation Toggle */}
             <div className="pt-2">
-              <label className="flex items-center gap-3 p-3.5 rounded-xl bg-brand-dark/60 border border-white/10 cursor-pointer hover:border-brand-red/30 transition-colors">
-                <input
-                  type="checkbox"
-                  checked={includeInstallation}
-                  onChange={(e) => setIncludeInstallation(e.target.checked)}
-                  className="w-5 h-5 rounded border-white/20 text-brand-red focus:ring-brand-red bg-brand-card cursor-pointer accent-brand-red"
-                />
-                <span className="text-xs sm:text-sm text-slate-200 font-medium">
-                  {t.calculator.includeInstallation}
-                </span>
+              <label className="flex items-center justify-between p-3.5 rounded-xl bg-brand-dark/60 border border-white/10 cursor-pointer hover:border-brand-red/30 transition-colors">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={includeInstallation}
+                    onChange={(e) => setIncludeInstallation(e.target.checked)}
+                    className="w-5 h-5 rounded border-white/20 text-brand-red focus:ring-brand-red bg-brand-card cursor-pointer accent-brand-red"
+                  />
+                  <span className="text-xs sm:text-sm text-slate-200 font-medium">
+                    {t.calculator.includeInstallation}
+                  </span>
+                </div>
+                {includeInstallation && (
+                  <span className="text-[11px] font-bold text-slate-400">
+                    +{new Intl.NumberFormat('uz-UZ').format(currentInstallPrice)} so'm/m²
+                  </span>
+                )}
               </label>
             </div>
+
+            {/* 5. Active 1m² breakdown pill */}
+            <div className="p-4 rounded-2xl bg-brand-dark/80 border border-brand-red/30 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+              <div className="space-y-0.5">
+                <div className="text-slate-400 font-medium flex items-center gap-1.5">
+                  <span>Tanlangan 1 m² narxi:</span>
+                  <span className="text-[10px] bg-brand-red/20 text-brand-red px-1.5 py-0.5 rounded font-bold uppercase">Aniq bozor narxi</span>
+                </div>
+                <div className="text-white font-bold flex items-center gap-2">
+                  <span className="text-brand-red text-base sm:text-lg">
+                    {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} so'm / m²
+                  </span>
+                  <span className="text-slate-400 text-xs font-normal">
+                    ({new Intl.NumberFormat('uz-UZ').format(currentMatPrice)} material {includeInstallation ? `+ ${new Intl.NumberFormat('uz-UZ').format(currentInstallPrice)} montaj` : ''})
+                  </span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-slate-400 font-medium">Bino hajmi:</div>
+                <div className="text-white font-bold text-base sm:text-lg">{area} m²</div>
+              </div>
+            </div>
+
+            {/* 6. Prominent Hisoblash Button */}
+            <button
+              type="button"
+              onClick={() => setHasCalculated(true)}
+              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2.5"
+            >
+              <CalcIcon className="w-5 h-5" />
+              <span>{hasCalculated ? "Qayta hisoblash" : "Hisoblash (Umumiy narxni ko'rish)"}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
 
           </div>
 
@@ -244,95 +302,142 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               {/* Highlight badge */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red/15 text-brand-red text-xs font-bold mb-6">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Tezkor hisob-kitob</span>
+                <span>{hasCalculated ? "Hisoblangan smeta" : "1 m² Narxi va Hisoblash"}</span>
               </div>
 
-              {/* Price Display */}
-              <div className="mb-6 pb-6 border-b border-white/10">
-                <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">
-                  {t.calculator.estimatedCost}
-                </span>
-                <div className="font-display font-extrabold text-3xl sm:text-4xl text-white red-gradient-text tracking-tight">
-                  {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} <span className="text-lg text-slate-300 font-medium">so'm</span>
+              {!hasCalculated ? (
+                /* Pre-calculation State: Shows 1m2 clearly, prompts to click Hisoblash */
+                <div className="text-center py-6 sm:py-8 space-y-6 animate-fadeIn">
+                  <div className="w-20 h-20 rounded-3xl bg-brand-red/10 border-2 border-brand-red/30 text-brand-red mx-auto flex items-center justify-center shadow-glow-red">
+                    <CalcIcon className="w-10 h-10 animate-pulse" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="text-xs uppercase tracking-wider text-slate-400 font-bold">
+                      1 m² Boshlang'ich Narxi
+                    </div>
+                    <div className="font-display font-extrabold text-3xl sm:text-4xl text-brand-red tracking-tight">
+                      {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} <span className="text-lg text-slate-300 font-medium">so'm / m²</span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Tanlangan maydon: <strong className="text-white font-bold">{area} m²</strong>
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-300 leading-relaxed text-left space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-white">
+                      <Sparkles className="w-4 h-4 text-brand-red" />
+                      <span>Umumiy narxni ko'rish uchun:</span>
+                    </div>
+                    <p className="text-slate-400">
+                      Maydon va materialni tanlab, <strong>"Hisoblash"</strong> tugmasini bosing. Tizim sizga umumiy smeta, bajarish muddati va rasmiy kafolat shartlarini darhol ko'rsatadi.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setHasCalculated(true)}
+                    className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm sm:text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  >
+                    <CalcIcon className="w-5 h-5" />
+                    <span>Hisoblash (Umumiy summani ko'rish)</span>
+                  </button>
+
+                  <div className="pt-2 text-[11px] text-slate-500">
+                    * Mutaxassisimizning manzilga borib lazerli o'lchov olishi 100% bepul.
+                  </div>
                 </div>
-                <p className="text-xs text-slate-400 mt-2">
-                  (O'rtacha {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} so'm / m² {includeInstallation ? "tayyor montaji bilan" : "faqat material"})
-                </p>
-              </div>
+              ) : (
+                /* Post-calculation State: Shows calculated Total & Action buttons */
+                <div className="animate-fadeIn">
+                  {/* Price Display */}
+                  <div className="mb-6 pb-6 border-b border-white/10">
+                    <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">
+                      {t.calculator.estimatedCost}
+                    </span>
+                    <div className="font-display font-extrabold text-3xl sm:text-4xl text-white red-gradient-text tracking-tight">
+                      {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} <span className="text-lg text-slate-300 font-medium">so'm</span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2">
+                      (1 m²: {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} so'm • {includeInstallation ? "montaji bilan" : "faqat material"})
+                    </p>
+                  </div>
 
-              {/* Breakdown details */}
-              <div className="space-y-3.5 mb-8 text-xs sm:text-sm">
-                <div className="flex items-center justify-between text-slate-300">
-                  <span className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-brand-red" />
-                    <span>{t.calculator.estimatedTime}</span>
-                  </span>
-                  <span className="font-bold text-white">~{estimatedDays} {t.calculator.days}</span>
+                  {/* Breakdown details */}
+                  <div className="space-y-3.5 mb-8 text-xs sm:text-sm">
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-brand-red" />
+                        <span>{t.calculator.estimatedTime}</span>
+                      </span>
+                      <span className="font-bold text-white">~{estimatedDays} {t.calculator.days}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-brand-red" />
+                        <span>Rasmiy kafolat:</span>
+                      </span>
+                      <span className="font-bold text-white">10 yil shartnoma bilan</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-slate-300">
+                      <span className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-brand-red" />
+                        <span>Mutaxassis o'lchovi:</span>
+                      </span>
+                      <span className="font-bold text-brand-red">100% Bepul</span>
+                    </div>
+                  </div>
+
+                  {/* Order with calculation button */}
+                  <button
+                    type="button"
+                    onClick={handleOrderWithEstimate}
+                    className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm sm:text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>{t.calculator.orderWithCalc}</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+
+                  {/* Secondary utility actions */}
+                  <div className="grid grid-cols-2 gap-2 mt-3">
+                    <button
+                      type="button"
+                      onClick={handlePrintEstimate}
+                      className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      title="Smetani PDF / Qog'ozga chop etish"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-brand-red" />
+                      <span>Smetani chop etish (PDF)</span>
+                    </button>
+
+                    <a
+                      href={`https://t.me/Muhammadazez?text=${encodeURIComponent(
+                        `Assalomu alaykum @Muhammadazez!\n` +
+                        `Kalkulyator orqali hisob-kitob qildim:\n` +
+                        `🏢 Bino: ${t.calculator.buildingTypes[buildingType]}\n` +
+                        `🧱 Material: ${t.calculator.materialTypes[materialType]}\n` +
+                        `📐 Maydon: ${area} m²\n` +
+                        `💰 Narx: ${new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} so'm\n` +
+                        `⏱ Muddat: ~${estimatedDays} kun\n\n` +
+                        `Iltimos, bepul o'lchov uchun bog'lansangiz.`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-3 rounded-xl bg-[#0088cc]/20 hover:bg-[#0088cc]/30 border border-[#0088cc]/40 text-[#29b6f6] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      title="Hisobni Telegram orqali adminga yuborish"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Telegramga yuborish</span>
+                    </a>
+                  </div>
+
+                  <p className="text-[11px] text-slate-400 text-center mt-4 leading-normal">
+                    {t.calculator.consultationNotice}
+                  </p>
                 </div>
-
-                <div className="flex items-center justify-between text-slate-300">
-                  <span className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-brand-red" />
-                    <span>Rasmiy kafolat:</span>
-                  </span>
-                  <span className="font-bold text-white">10 yil shartnoma bilan</span>
-                </div>
-
-                <div className="flex items-center justify-between text-slate-300">
-                  <span className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-brand-red" />
-                    <span>Mutaxassis o'lchovi:</span>
-                  </span>
-                  <span className="font-bold text-brand-red">100% Bepul</span>
-                </div>
-              </div>
-
-              {/* Order with calculation button */}
-              <button
-                type="button"
-                onClick={handleOrderWithEstimate}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm sm:text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-              >
-                <span>{t.calculator.orderWithCalc}</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-
-              {/* Secondary utility actions */}
-              <div className="grid grid-cols-2 gap-2 mt-3">
-                <button
-                  type="button"
-                  onClick={handlePrintEstimate}
-                  className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                  title="Smetani PDF / Qog'ozga chop etish"
-                >
-                  <Printer className="w-3.5 h-3.5 text-brand-red" />
-                  <span>Smetani chop etish (PDF)</span>
-                </button>
-
-                <a
-                  href={`https://t.me/Muhammadazez?text=${encodeURIComponent(
-                    `Assalomu alaykum @Muhammadazez!\n` +
-                    `Kalkulyator orqali hisob-kitob qildim:\n` +
-                    `🏢 Bino: ${t.calculator.buildingTypes[buildingType]}\n` +
-                    `🧱 Material: ${t.calculator.materialTypes[materialType]}\n` +
-                    `📐 Maydon: ${area} m²\n` +
-                    `💰 Narx: ${new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} so'm\n` +
-                    `⏱ Muddat: ~${estimatedDays} kun\n\n` +
-                    `Iltimos, bepul o'lchov uchun bog'lansangiz.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="py-2.5 px-3 rounded-xl bg-[#0088cc]/20 hover:bg-[#0088cc]/30 border border-[#0088cc]/40 text-[#29b6f6] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
-                  title="Hisobni Telegram orqali adminga yuborish"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Telegramga yuborish</span>
-                </a>
-              </div>
-
-              <p className="text-[11px] text-slate-400 text-center mt-4 leading-normal">
-                {t.calculator.consultationNotice}
-              </p>
+              )}
 
             </div>
           </div>

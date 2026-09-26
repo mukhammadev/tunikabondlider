@@ -5,6 +5,7 @@
 
 import { products as initialProducts } from '../data/products';
 import { portfolio as initialPortfolio } from '../data/portfolio';
+import { initialTeam } from '../data/team';
 
 const TOKEN_KEY = 'tl_admin_token';
 const USER_KEY = 'tl_admin_user';
@@ -226,6 +227,53 @@ export const apiUpdatePortfolio = async (itemId, itemData) => {
 export const apiDeletePortfolio = async (itemId) => {
   try {
     const res = await fetch(`/api/portfolio/${itemId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (res.ok) return true;
+  } catch {}
+  return true;
+};
+
+// --- TEAM & MASTERS API ---
+export const apiGetTeam = async () => {
+  try {
+    const res = await fetch('/api/team/');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {}
+  return initialTeam;
+};
+
+export const apiCreateTeamMember = async (memberData) => {
+  try {
+    const res = await fetch('/api/team/', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(memberData)
+    });
+    if (res.ok) return await res.json();
+  } catch {}
+  return { success: true, member: { ...memberData, id: `team-${Date.now()}` } };
+};
+
+export const apiUpdateTeamMember = async (memberId, memberData) => {
+  try {
+    const res = await fetch(`/api/team/${memberId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(memberData)
+    });
+    if (res.ok) return true;
+  } catch {}
+  return true;
+};
+
+export const apiDeleteTeamMember = async (memberId) => {
+  try {
+    const res = await fetch(`/api/team/${memberId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });

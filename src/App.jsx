@@ -16,18 +16,24 @@ import { LeadModal } from './components/LeadModal';
 import { QuickActions } from './components/QuickActions';
 import { BeforeAfter } from './components/BeforeAfter';
 import { TrustAndReviews } from './components/TrustAndReviews';
+import { TeamSection } from './components/TeamSection';
+import { BrandIntro } from './components/BrandIntro';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio } from './services/api';
+import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam } from './services/api';
 
 export function App() {
   const [currentLang, setCurrentLang] = useState(() => {
     return localStorage.getItem('tl_lang') || 'uz';
   });
 
-  // Dynamic products & portfolio state from CMS
+  // Splash Brand Intro animation on site load & refresh
+  const [showBrandIntro, setShowBrandIntro] = useState(true);
+
+  // Dynamic products, portfolio & team state from CMS
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
+  const [teamList, setTeamList] = useState([]);
 
   // Modals state
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -51,14 +57,16 @@ export function App() {
     document.documentElement.lang = currentLang;
   }, [currentLang]);
 
-  // Fetch dynamic products and portfolio items
+  // Fetch dynamic products, portfolio and team members
   const loadDynamicData = async () => {
-    const [prods, ports] = await Promise.all([
+    const [prods, ports, teams] = await Promise.all([
       apiGetProducts(),
-      apiGetPortfolio()
+      apiGetPortfolio(),
+      apiGetTeam()
     ]);
     setProductsList(prods);
     setPortfolioList(ports);
+    setTeamList(teams);
   };
 
   useEffect(() => {
@@ -116,9 +124,22 @@ export function App() {
     setLeadModalOpen(true);
   };
 
+  const handleOpenMasterModal = (masterName) => {
+    setLeadModalData({
+      service: `Usta chaqirish: ${masterName} (Bepul o'lchov)`,
+      source: "Bizning Jamoa & Ustalar"
+    });
+    setLeadModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-brand-dark text-slate-100 flex flex-col font-sans selection:bg-brand-red selection:text-white">
       
+      {/* Brand Intro & Splash Screen Animation on Site Load & Refresh */}
+      {showBrandIntro && (
+        <BrandIntro onComplete={() => setShowBrandIntro(false)} />
+      )}
+
       {/* Navigation Header */}
       <Navbar
         currentLang={currentLang}
@@ -169,6 +190,13 @@ export function App() {
         {/* 4.1 Interactive Before & After Facade Slider */}
         <BeforeAfter
           onOpenLeadModal={handleOpenLeadModal}
+        />
+
+        {/* 4.2 Bizning Professional Jamoa & Ustalar (Naves, Darvozaxona, Koziryok, Fasad) */}
+        <TeamSection
+          t={t}
+          teamMembers={teamList}
+          onOpenLeadModalWithMaster={handleOpenMasterModal}
         />
 
         {/* 5. Why Choose Us (6 Pillars) */}

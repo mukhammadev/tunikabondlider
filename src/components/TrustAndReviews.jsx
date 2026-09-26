@@ -144,11 +144,10 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
                     <span className="text-xs font-bold text-slate-400 ml-2">5.0 / 5.0</span>
                   </div>
 
-                  {/* Comment with Quote icon */}
-                  <div className="relative mb-6">
-                    <Quote className="w-8 h-8 text-brand-red/20 absolute -top-3 -left-2 -z-10" />
-                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed italic">
-                      "{rev.comment}"
+                  {/* Comment with clean styling and no overlapping icon */}
+                  <div className="mb-6 pl-3.5 border-l-2 border-brand-red/70 py-1 bg-white/[0.02] rounded-r-xl">
+                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                      {rev.comment}
                     </p>
                   </div>
                 </div>

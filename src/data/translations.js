@@ -92,6 +92,21 @@ export const translations = {
       cornices: "Karniz va Shift",
       clickToZoom: "Kattalashtirish uchun bosing"
     },
+    team: {
+      badge: "Bizning Professional Jamoa",
+      title: "Tajribali Ustalar va Firma Rahbariyati",
+      subtitle: "Naves, darvozaxona, koziryok va fasad bo'yicha ko'p yillik tajribaga ega mutaxassislar. Har bir usta bajargan ishiga shaxsan kafolat beradi.",
+      all: "Barchasi",
+      naves: "Naves Ustalari",
+      darvozaxona: "Darvozaxona",
+      koziryok: "Koziryok Ustalari",
+      fasad: "Fasad & Alyukabond",
+      leadership: "Firma Rahbariyati",
+      viewWorks: "Ishlarini ko'rish",
+      experience: "Tajriba",
+      objects: "Obyektlar",
+      callMaster: "Shu ustani chaqirish (Bepul o'lchov)"
+    },
     whyUs: {
       badge: "Nega Tunikabond Lider?",
       title: "Mijozlarimiz Nega Aynan Bizni Tanlashadi?",
@@ -247,6 +262,21 @@ export const translations = {
       cornices: "Карнизы и Потолки",
       clickToZoom: "Нажмите для увеличения"
     },
+    team: {
+      badge: "Наша Профессиональная Команда",
+      title: "Опытные Мастера и Руководство",
+      subtitle: "Ведущие специалисты с многолетним стажем по навесам, въездным группам, козырькам и вентилируемым фасадам. Каждый мастер лично гарантирует безупречное качество.",
+      all: "Все",
+      naves: "Мастера по Навесам",
+      darvozaxona: "Въездные группы (Дарвозахона)",
+      koziryok: "Мастера по Козырькам",
+      fasad: "Фасады & Алюкобонд",
+      leadership: "Руководство компании",
+      viewWorks: "Посмотреть работы",
+      experience: "Опыт",
+      objects: "Объектов",
+      callMaster: "Вызвать мастера на замер"
+    },
     whyUs: {
       badge: "Почему Tunikabond Lider?",
       title: "Почему Клиенты Доверяют Нам?",
@@ -401,6 +431,21 @@ export const translations = {
       commercial: "Commercial",
       cornices: "Cornice & Ceiling",
       clickToZoom: "Click image to expand"
+    },
+    team: {
+      badge: "Our Professional Team",
+      title: "Experienced Craftsmen & Leadership",
+      subtitle: "Industry-leading specialists in metal canopies, entrance gatehouses, modern awnings, and premium facades. Every craftsman guarantees exceptional quality.",
+      all: "All",
+      naves: "Canopy Masters",
+      darvozaxona: "Gatehouses",
+      koziryok: "Awning Masters",
+      fasad: "Facade & Alucobond",
+      leadership: "Company Leadership",
+      viewWorks: "View Works",
+      experience: "Experience",
+      objects: "Projects",
+      callMaster: "Request this Master (Free Quote)"
     },
     whyUs: {
       badge: "Why Tunikabond Lider?",
