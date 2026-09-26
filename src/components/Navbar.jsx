@@ -25,14 +25,14 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
   ];
 
   return (
-    <header className="fixed top-3 sm:top-4 left-0 right-0 z-40 px-3 sm:px-6 pointer-events-none transition-all duration-300">
-      <div className={`max-w-7xl mx-auto rounded-2xl transition-all duration-300 pointer-events-auto relative overflow-hidden ${
+    <header className="fixed top-3 sm:top-5 left-0 right-0 z-40 px-3 sm:px-6 pointer-events-none transition-all duration-300">
+      <div className={`max-w-5xl mx-auto rounded-full transition-all duration-300 pointer-events-auto relative overflow-hidden ${
         isScrolled 
-          ? 'bg-brand-dark/95 backdrop-blur-xl border border-brand-red/40 shadow-2xl shadow-black/80 shadow-glow-red/20 py-2.5 px-4 sm:px-6' 
-          : 'bg-brand-surface/80 backdrop-blur-lg border border-white/15 shadow-xl shadow-black/40 py-3 px-4 sm:px-6'
+          ? 'bg-brand-surface/95 backdrop-blur-xl border border-brand-red/40 shadow-2xl shadow-black/80 shadow-glow-red/20 py-2 px-4 sm:px-6' 
+          : 'bg-brand-surface/80 backdrop-blur-lg border border-white/15 shadow-xl shadow-black/40 py-2.5 px-4 sm:px-6'
       }`}>
         {/* Subtle red ambient glow line along bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-red to-transparent opacity-80" />
+        <div className="absolute bottom-0 left-10 right-10 h-[1.5px] bg-gradient-to-r from-transparent via-brand-red to-transparent opacity-80" />
 
         <div className="flex items-center justify-between">
           

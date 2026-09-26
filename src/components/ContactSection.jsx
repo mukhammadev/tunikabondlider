@@ -329,6 +329,17 @@ export const ContactSection = ({ t }) => {
         </div>
 
       </div>
+
+      {/* Massive Curved Cosmic Horizon Glow (Gcore video style frame 00:36-00:38) */}
+      <div className="absolute -bottom-36 left-1/2 -translate-x-1/2 w-[1400px] h-[360px] pointer-events-none overflow-hidden z-0">
+        <div 
+          className="w-full h-full rounded-[100%] opacity-85"
+          style={{
+            background: 'radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.9) 0%, rgba(245, 158, 11, 0.75) 25%, rgba(196, 0, 0, 0.6) 55%, transparent 75%)',
+            filter: 'blur(30px)'
+          }}
+        />
+      </div>
     </section>
   );
 };
