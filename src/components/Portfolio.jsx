@@ -50,10 +50,10 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
             <Compass className="w-3.5 h-3.5" />
             <span>{t.portfolio?.badge || "Konstruksiyalar & Ishlar Katalogi"}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight mb-4">
             {t.portfolio?.title || "Naveslar, Koziryoklar, Darvozaxonalar va Fasadlar"}
           </h2>
-          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             {t.portfolio?.subtitle || "Kerakli yo'nalishni tanlang va namunali ishlarni ko'ring. Har bir loyiha korxonamizning ma'sul ustasiga biriktirilgan."}
           </p>
         </div>
@@ -212,7 +212,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                 <span className="px-2.5 py-0.5 rounded-lg bg-brand-red text-white text-[11px] font-bold">
                   {getCategoryLabel(selectedImage.category)}
                 </span>
-                <h3 className="font-display font-bold text-xl light:text-slate-900 text-white">
+                <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white">
                   {typeof selectedImage.title === 'object' ? (selectedImage.title[currentLang] || selectedImage.title.uz) : selectedImage.title}
                 </h3>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">

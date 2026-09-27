@@ -38,10 +38,10 @@ export const Process = ({ t }) => {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
             <span>{t.process.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight mb-4">
             {t.process.title}
           </h2>
-          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             {t.process.subtitle}
           </p>
         </div>
@@ -65,15 +65,15 @@ export const Process = ({ t }) => {
                     </span>
                   </div>
 
-                  <h3 className="font-display font-bold text-lg light:text-slate-900 text-white mb-2 group-hover:text-brand-red transition-colors">
+                  <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
                     {step.title}
                   </h3>
-                  <p className="text-xs sm:text-sm light:text-slate-600 text-slate-300 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                     {step.desc}
                   </p>
                 </div>
 
-                <div className="pt-4 mt-6 light:border-black/10 border-t border-white/10 flex items-center text-xs font-semibold text-brand-red">
+                <div className="pt-4 mt-6 border-black/10 dark:border-white/10 border-t border-white/10 flex items-center text-xs font-semibold text-brand-red">
                   <span>Qadam {idx + 1} / 4</span>
                 </div>
               </div>

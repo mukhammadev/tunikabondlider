@@ -201,10 +201,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
             <CalcIcon className="w-3.5 h-3.5" />
             <span>{t.calculator.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight mb-4">
             {t.calculator.title}
           </h2>
-          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             {t.calculator.subtitle}
           </p>
         </div>

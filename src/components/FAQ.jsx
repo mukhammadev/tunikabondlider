@@ -19,10 +19,10 @@ export const FAQ = ({ currentLang, t }) => {
             <HelpCircle className="w-3.5 h-3.5" />
             <span>{t.faq.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight mb-4">
             {t.faq.title}
           </h2>
-          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             {t.faq.subtitle}
           </p>
         </div>
@@ -37,21 +37,21 @@ export const FAQ = ({ currentLang, t }) => {
             return (
               <div 
                 key={i}
-                className="glass-card rounded-2xl overflow-hidden light:border-black/10 border border-white/10 transition-colors hover:border-brand-red/40"
+                className="glass-card rounded-2xl overflow-hidden border-black/10 dark:border-white/10 border border-white/10 transition-colors hover:border-brand-red/40"
               >
                 <button
                   type="button"
                   onClick={() => toggle(i)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-display font-bold text-base sm:text-lg light:text-slate-900 text-white hover:text-brand-red transition-colors"
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white hover:text-brand-red transition-colors"
                 >
                   <span>{q}</span>
-                  <div className="w-8 h-8 rounded-full light:bg-black/5 bg-white/5 flex items-center justify-center flex-shrink-0 text-brand-red">
+                  <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 bg-white/5 flex items-center justify-center flex-shrink-0 text-brand-red">
                     {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-6 sm:px-6 light:text-slate-600 text-slate-300 text-sm leading-relaxed light:border-black/5 border-t border-white/5 pt-4 animate-fadeIn">
+                  <div className="px-5 pb-6 sm:px-6 text-slate-600 dark:text-slate-300 text-sm leading-relaxed border-black/5 dark:border-white/5 border-t border-white/5 pt-4 animate-fadeIn">
                     {a}
                   </div>
                 )}

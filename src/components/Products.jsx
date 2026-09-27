@@ -29,10 +29,10 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
             <Layers className="w-3.5 h-3.5" />
             <span>{t.products.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight mb-4">
             {t.products.title}
           </h2>
-          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
             {t.products.subtitle}
           </p>
         </div>
@@ -94,7 +94,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
 
                   {/* Body Content */}
                   <div className="p-6">
-                    <h3 className="font-display font-bold text-xl light:text-slate-900 text-white group-hover:text-brand-red transition-colors mb-2 leading-snug">
+                    <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white group-hover:text-brand-red transition-colors mb-2 leading-snug">
                       {name}
                     </h3>
                     <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
