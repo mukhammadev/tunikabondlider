@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { submitLead } from '../services/telegram';
 import confetti from 'canvas-confetti';
-import { Phone, MapPin, Clock, Send, CheckCircle2, ShieldCheck, UserCheck } from 'lucide-react';
+import { Phone, MapPin, Clock, Send, CheckCircle2, ShieldCheck, UserCheck, Factory, Navigation, ExternalLink, Car, Sparkles } from 'lucide-react';
 
 export const ContactSection = ({ t }) => {
   const [formData, setFormData] = useState({
@@ -145,29 +145,30 @@ export const ContactSection = ({ t }) => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-2">
-                  {t.contact.addressTitle}
-                </span>
-                <div className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
-                  <MapPin className="w-5 h-5 text-brand-red flex-shrink-0 mt-0.5" />
-                  <span>{t.contact.addressText}</span>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-2">
-                  {t.contact.workHoursTitle}
-                </span>
-                <div className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
-                  <Clock className="w-5 h-5 text-brand-red flex-shrink-0 mt-0.5" />
-                  <span>{t.contact.workHoursText}</span>
+              {/* 24/7 Non-stop Service Banner */}
+              <div className="pt-2">
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-emerald-500/15 to-transparent border border-emerald-500/30">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span className="font-display font-extrabold text-sm text-slate-900 dark:text-white">
+                      {t.contact.workHoursTitle}
+                    </span>
+                    <span className="ml-auto px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-sm">
+                      24 / 7
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed pl-4">
+                    {t.contact.workHoursText}
+                  </p>
                 </div>
               </div>
 
               {/* Social Channels */}
-              <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-3">
+              <div className="pt-2 border-t border-slate-200 dark:border-white/10">
+                <span className="block text-xs uppercase tracking-wider font-bold text-slate-600 dark:text-slate-400 mb-3">
                   {t.contact.socialsTitle}
                 </span>
                 <div className="flex items-center gap-3">
@@ -175,7 +176,7 @@ export const ContactSection = ({ t }) => {
                     href="https://t.me/tunikabondLiderkanali"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-800 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold shadow-sm"
                   >
                     <span>Telegram Kanal</span>
                   </a>
@@ -183,7 +184,7 @@ export const ContactSection = ({ t }) => {
                     href="https://www.instagram.com/tunikabond_lider"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-800 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold shadow-sm"
                   >
                     <span>Instagram</span>
                   </a>
@@ -192,18 +193,90 @@ export const ContactSection = ({ t }) => {
 
             </div>
 
-            {/* Google Map Box */}
-            <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg h-56 bg-slate-100 dark:bg-brand-surface">
-              <iframe
-                title="Office Location"
-                src="https://www.google.com/maps/embed?pb=!1m13!1m8!1m3!1d6002.201579445047!2d69.285698!3d41.219574!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDEzJzEwLjUiTiA2OcKwMTcnMDguNSJF!5e0!3m2!1sru!2s!4v1764096417694!5m2!1sru!2s"
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
+            {/* Premium Workshop / Factory Location Box */}
+            <div className="glass-panel p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-brand-red/30 shadow-xl space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-brand-red/15 text-brand-red flex items-center justify-center shadow-glow-red flex-shrink-0">
+                    <Factory className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white leading-tight">
+                        {t.contact.addressTitle}
+                      </h4>
+                      <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-red/15 text-brand-red border border-brand-red/30">
+                        Bosh Sex
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-brand-red flex-shrink-0" />
+                      <span>{t.contact.addressText}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Feature Chips */}
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-1 font-medium">
+                  <Car className="w-3.5 h-3.5 text-brand-red" />
+                  <span>Bepul avtoturargoh</span>
+                </span>
+                <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-1 font-medium">
+                  <Sparkles className="w-3.5 h-3.5 text-brand-red" />
+                  <span>Jonli namunalar zali</span>
+                </span>
+              </div>
+
+              {/* Google Map Box with Interactive Pin Overlay */}
+              <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/15 shadow-md h-64 sm:h-72 bg-slate-100 dark:bg-brand-surface relative group">
+                <iframe
+                  title="Office Location"
+                  src="https://www.google.com/maps/embed?pb=!1m13!1m8!1m3!1d6002.201579445047!2d69.285698!3d41.219574!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDEzJzEwLjUiTiA2OcKwMTcnMDguNSJF!5e0!3m2!1sru!2s!4v1764096417694!5m2!1sru!2s"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+
+                {/* Floating location pin badge */}
+                <div className="absolute top-3 left-3 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white backdrop-blur-md border border-white/20 text-xs font-bold shadow-lg flex items-center gap-2 pointer-events-none">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-red"></span>
+                  </span>
+                  <span>Tunikabond Lider Ishxonasi</span>
+                </div>
+              </div>
+
+              {/* Navigator Action Buttons */}
+              <div className="grid grid-cols-2 gap-2.5 pt-1">
+                <a
+                  href="https://yandex.com/maps/?pt=69.285698,41.219574&z=16&l=map"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 hover:border-brand-red/50 text-slate-800 dark:text-white text-xs font-bold transition-all shadow-sm group"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-brand-red group-hover:scale-110 transition-transform" />
+                  <span>Yandex Xarita</span>
+                </a>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=41.219574,69.285698"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 hover:border-brand-red/50 text-slate-800 dark:text-white text-xs font-bold transition-all shadow-sm group"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-brand-red group-hover:scale-110 transition-transform" />
+                  <span>Google Maps</span>
+                </a>
+              </div>
+
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center leading-normal pt-1">
+                Tashrifdan oldin qo'ng'iroq qilsangiz, ustamiz sizni kutib oladi va barcha namunalarni jonli ko'rsatib beradi.
+              </p>
             </div>
 
           </div>
