@@ -28,20 +28,26 @@ export const TeamSection = ({
     }
   }, [activeMasterId, teamMembers]);
 
-  // Filter team members based on tabs: Barchasi, Ustalar, Firma Rahbariyati
+  // Filter team members based on tabs: Barchasi, Firma Boshlig'i, CEO, Ustalar
   const filteredMembers = teamMembers.filter((m) => {
     if (activeFilter === 'all') return true;
-    if (activeFilter === 'leadership') {
+    if (activeFilter === 'boshliq') {
       return (
-        m.isLeader || 
-        m.label?.toLowerCase().includes('boshlig') || 
-        m.label?.toLowerCase().includes('yordamchi') ||
-        m.role?.toLowerCase().includes('boshlig') ||
-        m.role?.toLowerCase().includes('yordamchi')
+        m.label === "Firma Boshlig'i" ||
+        m.role?.toLowerCase().includes("boshlig'")
+      );
+    }
+    if (activeFilter === 'ceo') {
+      return (
+        m.label === "CEO" ||
+        m.role?.toLowerCase().includes("ceo")
       );
     }
     if (activeFilter === 'masters') {
-      return !m.isLeader && !m.label?.toLowerCase().includes('boshlig');
+      return (
+        m.label === "Usta" ||
+        (!m.label?.includes("Boshlig'") && m.label !== "CEO" && !m.isLeader)
+      );
     }
     return true;
   });
@@ -96,9 +102,10 @@ export const TeamSection = ({
   };
 
   const filterTabs = [
-    { id: 'all', label: t.team?.all || "Barchasi" },
-    { id: 'masters', label: t.team?.masters || "Ustalar" },
-    { id: 'leadership', label: t.team?.leadership || "Firma Rahbariyati" }
+    { id: 'all', label: "Barchasi" },
+    { id: 'boshliq', label: "Firma Boshlig'i" },
+    { id: 'ceo', label: "CEO" },
+    { id: 'masters', label: "Ustalar" }
   ];
 
   // Helper to get all completed works for selected master (Catalog works + Direct works)

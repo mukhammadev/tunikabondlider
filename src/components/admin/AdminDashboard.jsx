@@ -56,7 +56,7 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
   const [teamForm, setTeamForm] = useState({
     name: '',
     role: 'Usta Mutaxassis',
-    label: 'Naves Ustasi',
+    label: 'Usta',
     experience: '6+ yil tajriba',
     completedProjects: '300+ obyekt',
     phone: '+998 99 533-33-03',
@@ -264,8 +264,8 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     setEditingTeamMember(null);
     setTeamForm({
       name: '',
-      role: 'Usta Mutaxassis — Zamonaviy Naveslar',
-      label: 'Naves Ustasi',
+      role: 'Usta Mutaxassis',
+      label: 'Usta',
       experience: '6+ yil tajriba',
       completedProjects: '300+ obyekt',
       phone: '+998 99 533-33-03',
@@ -281,7 +281,7 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     setTeamForm({
       name: member.name || '',
       role: member.role || '',
-      label: member.label || 'Naves Ustasi',
+      label: member.label || 'Usta',
       experience: member.experience || '',
       completedProjects: member.completedProjects || '',
       phone: member.phone || '',
@@ -1280,15 +1280,11 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                   <select
                     value={teamForm.label}
                     onChange={(e) => setTeamForm({ ...teamForm, label: e.target.value })}
-                    className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                    className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red font-bold"
                   >
-                    <option value="Naves Ustasi">Naves Ustasi</option>
-                    <option value="Darvozaxona Ustasi">Darvozaxona Ustasi</option>
-                    <option value="Koziryok Ustasi">Koziryok Ustasi</option>
-                    <option value="Bosh Usta">Bosh Usta</option>
                     <option value="Firma Boshlig'i">Firma Boshlig'i</option>
-                    <option value="Boshliq Yordamchisi">Boshliq Yordamchisi</option>
-                    <option value="Fasad & Alyukabond">Fasad & Alyukabond</option>
+                    <option value="CEO">CEO</option>
+                    <option value="Usta">Usta</option>
                   </select>
                 </div>
 
