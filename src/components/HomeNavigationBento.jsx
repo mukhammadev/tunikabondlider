@@ -41,8 +41,8 @@ export const HomeNavigationBento = ({ t, onNavigate }) => {
     },
     {
       id: 'portfolio',
-      title: "2000+ Loyihalar & AI Fasad",
-      subtitle: "Bajarilgan obyektlar fotosuratlari, Oldin/Keyin taqqoslash va o'z uyingiz rasmini AI orqali sinab ko'rish.",
+      title: "2000+ Bajarilgan Loyihalar",
+      subtitle: "Bajarilgan obyektlar fotogalereyasi va tajribali professional ustalar jamoasi.",
       badge: "Tayyor ishlar",
       badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
       icon: Compass,

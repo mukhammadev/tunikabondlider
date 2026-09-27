@@ -14,7 +14,6 @@ import { Footer } from './components/Footer';
 import { ProductModal } from './components/ProductModal';
 import { LeadModal } from './components/LeadModal';
 import { QuickActions } from './components/QuickActions';
-import { BeforeAfter } from './components/BeforeAfter';
 import { TrustAndReviews } from './components/TrustAndReviews';
 import { TeamSection } from './components/TeamSection';
 import { BrandIntro } from './components/BrandIntro';
@@ -226,11 +225,6 @@ export function App() {
               onNavigate={navigateToPage}
             />
 
-            {/* Featured Before & After Facade Slider + AI */}
-            <BeforeAfter
-              onOpenLeadModal={handleOpenLeadModal}
-            />
-
             {/* Why Choose Us */}
             <WhyUs
               t={t}
@@ -324,9 +318,6 @@ export function App() {
                   teamEl.scrollIntoView({ behavior: 'smooth' });
                 }
               }}
-            />
-            <BeforeAfter
-              onOpenLeadModal={handleOpenLeadModal}
             />
             <TeamSection
               t={t}
