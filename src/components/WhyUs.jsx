@@ -65,14 +65,14 @@ export const WhyUs = ({ t }) => {
               <Ruler className="w-7 h-7" />
             </div>
 
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-white/5 text-slate-400 border border-white/10 mb-3">
+            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold light:bg-black/5 bg-white/5 light:text-slate-500 text-slate-400 light:border-black/10 border border-white/10 mb-3">
               MILLIMETR ANIKLIK
             </div>
 
-            <h3 className="font-display font-bold text-lg sm:text-xl text-white mb-2 group-hover:text-brand-red transition-colors">
+            <h3 className="font-display font-bold text-lg sm:text-xl light:text-slate-900 text-white mb-2 group-hover:text-brand-red transition-colors">
               {t.whyUs.p2Title}
             </h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
+            <p className="light:text-slate-600 text-slate-300 text-sm leading-relaxed">
               {t.whyUs.p2Desc}
             </p>
           </div>
@@ -87,10 +87,10 @@ export const WhyUs = ({ t }) => {
               O'Z VAQTIDA
             </div>
 
-            <h3 className="font-display font-bold text-lg sm:text-xl text-white mb-2 group-hover:text-brand-red transition-colors">
+            <h3 className="font-display font-bold text-lg sm:text-xl light:text-slate-900 text-white mb-2 group-hover:text-brand-red transition-colors">
               {t.whyUs.p3Title}
             </h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
+            <p className="light:text-slate-600 text-slate-300 text-sm leading-relaxed">
               {t.whyUs.p3Desc}
             </p>
           </div>
@@ -106,15 +106,15 @@ export const WhyUs = ({ t }) => {
               </span>
             </div>
 
-            <h3 className="font-display font-bold text-xl sm:text-2xl text-white mb-3 group-hover:text-brand-red transition-colors">
+            <h3 className="font-display font-bold text-xl sm:text-2xl light:text-slate-900 text-white mb-3 group-hover:text-brand-red transition-colors">
               {t.whyUs.p4Title}
             </h3>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
+            <p className="light:text-slate-600 text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
               {t.whyUs.p4Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-              <span className="text-white font-bold">1 m² 75 000 so'mdan</span>
+            <div className="mt-6 pt-4 light:border-black/5 border-t border-white/5 flex flex-wrap items-center gap-4 text-xs light:text-slate-500 text-slate-400">
+              <span className="light:text-slate-900 text-white font-bold">1 m² 75 000 so'mdan</span>
               <span>•</span>
               <span>Halol hisob-kitob</span>
               <span>•</span>
@@ -128,14 +128,14 @@ export const WhyUs = ({ t }) => {
               <SunMedium className="w-7 h-7" />
             </div>
 
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-white/5 text-slate-400 border border-white/10 mb-3">
+            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold light:bg-black/5 bg-white/5 light:text-slate-500 text-slate-400 light:border-black/10 border border-white/10 mb-3">
               -40°C DAN +60°C GACHA
             </div>
 
-            <h3 className="font-display font-bold text-lg sm:text-xl text-white mb-2 group-hover:text-brand-red transition-colors">
+            <h3 className="font-display font-bold text-lg sm:text-xl light:text-slate-900 text-white mb-2 group-hover:text-brand-red transition-colors">
               {t.whyUs.p5Title}
             </h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
+            <p className="light:text-slate-600 text-slate-300 text-sm leading-relaxed">
               {t.whyUs.p5Desc}
             </p>
           </div>
@@ -151,14 +151,14 @@ export const WhyUs = ({ t }) => {
               </span>
             </div>
 
-            <h3 className="font-display font-bold text-xl sm:text-2xl text-white mb-3 group-hover:text-brand-red transition-colors">
+            <h3 className="font-display font-bold text-xl sm:text-2xl light:text-slate-900 text-white mb-3 group-hover:text-brand-red transition-colors">
               {t.whyUs.p6Title}
             </h3>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
+            <p className="light:text-slate-600 text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
               {t.whyUs.p6Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-brand-red font-bold">
+            <div className="mt-6 pt-4 light:border-black/5 border-t border-white/5 flex items-center gap-2 text-xs text-brand-red font-bold">
               <span>Binongizni qurilishdan oldin ko'ring</span>
               <ArrowRight className="w-4 h-4" />
             </div>
