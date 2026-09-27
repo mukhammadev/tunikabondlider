@@ -12,7 +12,8 @@
   --brand-border: 55 65 81;
 }
 
-html.dark {
+html.dark,
+.dark {
   --brand-dark: 11 15 25;
   --brand-surface: 17 24 39;
   --brand-card: 31 41 55;
@@ -24,6 +25,13 @@ html.light {
   --brand-surface: 255 255 255;
   --brand-card: 241 245 249;
   --brand-border: 203 213 225;
+}
+
+html.light .dark {
+  --brand-dark: 11 15 25;
+  --brand-surface: 17 24 39;
+  --brand-card: 31 41 55;
+  --brand-border: 55 65 81;
 }
 
 /* ═══════════════════════════════════════════════════════════

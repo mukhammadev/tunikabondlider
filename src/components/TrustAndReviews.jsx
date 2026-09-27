@@ -66,7 +66,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
         {/* Section 1: Official Warranty & Certifications */}
         <div className="mb-20">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Ishonch va Kafolat</span>
             </div>
@@ -91,7 +91,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
                       <div className="w-12 h-12 rounded-2xl bg-brand-red/10 border border-brand-red/30 flex items-center justify-center text-brand-red group-hover:scale-110 transition-transform">
                         <Icon className="w-6 h-6" />
                       </div>
-                      <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-white/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20 dark:border-white/10">
+                      <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-100 dark:bg-white/10 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-white/10">
                         {cert.badge}
                       </span>
                     </div>
@@ -137,11 +137,11 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
               >
                 <div>
                   {/* Rating Stars */}
-                  <div className="flex items-center gap-1 mb-4 text-amber-400">
+                  <div className="flex items-center gap-1 mb-4 text-amber-500 dark:text-amber-400">
                     {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                      <Star key={i} className="w-4 h-4 fill-amber-500 dark:fill-amber-400" />
                     ))}
-                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-2">5.0 / 5.0</span>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-2">5.0 / 5.0</span>
                   </div>
 
                   {/* Comment with clean styling and no overlapping icon */}
@@ -158,10 +158,10 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
                     <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                       {rev.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">{rev.role}</p>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">{rev.role}</p>
                     <p className="text-[10px] text-brand-red font-semibold mt-0.5">{rev.project}</p>
                   </div>
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{rev.date}</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">{rev.date}</span>
                 </div>
               </div>
             ))}

@@ -86,14 +86,14 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
 
         {/* Technical Specs Table */}
         <div className="mb-8">
-          <h4 className="text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <h4 className="text-xs uppercase tracking-wider font-bold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-brand-red" />
             <span>Texnik parametrlar va afzalliklari:</span>
           </h4>
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/70 overflow-hidden divide-y divide-slate-200 dark:divide-white/10 text-xs sm:text-sm">
             {specsList.map((spec, i) => (
               <div key={i} className="flex justify-between p-3.5 sm:px-4 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-                <span className="text-slate-500 dark:text-slate-400 font-medium">{spec.label || spec.name}</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">{spec.label || spec.name}</span>
                 <span className="font-semibold text-slate-900 dark:text-white text-right">{spec.value}</span>
               </div>
             ))}
@@ -103,7 +103,7 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
         {/* Price and Action Button */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-slate-100 dark:bg-brand-surface border border-slate-200 dark:border-brand-red/30 shadow-inner">
           <div>
-            <span className="block text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">
+            <span className="block text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">
               Amaldagi zavod narxi:
             </span>
             <div className="font-display font-black text-xl sm:text-2xl text-brand-red">

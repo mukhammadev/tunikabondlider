@@ -60,7 +60,7 @@ export const Process = ({ t }) => {
                     <div className="w-12 h-12 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red group-hover:bg-brand-red group-hover:text-white transition-all shadow-glow-red">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="font-display font-black text-2xl text-slate-400 dark:text-slate-600 group-hover:text-brand-red transition-colors">
+                    <span className="font-display font-black text-2xl text-slate-600 dark:text-slate-400 group-hover:text-brand-red transition-colors">
                       {step.num}
                     </span>
                   </div>

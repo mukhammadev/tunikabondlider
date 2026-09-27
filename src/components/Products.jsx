@@ -74,7 +74,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70" />
                     
                     {/* Badge */}
                     <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-brand-red text-white text-xs font-black shadow-md">
@@ -82,10 +82,10 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                     </div>
 
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end text-xs font-bold text-white">
-                      <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10">
+                      <span className="px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/20">
                         {product.thickness}
                       </span>
-                      <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1 text-brand-red">
+                      <span className="px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/20 flex items-center gap-1 text-brand-red">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>{product.warranty}</span>
                       </span>
@@ -104,11 +104,11 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                     {/* Quick Specs List */}
                     <div className="space-y-2 mb-6 text-xs text-slate-700 dark:text-slate-300">
                       <div className="flex justify-between py-1.5 border-b border-slate-200 dark:border-white/10">
-                        <span className="text-slate-500 dark:text-slate-400">{t.products.thicknessLabel}</span>
+                        <span className="text-slate-600 dark:text-slate-400 font-medium">{t.products.thicknessLabel}</span>
                         <span className="font-semibold text-slate-900 dark:text-white">{product.thickness}</span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-slate-200 dark:border-white/10">
-                        <span className="text-slate-500 dark:text-slate-400">{t.products.coatingLabel}</span>
+                        <span className="text-slate-600 dark:text-slate-400 font-medium">{t.products.coatingLabel}</span>
                         <span className="font-semibold text-slate-900 dark:text-white">{product.coating}</span>
                       </div>
                     </div>
@@ -118,7 +118,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                 {/* Footer with Price and Button */}
                 <div className="p-6 pt-0">
                   <div className="mb-4">
-                    <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
+                    <span className="block text-[11px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
                       Zavod narxi:
                     </span>
                     <span className="font-display font-extrabold text-base text-brand-red">

@@ -181,7 +181,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                     <button
                       type="button"
                       onClick={() => { setPhotoUrl(''); setPhotoName(''); }}
-                      className="p-2 rounded-xl bg-white/10 hover:bg-brand-red/30 text-slate-300 hover:text-white transition-colors"
+                      className="p-2 rounded-xl bg-slate-200 hover:bg-brand-red/20 dark:bg-white/10 dark:hover:bg-brand-red/30 text-slate-700 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-colors"
                       title="Rasmni o'chirish"
                     >
                       <X className="w-4 h-4" />
@@ -205,7 +205,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                 )}
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 pt-2">
+              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-600 dark:text-slate-400 font-medium pt-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-brand-red" />
                 <span>100% Bepul va majburiyatlarsiz</span>
               </div>

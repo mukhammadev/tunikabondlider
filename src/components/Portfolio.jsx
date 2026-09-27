@@ -93,7 +93,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-60" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70" />
 
                     {/* Category Label Badge */}
                     <div className="absolute top-3.5 left-3.5">
@@ -107,7 +107,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                     </div>
 
                     <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-white">
-                      <span className="flex items-center gap-1 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/10">
+                      <span className="flex items-center gap-1 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/20">
                         <MapPin className="w-3.5 h-3.5 text-brand-red" />
                         <span>{item.location}</span>
                       </span>
@@ -152,7 +152,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                             className="w-9 h-9 rounded-full object-cover border-2 border-brand-red/60 shadow-sm flex-shrink-0"
                           />
                           <div className="min-w-0">
-                            <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-medium">Mas'ul usta:</span>
+                            <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">Mas'ul usta:</span>
                             <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/master:text-brand-red transition-colors flex items-center gap-1 truncate">
                               <span>{item.masterName}</span>
                               <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
@@ -238,7 +238,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                     className="w-10 h-10 rounded-full object-cover border-2 border-brand-red"
                   />
                   <div>
-                    <span className="block text-[10px] text-slate-500 dark:text-slate-400">Mas'ul usta:</span>
+                    <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">Mas'ul usta:</span>
                     <span className="font-bold text-sm text-slate-900 dark:text-white hover:text-brand-red flex items-center gap-1">
                       {selectedImage.masterName} <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                     </span>

@@ -69,7 +69,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
                     className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow-red"
                     style={{ background: item.bgGradient }}
                   >
-                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-brand-dark/80 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/10">
+                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/20 shadow-sm">
                       {item.code}
                     </div>
                   </div>
@@ -111,7 +111,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
               className="w-full h-44 rounded-2xl mb-6 relative overflow-hidden shadow-inner border border-white/20 flex items-end p-4"
               style={{ background: selectedSwatch.bgGradient }}
             >
-              <div className="px-3 py-1 rounded-lg bg-brand-dark/80 backdrop-blur-md text-xs font-bold text-white border border-white/10">
+              <div className="px-3 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md text-xs font-bold text-white border border-white/20 shadow-sm">
                 {selectedSwatch.code}
               </div>
             </div>

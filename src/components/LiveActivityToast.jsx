@@ -132,14 +132,14 @@ export const LiveActivityToast = ({ onOpenLeadModal }) => {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <span className="uppercase tracking-wider font-mono text-[10px]">Jonli Faollik</span>
-            <span className="text-slate-300 dark:text-slate-600">•</span>
-            <span className="text-slate-500 dark:text-slate-400 font-mono text-[10px]">{current.time}</span>
+            <span className="text-slate-400 dark:text-slate-600">•</span>
+            <span className="text-slate-600 dark:text-slate-400 font-mono text-[10px]">{current.time}</span>
           </div>
 
           <button
             type="button"
             onClick={() => setIsDismissed(true)}
-            className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+            className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Yopish"
           >
             <X className="w-3.5 h-3.5" />

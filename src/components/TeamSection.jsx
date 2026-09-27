@@ -215,16 +215,16 @@ export const TeamSection = ({
                               e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
                             }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-80 pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 pointer-events-none" />
 
                           {/* Role Badge */}
                           <div className="absolute top-3.5 left-3.5">
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold shadow-md border ${
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold shadow-md border backdrop-blur-md ${
                               isBoss
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 backdrop-blur-md'
+                                ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40'
                                 : isAssistant
-                                ? 'bg-blue-500/20 text-blue-300 border-blue-500/40 backdrop-blur-md'
-                                : 'bg-brand-red/20 text-white border-brand-red/50 backdrop-blur-md'
+                                ? 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/40'
+                                : 'bg-white/95 text-brand-red border-brand-red/30 dark:bg-brand-red/20 dark:text-white dark:border-brand-red/50'
                             }`}>
                               <Sparkles className="w-3 h-3 text-brand-red" />
                               <span>{member.label || member.role}</span>
@@ -233,14 +233,14 @@ export const TeamSection = ({
 
                           {/* Projects Count Pill */}
                           <div className="absolute bottom-3 right-3">
-                            <span className="px-2.5 py-1 rounded-xl bg-brand-dark/80 backdrop-blur-md border border-white/10 text-white text-[11px] font-bold">
+                            <span className="px-2.5 py-1 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-sm">
                               {member.completedProjects || "250+ obyekt"}
                             </span>
                           </div>
 
                           {/* Experience Pill */}
                           <div className="absolute bottom-3 left-3">
-                            <span className="px-2.5 py-1 rounded-xl bg-brand-red/90 text-white text-[11px] font-black flex items-center gap-1 shadow-sm">
+                            <span className="px-2.5 py-1 rounded-xl bg-brand-red text-white text-[11px] font-black flex items-center gap-1 shadow-sm">
                               <ShieldCheck className="w-3 h-3" />
                               <span>{member.experience || "5+ yil"}</span>
                             </span>
@@ -308,8 +308,8 @@ export const TeamSection = ({
           </div>
 
           {/* Micro status indicator */}
-          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-400 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-600 dark:text-slate-400 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring</span>
           </div>
         </div>

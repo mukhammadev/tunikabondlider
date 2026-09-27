@@ -55,7 +55,7 @@ export const WhyUs = ({ t }) => {
               <span>•</span>
               <span>Zavod Sertifikati</span>
               <span>•</span>
-              <span className="text-emerald-500 dark:text-emerald-400 font-bold">100% Ishonch</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold">100% Ishonch</span>
             </div>
           </div>
 
@@ -83,7 +83,7 @@ export const WhyUs = ({ t }) => {
               <Clock className="w-7 h-7" />
             </div>
 
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20 mb-3">
+            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/20 mb-3">
               O'Z VAQTIDA
             </div>
 
@@ -101,7 +101,7 @@ export const WhyUs = ({ t }) => {
               <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
                 <Banknote className="w-7 h-7" />
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
                 O'RTAKASHLARSIZ
               </span>
             </div>
@@ -146,7 +146,7 @@ export const WhyUs = ({ t }) => {
               <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
                 <Eye className="w-7 h-7" />
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">
+              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-sky-100 dark:bg-sky-500/20 text-sky-800 dark:text-sky-400 border border-sky-300 dark:border-sky-500/30">
                 3D MODELLASHTIRISH
               </span>
             </div>

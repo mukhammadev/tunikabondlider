@@ -316,7 +316,7 @@ export const ContactSection = ({ t }) => {
                     )}
                   </button>
 
-                  <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center">
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 text-center font-medium">
                     Tugmani bosish orqali siz shaxsiy ma'lumotlaringizni qayta ishlashga rozilik bildirasiz.
                   </p>
 

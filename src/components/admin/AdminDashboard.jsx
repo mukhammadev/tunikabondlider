@@ -349,7 +349,7 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn">
+    <div className="dark fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn">
       
       {/* Top Navbar */}
       <div className="bg-brand-surface border-b border-white/10 px-6 py-4 flex items-center justify-between flex-shrink-0">

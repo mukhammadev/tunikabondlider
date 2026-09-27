@@ -386,21 +386,21 @@ const DemoSliderTab = ({ onOpenLeadModal }) => {
       {/* Project info strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 sm:p-6 rounded-2xl bg-white dark:bg-brand-surface/60 border border-slate-200 dark:border-white/10 shadow-sm">
         <div>
-          <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Joylashuvi</span>
+          <span className="block text-[11px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">Joylashuvi</span>
           <span className="block text-sm font-bold text-slate-900 dark:text-white mt-0.5">{cur.location}</span>
         </div>
         <div>
-          <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Maydon</span>
+          <span className="block text-[11px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">Maydon</span>
           <span className="block text-sm font-bold text-brand-red mt-0.5">{cur.area}</span>
         </div>
         <div>
-          <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Montaj vaqti</span>
+          <span className="block text-[11px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">Montaj vaqti</span>
           <span className="block text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1">
             <Clock className="w-3.5 h-3.5 inline" /> {cur.duration}
           </span>
         </div>
         <div>
-          <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Mahsulot</span>
+          <span className="block text-[11px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">Mahsulot</span>
           <span className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mt-0.5 truncate" title={cur.material}>{cur.material}</span>
         </div>
       </div>
@@ -480,7 +480,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
             </div>
             <div>
               <h4 className="font-bold text-slate-900 dark:text-white text-sm">10 Yillik Rasmiy Kafolat</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Rang, chidamlilik va havo injiqliklariga.</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">Rang, chidamlilik va havo injiqliklariga.</p>
             </div>
           </div>
           <div className="p-5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm flex items-start gap-4">
@@ -489,7 +489,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
             </div>
             <div>
               <h4 className="font-bold text-slate-900 dark:text-white text-sm">Olov va Suvga Chidamli</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">A2 sinfidagi yonmaydigan materiallar.</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">A2 sinfidagi yonmaydigan materiallar.</p>
             </div>
           </div>
           <div className="p-5 rounded-2xl bg-brand-red text-white shadow-glow-red flex flex-col justify-between">
