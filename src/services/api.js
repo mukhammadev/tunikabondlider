@@ -102,20 +102,63 @@ export const apiGetStats = async () => {
     const res = await fetch('/api/stats/');
     if (res.ok) return await res.json();
   } catch {}
-  return { totalLeads: 0, newLeads: 0, totalProducts: 6, totalProjects: 3, totalAdmins: 2 };
+
+  const [leads, products, portfolio, admins] = await Promise.all([
+    apiGetLeads(),
+    apiGetProducts(),
+    apiGetPortfolio(),
+    apiGetAdmins()
+  ]);
+
+  return {
+    totalLeads: leads.length,
+    newLeads: leads.filter(l => l.status === 'new' || !l.status).length,
+    totalProducts: products.length,
+    totalProjects: portfolio.length,
+    totalAdmins: admins.length
+  };
 };
 
 // --- LEADS API ---
 export const apiGetLeads = async () => {
+  let leads = [];
   try {
     const res = await fetch('/api/leads/');
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        leads = data;
+      }
+    }
   } catch {}
-  try {
-    return JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
-  } catch {
-    return [];
+
+  if (!leads.length) {
+    try {
+      leads = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
+    } catch {}
   }
+
+  const validStatuses = ['new', 'in_progress', 'completed', 'cancelled'];
+  const normalized = leads.map((l, index) => {
+    // Crucial: If status is undefined, null, or empty string, default strictly to 'new'
+    let status = l.status;
+    if (!status || !validStatuses.includes(status)) {
+      status = 'new';
+    }
+    return {
+      ...l,
+      id: l.id || `lead-local-${index}-${Date.now()}`,
+      status: status,
+      timestamp: l.timestamp || l.date || new Date().toISOString()
+    };
+  });
+
+  // Heal corrupt items in localStorage
+  try {
+    localStorage.setItem('tunikabond_leads', JSON.stringify(normalized));
+  } catch {}
+
+  return normalized;
 };
 
 export const apiUpdateLead = async (leadId, patchData) => {
@@ -125,8 +168,18 @@ export const apiUpdateLead = async (leadId, patchData) => {
       headers: getHeaders(),
       body: JSON.stringify(patchData)
     });
-    if (res.ok) return true;
+    if (res.ok) {
+      // Backend updated
+    }
   } catch {}
+
+  // Sync to localStorage for static host / offline persistence
+  try {
+    const existing = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
+    const updated = existing.map(l => (String(l.id) === String(leadId) ? { ...l, ...patchData } : l));
+    localStorage.setItem('tunikabond_leads', JSON.stringify(updated));
+  } catch {}
+
   return true;
 };
 
@@ -136,8 +189,18 @@ export const apiDeleteLead = async (leadId) => {
       method: 'DELETE',
       headers: getHeaders()
     });
-    if (res.ok) return true;
+    if (res.ok) {
+      // Backend deleted
+    }
   } catch {}
+
+  // Sync to localStorage for static host / offline persistence
+  try {
+    const existing = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
+    const updated = existing.filter(l => String(l.id) !== String(leadId));
+    localStorage.setItem('tunikabond_leads', JSON.stringify(updated));
+  } catch {}
+
   return true;
 };
 

@@ -100,14 +100,39 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
   // --- LEADS ACTIONS ---
   const handleLeadStatusChange = async (leadId, newStatus) => {
     await apiUpdateLead(leadId, { status: newStatus });
-    setLeads(leads.map(l => l.id === leadId ? { ...l, status: newStatus } : l));
+    setLeads(leads.map(l => String(l.id) === String(leadId) ? { ...l, status: newStatus } : l));
   };
 
   const handleDeleteLead = async (leadId) => {
     if (window.confirm("Haqiqatan ham ushbu arizani o'chirmoqchimisiz?")) {
       await apiDeleteLead(leadId);
-      setLeads(leads.filter(l => l.id !== leadId));
+      setLeads(leads.filter(l => String(l.id) !== String(leadId)));
     }
+  };
+
+  const handleExportCsv = () => {
+    if (!leads.length) {
+      alert("Yuklab olish uchun arizalar mavjud emas");
+      return;
+    }
+    const headers = ["ID", "Vaqti", "Mijoz", "Telefon", "Xizmat", "Holati", "Xabar"];
+    const rows = leads.map(l => [
+      l.id,
+      l.timestamp ? new Date(l.timestamp).toLocaleString('uz-UZ') : '',
+      `"${(l.name || '').replace(/"/g, '""')}"`,
+      `"${l.phone || ''}"`,
+      `"${(l.service || '').replace(/"/g, '""')}"`,
+      l.status === 'in_progress' ? 'Jarayonda' : l.status === 'completed' ? 'Bajarildi' : l.status === 'cancelled' ? 'Bekor qilindi' : 'Yangi',
+      `"${(l.message || '').replace(/"/g, '""')}"`
+    ]);
+    const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `tunikabond_arizalar_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   // --- PRODUCTS CRUD ---
@@ -415,9 +440,9 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                 <Inbox className="w-4 h-4" />
                 <span>Arizalar & Buyurtmalar</span>
               </div>
-              {leads.filter(l => l.status === 'new').length > 0 && (
+              {leads.filter(l => l.status === 'new' || !l.status).length > 0 && (
                 <span className="w-5 h-5 rounded-full bg-white text-brand-red text-[11px] font-black flex items-center justify-center">
-                  {leads.filter(l => l.status === 'new').length}
+                  {leads.filter(l => l.status === 'new' || !l.status).length}
                 </span>
               )}
             </button>
@@ -507,17 +532,17 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
 
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-slate-300">
-                    Yangi arizalar: <strong className="text-brand-red font-bold">{leads.filter(l => l.status === 'new').length} ta</strong>
+                    Yangi arizalar: <strong className="text-brand-red font-bold">{leads.filter(l => l.status === 'new' || !l.status).length} ta</strong>
                   </span>
-                  <a
-                    href="/api/leads/export"
-                    download
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all"
+                  <button
+                    type="button"
+                    onClick={handleExportCsv}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
                     title="Barcha arizalarni Excel formatida yuklab olish"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Excel (.csv)</span>
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -532,7 +557,7 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                     <div 
                       key={lead.id} 
                       className={`glass-panel p-5 rounded-2xl border transition-all ${
-                        lead.status === 'new' 
+                        (lead.status === 'new' || !lead.status) 
                           ? 'border-brand-red/50 shadow-glow-red bg-brand-red/5' 
                           : 'border-white/10'
                       }`}
@@ -546,15 +571,21 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                               {lead.name || "Noma'lum mijoz"}
                             </span>
                             <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
-                              lead.status === 'new' 
-                                ? 'bg-brand-red text-white' 
-                                : lead.status === 'in_progress' 
+                              lead.status === 'in_progress' 
                                 ? 'bg-amber-500 text-black' 
-                                : lead.status === 'completed'
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-slate-600 text-white'
+                                : lead.status === 'completed' 
+                                ? 'bg-emerald-500 text-white' 
+                                : lead.status === 'cancelled'
+                                ? 'bg-slate-600 text-white'
+                                : 'bg-brand-red text-white'
                             }`}>
-                              {lead.status === 'new' ? 'Yangi' : lead.status === 'in_progress' ? 'Jarayonda' : lead.status === 'completed' ? 'Bajarildi' : 'Bekor qilindi'}
+                              {lead.status === 'in_progress' 
+                                ? 'Jarayonda' 
+                                : lead.status === 'completed' 
+                                ? 'Bajarildi' 
+                                : lead.status === 'cancelled' 
+                                ? 'Bekor qilindi' 
+                                : 'Yangi'}
                             </span>
                           </div>
 

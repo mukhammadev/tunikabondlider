@@ -6,13 +6,22 @@
 export const submitLead = async (leadData) => {
   const { name, phone, service, message, source, calcData } = leadData;
 
+  // Generate standardized lead with unique ID, timestamp, and 'new' status
+  const now = new Date().toISOString();
+  const standardizedLead = {
+    id: leadData.id || `lead-${Date.now()}`,
+    timestamp: leadData.timestamp || now,
+    ...leadData,
+    status: (leadData.status && ['new', 'in_progress', 'completed', 'cancelled'].includes(leadData.status))
+      ? leadData.status
+      : 'new',
+    date: now
+  };
+
   // Store in browser backup storage so lead is never lost
   try {
     const existing = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
-    existing.unshift({
-      ...leadData,
-      date: new Date().toISOString()
-    });
+    existing.unshift(standardizedLead);
     localStorage.setItem('tunikabond_leads', JSON.stringify(existing.slice(0, 50)));
   } catch (e) {
     console.warn('Backup save error:', e);
@@ -40,7 +49,7 @@ export const submitLead = async (leadData) => {
     const apiRes = await fetch('/api/leads/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leadData)
+      body: JSON.stringify(standardizedLead)
     });
     if (apiRes.ok) return { success: true };
   } catch (err) {

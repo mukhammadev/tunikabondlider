@@ -423,11 +423,14 @@ def handle_leads():
         return jsonify({"error": "Telefon raqami kiritilishi shart"}), 400
 
     leads = load_json(LEADS_FILE, [])
+    raw_status = data.get("status")
+    valid_status = raw_status if raw_status in ["new", "in_progress", "completed", "cancelled"] else "new"
+
     lead_record = {
         "id": f"lead-{len(leads) + 1}",
         "timestamp": datetime.now().isoformat(),
-        "status": "new",  # new | in_progress | completed | cancelled
         **data,
+        "status": valid_status,
     }
     leads.insert(0, lead_record)
     save_json(LEADS_FILE, leads)
