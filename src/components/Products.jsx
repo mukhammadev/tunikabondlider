@@ -38,15 +38,15 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-14">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm ${
                 activeTab === tab.id
-                  ? 'bg-brand-red text-white shadow-glow-red font-bold'
-                  : 'bg-slate-100 dark:bg-brand-dark/70 text-slate-700 dark:text-slate-300 hover:text-brand-red hover:bg-slate-200 dark:hover:bg-brand-surface border border-slate-200 dark:border-white/10'
+                  ? 'bg-brand-red text-white border-2 border-brand-red shadow-glow-red font-extrabold'
+                  : 'bg-white dark:bg-[#13192b] text-slate-800 dark:text-slate-100 hover:text-brand-red hover:border-brand-red/50 border-2 border-slate-200 dark:border-white/15'
               }`}
             >
               {tab.label}

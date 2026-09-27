@@ -188,13 +188,13 @@ export const Navbar = ({
 
         {/* ══ MOBILE DRAWER ══ */}
         {mobileMenuOpen && (
-          <div className={`md:hidden rounded-2xl border shadow-2xl px-4 pt-3 pb-4 animate-slideDown ${
-            isLight ? 'bg-white/98 border-slate-200 shadow-2xl text-slate-900' : 'bg-[#0d1120]/98 border-white/15 shadow-2xl text-white'
+          <div className={`md:hidden rounded-2xl border-2 shadow-2xl px-4 pt-3.5 pb-4 animate-slideDown ${
+            isLight ? 'bg-white border-slate-300 shadow-2xl text-slate-900' : 'bg-[#0c1122] border-white/20 shadow-2xl text-white'
           }`}>
 
             {/* Language */}
-            <div className={`flex items-center justify-between px-2 py-2 rounded-xl border mb-2 ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'}`}>
-              <span className={`text-xs font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>Til:</span>
+            <div className={`flex items-center justify-between px-3 py-2 rounded-xl border mb-3 ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'}`}>
+              <span className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>Tilni tanlang:</span>
               <div className={`flex rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-white border-slate-200' : 'bg-white/8 border-white/10'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
                   <button key={lng} onClick={() => setLang(lng)}
@@ -205,7 +205,7 @@ export const Navbar = ({
             </div>
 
             {/* Nav links */}
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const isActive = currentPage === link.id;
@@ -214,15 +214,23 @@ export const Navbar = ({
                     key={link.id}
                     type="button"
                     onClick={() => handleLinkClick(link.id)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all text-left border shadow-sm ${
                       isActive
-                        ? 'bg-brand-red text-white font-bold shadow-glow-red'
+                        ? 'bg-brand-red text-white border-brand-red shadow-glow-red'
                         : isLight
-                          ? 'text-slate-800 hover:bg-slate-100 hover:text-brand-red'
-                          : 'text-slate-200 hover:bg-white/5 hover:text-brand-red'
+                          ? 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-900'
+                          : 'bg-[#151c30] hover:bg-[#1d2642] border-white/10 text-white'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-brand-red'}`} />
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : isLight
+                          ? 'bg-white text-brand-red shadow-sm'
+                          : 'bg-white/10 text-brand-red'
+                    }`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
                     <span className="truncate">{link.label}</span>
                   </button>
                 );

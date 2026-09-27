@@ -104,7 +104,7 @@ export const HomeNavigationBento = ({ t, onNavigate }) => {
               <div
                 key={card.id}
                 onClick={() => onNavigate(card.id)}
-                className={`group relative rounded-2xl p-6 sm:p-7 border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-brand-surface/70 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden flex flex-col justify-between ${
+                className={`group relative rounded-2xl p-6 sm:p-7 border-2 border-slate-200 dark:border-white/15 bg-white dark:bg-[#0f1423] shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden flex flex-col justify-between ${
                   card.accentBorder
                 } ${isWide ? 'md:col-span-2 lg:col-span-1' : ''}`}
               >
@@ -116,27 +116,27 @@ export const HomeNavigationBento = ({ t, onNavigate }) => {
                 <div>
                   {/* Top Row: Icon + Badge */}
                   <div className="flex items-center justify-between gap-3 mb-5">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-brand-red group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all shadow-md">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-brand-red group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all shadow-md">
                       <Icon className="w-6 h-6 transition-colors" />
                     </div>
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${card.badgeColor}`}>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border ${card.badgeColor}`}>
                       {card.badge}
                     </span>
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
+                  <h3 className="font-display font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
                     {card.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6 font-medium">
                     {card.subtitle}
                   </p>
                 </div>
 
                 {/* Bottom CTA Button */}
-                <div className="pt-4 border-t border-slate-200/60 dark:border-white/10 flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-red transition-colors">
+                <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-xs sm:text-sm font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-brand-red transition-colors">
                   <span>{card.ctaText}</span>
-                  <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:bg-brand-red group-hover:text-white group-hover:border-brand-red transition-all">
+                  <div className="w-8 h-8 rounded-xl bg-brand-red/10 dark:bg-brand-red/20 border border-brand-red/30 text-brand-red flex items-center justify-center group-hover:bg-brand-red group-hover:text-white group-hover:border-brand-red transition-all shadow-sm">
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
