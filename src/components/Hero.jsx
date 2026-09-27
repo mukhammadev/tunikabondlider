@@ -65,13 +65,13 @@ export const Hero = ({ t, onOpenLeadModal }) => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span className="text-slate-300 font-medium">Bugun navbatsiz bepul o'lchov:</span>
+            <span className="light:text-slate-600 text-slate-300 font-medium">Bugun navbatsiz bepul o'lchov:</span>
             <span className="text-brand-red font-bold font-mono">3 ta bo'sh vaqt</span>
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           </div>
 
           {/* Main Headline */}
-          <h1 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-[1.15] mb-6">
+          <h1 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl light:text-slate-900 text-white tracking-tight leading-[1.15] mb-6">
             {t.hero.titleStart}{' '}
             <span className="red-gradient-text block sm:inline">
               {t.hero.titleHighlight}
@@ -80,7 +80,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
           </h1>
 
           {/* Subheadline (John Caples Rule) */}
-          <p className="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-10 font-normal">
+          <p className="text-base sm:text-xl light:text-slate-600 text-slate-300 max-w-3xl mx-auto leading-relaxed mb-10 font-normal">
             {t.hero.subtitle}
           </p>
 
@@ -98,7 +98,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
 
             <a
               href="#products"
-              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand-surface/80 hover:bg-brand-surface border border-white/10 text-white font-semibold text-base hover:border-brand-red/40 transition-all hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl light:bg-slate-100/80 bg-brand-surface/80 hover:bg-brand-surface light:border-black/10 border border-white/10 light:text-slate-900 text-white font-semibold text-base hover:border-brand-red/40 transition-all hover:scale-105 active:scale-95"
             >
               <Building2 className="w-5 h-5 text-brand-red" />
               <span>{t.hero.ctaCatalog}</span>
@@ -113,11 +113,11 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                 <div className="w-10 h-10 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red group-hover:scale-110 transition-transform">
                   <Award className="w-5 h-5" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+                <div className="text-2xl sm:text-3xl font-extrabold light:text-slate-900 text-white font-display">
                   {counts.exp}+
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 font-medium">{t.hero.statExp}</p>
+              <p className="text-xs sm:text-sm light:text-slate-500 text-slate-400 font-medium">{t.hero.statExp}</p>
             </div>
 
             <div className="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group hover:border-brand-red/50">
@@ -125,11 +125,11 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                 <div className="w-10 h-10 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red group-hover:scale-110 transition-transform">
                   <Building2 className="w-5 h-5" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+                <div className="text-2xl sm:text-3xl font-extrabold light:text-slate-900 text-white font-display">
                   {counts.projects}+
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 font-medium">{t.hero.statProjects}</p>
+              <p className="text-xs sm:text-sm light:text-slate-500 text-slate-400 font-medium">{t.hero.statProjects}</p>
             </div>
 
             <div className="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group hover:border-brand-red/50">
@@ -137,11 +137,11 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                 <div className="w-10 h-10 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+                <div className="text-2xl sm:text-3xl font-extrabold light:text-slate-900 text-white font-display">
                   {counts.warranty} Yil
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 font-medium">{t.hero.statWarranty}</p>
+              <p className="text-xs sm:text-sm light:text-slate-500 text-slate-400 font-medium">{t.hero.statWarranty}</p>
             </div>
 
             <div className="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group hover:border-brand-red/50">
@@ -153,7 +153,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                   {counts.measure}%
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-400 font-medium">{t.hero.statMeasurement}</p>
+              <p className="text-xs sm:text-sm light:text-slate-500 text-slate-400 font-medium">{t.hero.statMeasurement}</p>
             </div>
 
           </div>

@@ -1,19 +1,29 @@
 [
   {
     "id": "team-boss",
-    "name": "Muhammadaziz Mirzayev",
+    "name": "Muhammadaziz Ibragimov",
     "role": "Firma Boshlig'i & Bosh Muhandis",
     "label": "Firma Boshlig'i",
     "isLeader": true,
     "experience": "9+ yil tajriba",
     "completedProjects": "600+ obyekt",
     "phone": "+998 99 533-33-03",
-    "photo": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80",
+    "photo": "/uploads/20260926_185135_8241a9d8.jpg",
     "bio": "Tunikabond Lider korxonasi rahbari va bosh muhandisi. Barcha metall konstruksiyalar mustahkamligi va montaj ishlarining 10 yillik kafolatiga shaxsan javobgar.",
     "specialties": [
       "fasad",
       "naves",
       "darvozaxona"
+    ],
+    "works": [
+      {
+        "id": "w-1790430718789-1",
+        "title": "Firma Boshlig'i — Namuna Loyihasi",
+        "category": "Fasad",
+        "image": "/uploads/20260926_185135_8241a9d8.jpg",
+        "location": "Toshkent shahri",
+        "desc": "Yuqori sifatli materiallar va 10 yillik kafolat bilan topshirilgan obyekt."
+      }
     ]
   },
   {

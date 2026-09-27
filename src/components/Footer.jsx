@@ -7,7 +7,7 @@ export const Footer = ({ t }) => {
   };
 
   return (
-    <footer className="bg-brand-surface/90 border-t border-white/10 pt-16 pb-12 relative">
+    <footer className="light:bg-slate-100/80 bg-brand-surface/90 light:border-black/10 border-t border-white/10 pt-16 pb-12 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -15,29 +15,29 @@ export const Footer = ({ t }) => {
           {/* Brand Info */}
           <div className="space-y-4">
             <a href="#" className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red">
+              <div className="w-11 h-11 rounded-xl light:bg-black/5 bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red">
                 <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain filter drop-shadow" />
               </div>
               <div>
-                <span className="block font-display font-bold text-xl text-white">
+                <span className="block font-display font-bold text-xl light:text-slate-900 text-white">
                   TUNIKABOND <span className="text-brand-red">LIDER</span>
                 </span>
-                <span className="block text-[10px] text-slate-400 uppercase tracking-widest font-medium">
+                <span className="block text-[10px] light:text-slate-500 text-slate-400 uppercase tracking-widest font-medium">
                   Fasad & Tom Yechimlari
                 </span>
               </div>
             </a>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            <p className="text-xs sm:text-sm light:text-slate-500 text-slate-400 leading-relaxed">
               {t.footer.desc}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider mb-4">
+            <h4 className="font-display font-bold text-sm light:text-slate-900 text-white uppercase tracking-wider mb-4">
               {t.nav.services} & Bo'limlar
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-slate-300">
+            <ul className="space-y-2.5 text-xs sm:text-sm light:text-slate-600 text-slate-300">
               <li>
                 <a href="#calculator" className="hover:text-brand-red transition-colors">
                   {t.nav.calculator}
@@ -73,8 +73,7 @@ export const Footer = ({ t }) => {
 
           {/* Contact Numbers with PROPER tel: links */}
           <div>
-            <h4 className="font-display font-bold text-sm text-white uppercase tracking-wider mb-4">
-              {t.contact.phoneTitle}
+            <h4 className="font-display font-bold text-sm light:text-slate-900 text-white uppercase tracking-wider mb-4">
             </h4>
             <ul className="space-y-3 text-xs sm:text-sm">
               <li>

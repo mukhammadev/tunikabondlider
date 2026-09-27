@@ -48,5 +48,10 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    // 'light:' variant — activates when html has .light class
+    function({ addVariant }) {
+      addVariant('light', 'html.light &');
+    }
+  ],
 }
