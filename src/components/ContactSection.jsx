@@ -61,10 +61,10 @@ export const ContactSection = ({ t }) => {
             <Phone className="w-3.5 h-3.5" />
             <span>{t.contact.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
             {t.contact.title}
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg">
+          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
             {t.contact.subtitle}
           </p>
         </div>
@@ -117,7 +117,7 @@ export const ContactSection = ({ t }) => {
                 <div className="space-y-2">
                   <a 
                     href="tel:+998995333303" 
-                    className="flex items-center gap-3 text-base sm:text-lg font-bold text-white hover:text-brand-red transition-colors"
+                    className="flex items-center gap-3 text-base sm:text-lg font-bold light:text-slate-800 text-white hover:text-brand-red transition-colors"
                   >
                     <div className="w-9 h-9 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red">
                       <Phone className="w-4 h-4" />
@@ -126,7 +126,7 @@ export const ContactSection = ({ t }) => {
                   </a>
                   <a 
                     href="tel:+998981411808" 
-                    className="flex items-center gap-3 text-base font-semibold text-slate-200 hover:text-brand-red transition-colors"
+                    className="flex items-center gap-3 text-base font-semibold light:text-slate-700 text-slate-200 hover:text-brand-red transition-colors"
                   >
                     <div className="w-9 h-9 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red">
                       <Phone className="w-4 h-4" />
@@ -135,7 +135,7 @@ export const ContactSection = ({ t }) => {
                   </a>
                   <a 
                     href="tel:+998990473809" 
-                    className="flex items-center gap-3 text-base font-semibold text-slate-200 hover:text-brand-red transition-colors"
+                    className="flex items-center gap-3 text-base font-semibold light:text-slate-700 text-slate-200 hover:text-brand-red transition-colors"
                   >
                     <div className="w-9 h-9 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red">
                       <Phone className="w-4 h-4" />
@@ -217,10 +217,10 @@ export const ContactSection = ({ t }) => {
                   <div className="w-16 h-16 rounded-full bg-brand-red/20 text-brand-red flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-10 h-10" />
                   </div>
-                  <h3 className="font-display font-extrabold text-2xl text-white mb-2">
+                  <h3 className="font-display font-extrabold text-2xl light:text-slate-900 text-white mb-2">
                     {t.contact.successTitle}
                   </h3>
-                  <p className="text-slate-300 text-sm max-w-md mx-auto mb-8">
+                  <p className="light:text-slate-600 text-slate-300 text-sm max-w-md mx-auto mb-8">
                     {t.contact.successDesc}
                   </p>
                   <button
@@ -249,7 +249,7 @@ export const ContactSection = ({ t }) => {
                       placeholder={t.contact.formNamePlaceholder}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-brand-dark/70 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
+                      className="w-full px-4 py-3.5 rounded-xl light:bg-white light:border-black/10 light:text-slate-900 light:placeholder-slate-400 bg-brand-dark/70 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
                     />
                   </div>
 
@@ -264,7 +264,7 @@ export const ContactSection = ({ t }) => {
                       placeholder="+998 (90) 123-45-67"
                       value={formData.phone}
                       onChange={handlePhoneChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-brand-dark/70 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm font-semibold tracking-wide"
+                      className="w-full px-4 py-3.5 rounded-xl light:bg-white light:border-black/10 light:text-slate-900 light:placeholder-slate-400 bg-brand-dark/70 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm font-semibold tracking-wide"
                     />
                   </div>
 
@@ -296,7 +296,7 @@ export const ContactSection = ({ t }) => {
                       placeholder={t.contact.formMessagePlaceholder}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-brand-dark/70 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm resize-none"
+                      className="w-full px-4 py-3.5 rounded-xl light:bg-white light:border-black/10 light:text-slate-900 light:placeholder-slate-400 bg-brand-dark/70 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm resize-none"
                     />
                   </div>
 

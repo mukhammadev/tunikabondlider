@@ -28,10 +28,10 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
             <Palette className="w-3.5 h-3.5" />
             <span>{t.swatches.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
             {t.swatches.title}
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg">
+          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
             {t.swatches.subtitle}
           </p>
         </div>

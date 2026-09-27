@@ -16,10 +16,10 @@ export const WhyUs = ({ t }) => {
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>{t.whyUs.badge}</span>
           </div>
-          <h2 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
             {t.whyUs.title}
           </h2>
-          <p className="text-slate-300 text-sm sm:text-lg">
+          <p className="light:text-slate-600 text-slate-300 text-sm sm:text-lg">
             {t.whyUs.subtitle}
           </p>
         </div>
@@ -40,15 +40,15 @@ export const WhyUs = ({ t }) => {
               </span>
             </div>
 
-            <h3 className="font-display font-bold text-xl sm:text-2xl text-white mb-3 group-hover:text-brand-red transition-colors">
+            <h3 className="font-display font-bold text-xl sm:text-2xl light:text-slate-900 text-white mb-3 group-hover:text-brand-red transition-colors">
               {t.whyUs.p1Title}
             </h3>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
+            <p className="light:text-slate-600 text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
               {t.whyUs.p1Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-              <span className="flex items-center gap-1.5 font-bold text-white">
+            <div className="mt-6 pt-4 light:border-black/5 border-t border-white/5 flex flex-wrap items-center gap-4 text-xs light:text-slate-500 text-slate-400">
+              <span className="flex items-center gap-1.5 font-bold light:text-slate-900 text-white">
                 <Sparkles className="w-3.5 h-3.5 text-brand-red" />
                 Yuridik Shartnoma
               </span>

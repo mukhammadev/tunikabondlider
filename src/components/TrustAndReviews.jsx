@@ -73,7 +73,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-white tracking-tight mb-4">
               Rasmiy Kafolat va <span className="text-gradient-red">Sifat Sertifikatlari</span>
             </h2>
-            <p className="text-slate-300 text-base sm:text-lg">
+            <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
               Biz faqat so'zda emas, balki qonuniy kuchga ega 10 yillik rasmiy shartnoma va sifat sertifikatlari bilan xizmat ko'rsatamiz.
             </p>
           </div>
@@ -124,7 +124,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-white tracking-tight mb-4">
               Mijozlarimiz Biz Haqimizda <span className="text-gradient-red">Nima Deydi?</span>
             </h2>
-            <p className="text-slate-300 text-base sm:text-lg">
+            <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
               Yuzlab muvaffaqiyatli topshirilgan fasad va tom loyihalarimiz egalarining samimiy baholari.
             </p>
           </div>

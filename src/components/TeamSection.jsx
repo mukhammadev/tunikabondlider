@@ -143,10 +143,10 @@ export const TeamSection = ({
             <Users className="w-3.5 h-3.5" />
             <span>{t.team?.badge || "Bizning Professional Jamoa"}</span>
           </div>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight mb-4">
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl light:text-slate-900 text-white tracking-tight mb-4">
             {t.team?.title || "Tajribali Ustalar va Rahbariyat"}
           </h2>
-          <p className="text-slate-300 text-base sm:text-lg">
+          <p className="light:text-slate-600 text-slate-300 text-base sm:text-lg">
             {t.team?.subtitle || "Ko'p yillik amaliy tajribaga ega bo'lgan o'z sohasining yetakchi ustalari va muhandislari."}
           </p>
         </div>
