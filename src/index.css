@@ -201,3 +201,20 @@ html.light input[type="range"] {
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-slideDown { animation: slideDown 0.2s ease-out both; }
+
+@keyframes specular-sweep {
+  0%   { transform: translateX(-160%) skewX(-20deg); }
+  100% { transform: translateX(260%) skewX(-20deg); }
+}
+.animate-specular-sweep {
+  animation: specular-sweep 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes laser-glow {
+  0%   { width: 0; opacity: 0; }
+  50%  { width: 220px; opacity: 1; }
+  100% { width: 300px; opacity: 0.6; }
+}
+.animate-laser-glow {
+  animation: laser-glow 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

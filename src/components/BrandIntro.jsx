@@ -2,30 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 /**
- * Gcore-inspired Minimalist Luxury Intro Reveal (Awwwards video style):
- * 1. Concentric pulsing ring in deep black space
- * 2. Smooth morph & expansion into Tunikabond Lider emblem & typography
- * 3. Fluid upward curtain wipe reveal (translateY(-100%)) with luxury cubic-bezier easing
+ * Cinematic Luxury Intro Reveal (Apple & Porsche Architecture Style):
+ * 1. Deep Matte Obsidian Space with subtle Red Core Ambient Glow
+ * 2. Glassmorphic Emblem with Metallic Specular Laser Sweep
+ * 3. Minimalist Brand Typography ("TUNIKABOND LIDER")
+ * 4. Dual-Curtain Architectural Aperture Reveal (Top shutter up, Bottom shutter down)
+ * 5. Ultra-snappy 1.25s duration: creates instant luxury without user boredom
  */
 export const BrandIntro = ({ onComplete }) => {
-  const [phase, setPhase] = useState('ring'); // 'ring' -> 'logo' -> 'wipe' -> 'done'
+  const [phase, setPhase] = useState('init'); // 'init' -> 'shimmer' -> 'reveal' -> 'done'
 
   useEffect(() => {
-    // Phase 1: Ring pulses, then morphs into logo at 450ms
+    // 1. Shimmer sweep starts at 200ms
     const t1 = setTimeout(() => {
-      setPhase('logo');
-    }, 450);
+      setPhase('shimmer');
+    }, 200);
 
-    // Phase 2: Upward curtain wipe begins at 1000ms
+    // 2. Dual-curtain aperture separation starts at 750ms
     const t2 = setTimeout(() => {
-      setPhase('wipe');
-    }, 1000);
+      setPhase('reveal');
+    }, 750);
 
-    // Phase 3: Complete & unmount at 1700ms
+    // 3. Unmount completely at 1350ms
     const t3 = setTimeout(() => {
       setPhase('done');
       if (onComplete) onComplete();
-    }, 1700);
+    }, 1350);
 
     return () => {
       clearTimeout(t1);
@@ -34,107 +36,113 @@ export const BrandIntro = ({ onComplete }) => {
     };
   }, [onComplete]);
 
-  // Click or touch immediately triggers upward wipe
-  const handleSkip = () => {
-    if (phase !== 'wipe' && phase !== 'done') {
-      setPhase('wipe');
+  // Click or touch immediately triggers opening
+  const handleSkip = (e) => {
+    if (e) e.stopPropagation();
+    if (phase !== 'reveal' && phase !== 'done') {
+      setPhase('reveal');
       setTimeout(() => {
         setPhase('done');
         if (onComplete) onComplete();
-      }, 650);
+      }, 450);
     }
   };
 
   if (phase === 'done') return null;
 
-  const isWiping = phase === 'wipe';
-  const showLogo = phase === 'logo' || phase === 'wipe';
+  const isRevealing = phase === 'reveal';
 
   return (
     <div
       onClick={handleSkip}
       className="fixed inset-0 z-[9999] overflow-hidden select-none cursor-pointer"
-      style={{
-        transform: isWiping ? 'translateY(-100%)' : 'translateY(0%)',
-        transition: 'transform 0.75s cubic-bezier(0.86, 0, 0.07, 1)',
-        willChange: 'transform',
-      }}
       aria-label="Tunikabond Lider brendining ochilish animatsiyasi"
     >
-      {/* Background Matte Dark Void */}
-      <div className="absolute inset-0 bg-[#080B10] flex flex-col items-center justify-center p-6">
-        
-        {/* Subtle Warm Halo in Center */}
-        <div 
-          className="absolute w-[450px] h-[450px] rounded-full bg-brand-red/15 blur-[120px] pointer-events-none transition-opacity duration-700"
-          style={{ opacity: showLogo ? 0.6 : 0.2 }}
-        />
+      {/* ═══ TOP SHUTTER CURTAIN ═══ */}
+      <div
+        className="absolute inset-x-0 top-0 h-1/2 bg-[#06080D] border-b border-white/5"
+        style={{
+          transform: isRevealing ? 'translateY(-100%)' : 'translateY(0%)',
+          transition: 'transform 0.65s cubic-bezier(0.77, 0, 0.175, 1)',
+          willChange: 'transform'
+        }}
+      >
+        {/* Subtle top ambient red gradient */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-brand-red/10 rounded-full blur-[100px] pointer-events-none" />
+      </div>
 
-        {/* Skip button in top right */}
-        <button
-          type="button"
-          onClick={handleSkip}
-          className="absolute top-6 right-6 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold border border-white/10 transition-all z-20"
-        >
-          <span>O'tkazish</span>
-          <ArrowRight className="w-3.5 h-3.5 text-brand-red" />
-        </button>
+      {/* ═══ BOTTOM SHUTTER CURTAIN ═══ */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-1/2 bg-[#06080D] border-t border-white/5"
+        style={{
+          transform: isRevealing ? 'translateY(100%)' : 'translateY(0%)',
+          transition: 'transform 0.65s cubic-bezier(0.77, 0, 0.175, 1)',
+          willChange: 'transform'
+        }}
+      >
+        {/* Subtle bottom ambient red gradient */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-brand-red/10 rounded-full blur-[100px] pointer-events-none" />
 
-        {/* Central Animation Stage */}
-        <div className="relative flex flex-col items-center justify-center z-10">
-          
-          {/* 1. Pulsing Concentric Rings (Phase: Ring) */}
-          <div 
-            className={`relative flex items-center justify-center transition-all duration-500 ${
-              showLogo ? 'scale-110 opacity-0 absolute pointer-events-none' : 'scale-100 opacity-100'
-            }`}
-          >
-            {/* Outer expanding ring */}
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-white/80 animate-ping opacity-30 absolute" />
-            
-            {/* Concentric middle ring with red glow */}
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.4)] flex items-center justify-center">
-              {/* Inner solid white core dot */}
-              <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white shadow-[0_0_15px_#ffffff]" />
-            </div>
-          </div>
-
-          {/* 2. Logo & Brand Typography Reveal (Phase: Logo) */}
-          <div 
-            className={`flex flex-col items-center gap-4 transition-all duration-500 ease-out ${
-              showLogo ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-3 pointer-events-none'
-            }`}
-          >
-            {/* Logo Emblem Icon */}
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/15 p-3 flex items-center justify-center shadow-[0_0_30px_rgba(196,0,0,0.5)]">
-              <img
-                src="/favi.svg"
-                alt="Tunikabond Lider"
-                className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(196,0,0,0.8)]"
-              />
-            </div>
-
-            {/* Typography */}
-            <div className="text-center space-y-1">
-              <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white tracking-widest flex items-center justify-center gap-2">
-                <span>TUNIKABOND</span>
-                <span className="text-brand-red font-black">LIDER</span>
-              </h1>
-              <p className="text-[11px] sm:text-xs font-mono uppercase tracking-[0.25em] text-slate-400">
-                Arxitektura • Fasad • Naves
-              </p>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Bottom subtle brand tagline */}
-        <div className="absolute bottom-8 text-center">
-          <span className="text-[10px] font-mono tracking-widest uppercase text-slate-500">
-            Premium Fasad Tizimlari
+        {/* Minimalist Bottom Brand Tagline */}
+        <div className="absolute bottom-6 inset-x-0 text-center pointer-events-none">
+          <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.3em] uppercase text-slate-500">
+            Arxitektura • Fasad • Sifat
           </span>
         </div>
+      </div>
 
+      {/* ═══ SKIP BUTTON ═══ */}
+      <button
+        type="button"
+        onClick={handleSkip}
+        className="absolute top-6 right-6 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold border border-white/10 backdrop-blur-md transition-all z-30"
+      >
+        <span>O'tkazish</span>
+        <ArrowRight className="w-3.5 h-3.5 text-brand-red" />
+      </button>
+
+      {/* ═══ CENTER BRAND EMBLEM & TYPOGRAPHY ═══ */}
+      <div 
+        className="absolute inset-0 flex flex-col items-center justify-center p-6 z-20 pointer-events-none transition-all duration-500 ease-out"
+        style={{
+          opacity: isRevealing ? 0 : 1,
+          transform: isRevealing ? 'scale(1.08) translateY(-8px)' : 'scale(1) translateY(0)',
+          willChange: 'opacity, transform'
+        }}
+      >
+        {/* Horizontal Laser Line Accent */}
+        <div className="h-[1.5px] bg-gradient-to-r from-transparent via-brand-red to-transparent mb-6 animate-laser-glow" />
+
+        {/* Frosted Glass Emblem */}
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-b from-white/12 to-white/5 border border-white/20 p-4 flex items-center justify-center backdrop-blur-2xl shadow-[0_0_50px_rgba(196,0,0,0.45)] overflow-hidden">
+          {/* Metallic Specular Shimmer Sweep */}
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full pointer-events-none"
+            style={{
+              animation: 'specular-sweep 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+              animationDelay: '150ms'
+            }}
+          />
+          <img
+            src="/favi.svg"
+            alt="Tunikabond Lider"
+            className="w-full h-full object-contain filter drop-shadow-[0_4px_16px_rgba(196,0,0,0.8)]"
+          />
+        </div>
+
+        {/* Brand Typography */}
+        <div className="text-center mt-5 space-y-1">
+          <h1 className="font-display font-black text-2xl sm:text-4xl text-white tracking-[0.16em] flex items-center justify-center gap-2.5">
+            <span>TUNIKABOND</span>
+            <span className="text-brand-red">LIDER</span>
+          </h1>
+          <p className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-slate-400">
+            Premium Fasad & Naves Tizimlari
+          </p>
+        </div>
+
+        {/* Subtle Horizontal Laser Bottom Accent */}
+        <div className="h-[1.5px] bg-gradient-to-r from-transparent via-brand-red to-transparent mt-6 animate-laser-glow" />
       </div>
     </div>
   );
