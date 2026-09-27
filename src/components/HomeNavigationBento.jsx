@@ -1,0 +1,152 @@
+import React from 'react';
+import { 
+  Calculator, 
+  Layers, 
+  Sparkles, 
+  ArrowRight, 
+  Palette, 
+  ShieldCheck, 
+  PhoneCall, 
+  Compass, 
+  Users,
+  CheckCircle2,
+  Clock
+} from 'lucide-react';
+
+export const HomeNavigationBento = ({ t, onNavigate }) => {
+  const cards = [
+    {
+      id: 'calculator',
+      title: "Interaktiv Kalkulyator",
+      subtitle: "Bino hajmini kiriting va fasad yoki tom narxini, kerakli material miqdorini 1 daqiqada onlayn hisoblang.",
+      badge: "Onlayn hisoblagich",
+      badgeColor: "bg-brand-red/10 text-brand-red border-brand-red/30",
+      icon: Calculator,
+      ctaText: "Narxni hisoblash",
+      gradient: "from-brand-red/20 via-transparent to-transparent",
+      accentBorder: "group-hover:border-brand-red/50",
+      featured: true,
+    },
+    {
+      id: 'products',
+      title: "Mahsulotlar & 30+ Ranglar",
+      subtitle: "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari hamda karniz turlari.",
+      badge: "Sifatli materiallar",
+      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/30",
+      icon: Layers,
+      ctaText: "Katalogni ko'rish",
+      gradient: "from-blue-500/15 via-transparent to-transparent",
+      accentBorder: "group-hover:border-blue-500/50",
+      featured: false,
+    },
+    {
+      id: 'portfolio',
+      title: "2000+ Loyihalar & AI Fasad",
+      subtitle: "Bajarilgan obyektlar fotosuratlari, Oldin/Keyin taqqoslash va o'z uyingiz rasmini AI orqali sinab ko'rish.",
+      badge: "Tayyor ishlar",
+      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
+      icon: Compass,
+      ctaText: "Galereyani ko'rish",
+      gradient: "from-emerald-500/15 via-transparent to-transparent",
+      accentBorder: "group-hover:border-emerald-500/50",
+      featured: false,
+    },
+    {
+      id: 'about',
+      title: "Biz haqimizda & 10 Yil Kafolat",
+      subtitle: "6 yillik tajriba, rasmiy kafolat shartnomasi, mijozlarning video va matnli sharhlari hamda tez-tez beriladigan savollar.",
+      badge: "Ishonch va sifat",
+      badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/30",
+      icon: ShieldCheck,
+      ctaText: "Kompaniya haqida",
+      gradient: "from-amber-500/15 via-transparent to-transparent",
+      accentBorder: "group-hover:border-amber-500/50",
+      featured: false,
+    },
+    {
+      id: 'contact',
+      title: "24/7 Aloqa & Ustaxona Manzili",
+      subtitle: "Siz uchun to'xtovsiz xizmatdamiz! Bepul o'lchovga buyurtma bering yoki ustaxonamiz xaritasini ko'ring.",
+      badge: "To'xtovsiz xizmat",
+      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
+      icon: Clock,
+      ctaText: "Bog'lanish & Xarita",
+      gradient: "from-emerald-500/15 via-transparent to-transparent",
+      accentBorder: "group-hover:border-emerald-500/50",
+      featured: true,
+    }
+  ];
+
+  return (
+    <section className="py-14 sm:py-20 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Sayt bo'limlari va xizmatlar</span>
+          </div>
+          <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-slate-900 dark:text-white tracking-tight mb-4">
+            Kerakli Bo'limni Tanlang
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300">
+            Har bir bo'lim alohida sahifa sifatida qulay ajratilgan. Qiziqqan yo'nalishingiz bo'yicha to'liq ma'lumot oling.
+          </p>
+        </div>
+
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          {cards.map((card, index) => {
+            const Icon = card.icon;
+            const isWide = card.featured && (index === 0 || index === cards.length - 1);
+            return (
+              <div
+                key={card.id}
+                onClick={() => onNavigate(card.id)}
+                className={`group relative rounded-2xl p-6 sm:p-7 border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-brand-surface/70 backdrop-blur-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden flex flex-col justify-between ${
+                  card.accentBorder
+                } ${isWide ? 'md:col-span-2 lg:col-span-1' : ''}`}
+              >
+                {/* Background glow gradient */}
+                <div 
+                  className={`absolute -top-24 -right-24 w-48 h-48 rounded-full bg-gradient-to-br ${card.gradient} blur-3xl pointer-events-none group-hover:scale-150 transition-transform duration-700`}
+                />
+
+                <div>
+                  {/* Top Row: Icon + Badge */}
+                  <div className="flex items-center justify-between gap-3 mb-5">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-brand-red group-hover:scale-110 group-hover:bg-brand-red group-hover:text-white transition-all shadow-md">
+                      <Icon className="w-6 h-6 transition-colors" />
+                    </div>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border ${card.badgeColor}`}>
+                      {card.badge}
+                    </span>
+                  </div>
+
+                  {/* Title & Description */}
+                  <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
+                    {card.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+                    {card.subtitle}
+                  </p>
+                </div>
+
+                {/* Bottom CTA Button */}
+                <div className="pt-4 border-t border-slate-200/60 dark:border-white/10 flex items-center justify-between text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-brand-red transition-colors">
+                  <span>{card.ctaText}</span>
+                  <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:bg-brand-red group-hover:text-white group-hover:border-brand-red transition-all">
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </div>
+
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  );
+};

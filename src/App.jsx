@@ -18,12 +18,41 @@ import { BeforeAfter } from './components/BeforeAfter';
 import { TrustAndReviews } from './components/TrustAndReviews';
 import { TeamSection } from './components/TeamSection';
 import { BrandIntro } from './components/BrandIntro';
-import { LiveActivityToast } from './components/LiveActivityToast';
+import { HomeNavigationBento } from './components/HomeNavigationBento';
+import { PageBanner } from './components/PageBanner';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam } from './services/api';
 
+const VALID_PAGES = ['home', 'calculator', 'products', 'portfolio', 'about', 'contact'];
+
 export function App() {
+  const getPageFromHash = () => {
+    const hash = window.location.hash.replace('#', '').toLowerCase();
+    if (VALID_PAGES.includes(hash)) return hash;
+    return 'home';
+  };
+
+  const [currentPage, setCurrentPage] = useState(getPageFromHash);
+
+  const navigateToPage = (pageId) => {
+    if (VALID_PAGES.includes(pageId)) {
+      setCurrentPage(pageId);
+      window.location.hash = pageId;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const page = getPageFromHash();
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const [currentLang, setCurrentLang] = useState(() => {
     return localStorage.getItem('tl_lang') || 'uz';
   });
@@ -174,97 +203,189 @@ export function App() {
         onOpenAdmin={handleOpenAdmin}
         theme={theme}
         toggleTheme={toggleTheme}
+        currentPage={currentPage}
+        onNavigate={navigateToPage}
       />
 
       {/* Main Content Sections */}
       <main className="flex-grow">
         
-        {/* Hero Section */}
-        <Hero
-          t={t}
-          onOpenLeadModal={handleOpenLeadModal}
-        />
+        {/* ═══ 1. BOSH SAHIFA (HOME) ═══ */}
+        {currentPage === 'home' && (
+          <div className="animate-fadeIn">
+            {/* Hero Section */}
+            <Hero
+              t={t}
+              onOpenLeadModal={handleOpenLeadModal}
+              onNavigate={navigateToPage}
+            />
 
-        {/* 1. Calculator (New Feature) */}
-        <Calculator
-          t={t}
-          onOpenLeadModalWithCalc={handleOpenCalcModal}
-        />
+            {/* Quick Navigation Hub / Bento */}
+            <HomeNavigationBento
+              t={t}
+              onNavigate={navigateToPage}
+            />
 
-        {/* 2. Products Catalog (Dynamic CMS) */}
-        <Products
-          currentLang={currentLang}
-          t={t}
-          items={productsList}
-          onSelectProduct={setSelectedProduct}
-        />
+            {/* Featured Before & After Facade Slider + AI */}
+            <BeforeAfter
+              onOpenLeadModal={handleOpenLeadModal}
+            />
 
-        {/* 3. Color & Texture Swatches */}
-        <ColorSwatches
-          currentLang={currentLang}
-          t={t}
-          onOpenLeadModalWithSwatch={handleOpenSwatchModal}
-        />
+            {/* Why Choose Us */}
+            <WhyUs
+              t={t}
+            />
 
-        {/* 4. Portfolio / Delivered Projects (Dynamic CMS) */}
-        <Portfolio
-          currentLang={currentLang}
-          t={t}
-          items={portfolioList}
-          onSelectMaster={(masterIdOrName) => {
-            setActiveMasterId(masterIdOrName);
-            const teamEl = document.getElementById('team');
-            if (teamEl) {
-              teamEl.scrollIntoView({ behavior: 'smooth' });
-            }
-          }}
-        />
+            {/* Warranty & Reviews */}
+            <TrustAndReviews
+              onOpenLeadModal={handleOpenLeadModal}
+            />
 
-        {/* 4.1 Interactive Before & After Facade Slider */}
-        <BeforeAfter
-          onOpenLeadModal={handleOpenLeadModal}
-        />
+            {/* Contact / Location */}
+            <ContactSection
+              t={t}
+            />
+          </div>
+        )}
 
-        {/* 4.2 Bizning Professional Jamoa & Ustalar */}
-        <TeamSection
-          t={t}
-          teamMembers={teamList}
-          portfolioList={portfolioList}
-          activeMasterId={activeMasterId}
-          onOpenLeadModalWithMaster={handleOpenMasterModal}
-        />
+        {/* ═══ 2. KALKULYATOR PAGE ═══ */}
+        {currentPage === 'calculator' && (
+          <div className="animate-fadeIn">
+            <PageBanner
+              title="Fasad va Tom Narxini Hisoblang"
+              subtitle="Bino parametrlari va kerakli materialni tanlang. Tizim taxminiy xarajat va muddatni bir zumda hisoblab beradi."
+              badge="Interaktiv hisoblagich"
+              breadcrumb="Kalkulyator"
+              onBackToHome={() => navigateToPage('home')}
+            />
+            <Calculator
+              t={t}
+              onOpenLeadModalWithCalc={handleOpenCalcModal}
+            />
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-20 text-center">
+              <div className="p-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/40 shadow-sm">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  Hisoblagich natijalari taxminiy xarakterga ega. Mutaxassisimiz obyektga borib bepul aniq o'lchov olganidan so'ng, smeta va shartnoma tuziladi.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => handleOpenLeadModal("Bepul usta o'lchovi va smeta")}
+                  className="mt-4 px-6 py-2.5 rounded-xl bg-brand-red text-white text-xs sm:text-sm font-bold shadow-glow-red hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  Bepul mutaxassis chaqirish
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* 5. Why Choose Us (6 Pillars) */}
-        <WhyUs
-          t={t}
-        />
+        {/* ═══ 3. MAHSULOTLAR VA KATALOG PAGE ═══ */}
+        {currentPage === 'products' && (
+          <div className="animate-fadeIn">
+            <PageBanner
+              title="Mahsulotlar Katalogi va Ranglar"
+              subtitle="Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, naves va karnizlar palitrasi."
+              badge="Katalog & Ranglar"
+              breadcrumb="Katalog"
+              onBackToHome={() => navigateToPage('home')}
+            />
+            <Products
+              currentLang={currentLang}
+              t={t}
+              items={productsList}
+              onSelectProduct={setSelectedProduct}
+            />
+            <ColorSwatches
+              currentLang={currentLang}
+              t={t}
+              onOpenLeadModalWithSwatch={handleOpenSwatchModal}
+            />
+          </div>
+        )}
 
-        {/* 5.1 Official Warranty & Customer Reviews */}
-        <TrustAndReviews
-          onOpenLeadModal={handleOpenLeadModal}
-        />
+        {/* ═══ 4. LOYIHALAR VA USTARLAR PAGE ═══ */}
+        {currentPage === 'portfolio' && (
+          <div className="animate-fadeIn">
+            <PageBanner
+              title="Bajarilgan Loyihalar va Professional Ustalar"
+              subtitle="2000+ muvaffaqiyatli topshirilgan kottedj, savdo binosi va shaxsiy xonadonlar fasadlari hamda tajribali ustalar jamoasi."
+              badge="Loyihalar & Ustalar"
+              breadcrumb="Loyihalar"
+              onBackToHome={() => navigateToPage('home')}
+            />
+            <Portfolio
+              currentLang={currentLang}
+              t={t}
+              items={portfolioList}
+              onSelectMaster={(masterIdOrName) => {
+                setActiveMasterId(masterIdOrName);
+                const teamEl = document.getElementById('team');
+                if (teamEl) {
+                  teamEl.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            />
+            <BeforeAfter
+              onOpenLeadModal={handleOpenLeadModal}
+            />
+            <TeamSection
+              t={t}
+              teamMembers={teamList}
+              portfolioList={portfolioList}
+              activeMasterId={activeMasterId}
+              onOpenLeadModalWithMaster={handleOpenMasterModal}
+            />
+          </div>
+        )}
 
-        {/* 6. Process / Workflow (4 Steps) */}
-        <Process
-          t={t}
-        />
+        {/* ═══ 5. BIZ HAQIMIZDA & FAQ PAGE ═══ */}
+        {currentPage === 'about' && (
+          <div className="animate-fadeIn">
+            <PageBanner
+              title="Biz Haqimizda & 10 Yil Rasmiy Kafolat"
+              subtitle="Tunikabond Lider — O'zbekiston bo'ylab 6 yildan ortiq vaqt davomida yuqori sifatli fasad va tom yechimlarini yetkazib beruvchi yetakchi kompaniya."
+              badge="Biz haqimizda"
+              breadcrumb="Biz haqimizda"
+              onBackToHome={() => navigateToPage('home')}
+            />
+            <WhyUs
+              t={t}
+            />
+            <TrustAndReviews
+              onOpenLeadModal={handleOpenLeadModal}
+            />
+            <Process
+              t={t}
+            />
+            <FAQ
+              currentLang={currentLang}
+              t={t}
+            />
+          </div>
+        )}
 
-        {/* 7. FAQ Section */}
-        <FAQ
-          currentLang={currentLang}
-          t={t}
-        />
-
-        {/* 8. Contact Section & Form */}
-        <ContactSection
-          t={t}
-        />
+        {/* ═══ 6. ALOQA & USTAXONA PAGE ═══ */}
+        {currentPage === 'contact' && (
+          <div className="animate-fadeIn">
+            <PageBanner
+              title="Bog'lanish & Ustaxona Manzili"
+              subtitle="Siz uchun to'xtovsiz xizmatdamiz! Savollaringiz bormi yoki bepul o'lchov kerakmi? Istalgan vaqtda murojaat qiling."
+              badge="24/7 Aloqa"
+              breadcrumb="Aloqa"
+              onBackToHome={() => navigateToPage('home')}
+            />
+            <ContactSection
+              t={t}
+            />
+          </div>
+        )}
 
       </main>
 
       {/* Footer */}
       <Footer
         t={t}
+        onNavigate={navigateToPage}
       />
 
       {/* Product Detail Modal */}
@@ -285,11 +406,6 @@ export function App() {
 
       {/* Floating Call & Telegram Quick Action Buttons */}
       <QuickActions
-        onOpenLeadModal={handleOpenLeadModal}
-      />
-
-      {/* Real-time Customer Activity & Order Ticker (Magnetizing Social Proof) */}
-      <LiveActivityToast
         onOpenLeadModal={handleOpenLeadModal}
       />
 

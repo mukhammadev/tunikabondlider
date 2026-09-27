@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Menu, X, Calculator, Palette, Layers, Info, HelpCircle, Lock, Shield, Sun, Moon } from 'lucide-react';
+import { Phone, Menu, X, Calculator, Layers, Info, HelpCircle, Lock, Shield, Sun, Moon, Home, Compass } from 'lucide-react';
 
-export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, onOpenAdmin, theme, toggleTheme }) => {
+export const Navbar = ({ 
+  currentLang, 
+  setLang, 
+  t, 
+  onOpenLeadModal, 
+  currentUser, 
+  onOpenAdmin, 
+  theme, 
+  toggleTheme,
+  currentPage = 'home',
+  onNavigate
+}) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -12,20 +23,26 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
   }, []);
 
   const navLinks = [
-    { href: '#calculator', label: t.nav.calculator, icon: Calculator },
-    { href: '#products',   label: t.nav.products,   icon: Layers },
-    { href: '#swatches',   label: t.nav.swatches,   icon: Palette },
-    { href: '#portfolio',  label: t.nav.portfolio,  icon: Layers },
-    { href: '#why-us',     label: t.nav.about,      icon: Info },
-    { href: '#faq',        label: t.nav.faq,        icon: HelpCircle },
-    { href: '#contact',    label: t.nav.contact,    icon: Phone },
+    { id: 'home',       label: t.nav.home || "Bosh sahifa",       icon: Home },
+    { id: 'calculator', label: t.nav.calculator || "Kalkulyator", icon: Calculator },
+    { id: 'products',   label: t.nav.products || "Katalog",       icon: Layers },
+    { id: 'portfolio',  label: t.nav.portfolio || "Loyihalar",    icon: Compass },
+    { id: 'about',      label: t.nav.about || "Biz haqimizda",    icon: Info },
+    { id: 'contact',    label: t.nav.contact || "Aloqa",          icon: Phone },
   ];
 
   const isLight = theme === 'light';
 
+  const handleLinkClick = (pageId) => {
+    setMobileMenuOpen(false);
+    if (onNavigate) {
+      onNavigate(pageId);
+    }
+  };
+
   return (
     <header className="fixed top-3 sm:top-4 left-0 right-0 z-40 px-3 sm:px-5 pointer-events-none">
-      <div className="max-w-[1100px] mx-auto pointer-events-auto flex flex-col gap-2">
+      <div className="max-w-[1150px] mx-auto pointer-events-auto flex flex-col gap-2">
 
         {/* ══ PILL BAR ══ */}
         <div
@@ -39,13 +56,14 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 : 'bg-[#0d1120]/85 backdrop-blur-xl border border-white/8 shadow-xl shadow-black/40'
           }`}
         >
-          {/* Red glow line bottom */}
-          <div className="absolute bottom-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-brand-red/60 to-transparent pointer-events-none" />
-
           <div className="flex items-center h-14 px-4 sm:px-5 gap-3">
 
             {/* ── Logo ── */}
-            <a href="#" className="flex items-center gap-2 group shrink-0">
+            <button
+              type="button"
+              onClick={() => handleLinkClick('home')}
+              className="flex items-center gap-2 group shrink-0 text-left cursor-pointer"
+            >
               <div className={`w-8 h-8 rounded-lg border border-brand-red/50 p-1 flex items-center justify-center group-hover:border-brand-red transition-all ${isLight ? 'bg-black/5' : 'bg-white/8'}`}>
                 <img src="/favi.svg" alt="Logo" className="w-full h-full object-contain" />
               </div>
@@ -57,23 +75,29 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                   Fasad &amp; Tom
                 </span>
               </div>
-            </a>
+            </button>
 
-            {/* ── Desktop nav (only xl, otherwise links are too cramped) ── */}
-            <nav className="hidden xl:flex items-center gap-1 mx-auto">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors hover:text-brand-red ${
-                    isLight 
-                      ? 'text-slate-800 hover:text-brand-red hover:bg-black/5' 
-                      : 'text-slate-200 hover:text-brand-red hover:bg-white/10'
-                  }`}
-                >
-                  {link.label}
-                </a>
-              ))}
+            {/* ── Desktop nav ── */}
+            <nav className="hidden lg:flex items-center gap-1 mx-auto">
+              {navLinks.map((link) => {
+                const isActive = currentPage === link.id;
+                return (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => handleLinkClick(link.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-brand-red text-white shadow-glow-red font-bold'
+                        : isLight 
+                          ? 'text-slate-800 hover:text-brand-red hover:bg-black/5' 
+                          : 'text-slate-200 hover:text-brand-red hover:bg-white/10'
+                    }`}
+                  >
+                    {link.label}
+                  </button>
+                );
+              })}
             </nav>
 
             {/* Spacer for md/lg (no nav shown) */}
@@ -181,16 +205,26 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
             </div>
 
             {/* Nav links */}
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-1.5">
               {navLinks.map((link) => {
                 const Icon = link.icon;
+                const isActive = currentPage === link.id;
                 return (
-                  <a key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium hover:text-brand-red transition-colors ${isLight ? 'text-slate-800 hover:bg-slate-100' : 'text-slate-200 hover:bg-white/5'}`}
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => handleLinkClick(link.id)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
+                      isActive
+                        ? 'bg-brand-red text-white font-bold shadow-glow-red'
+                        : isLight
+                          ? 'text-slate-800 hover:bg-slate-100 hover:text-brand-red'
+                          : 'text-slate-200 hover:bg-white/5 hover:text-brand-red'
+                    }`}
                   >
-                    <Icon className="w-3.5 h-3.5 text-brand-red shrink-0" />
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-brand-red'}`} />
                     <span className="truncate">{link.label}</span>
-                  </a>
+                  </button>
                 );
               })}
             </div>

@@ -1,9 +1,17 @@
 import React from 'react';
 import { Phone, ArrowUp, Send, UserCheck } from 'lucide-react';
 
-export const Footer = ({ t }) => {
+export const Footer = ({ t, onNavigate }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNav = (pageId) => {
+    if (onNavigate) {
+      onNavigate(pageId);
+    } else {
+      scrollToTop();
+    }
   };
 
   return (
@@ -14,19 +22,23 @@ export const Footer = ({ t }) => {
           
           {/* Brand Info */}
           <div className="space-y-4">
-            <a href="#" className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-slate-200/60 dark:bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red">
+            <button
+              type="button"
+              onClick={() => handleNav('home')}
+              className="flex items-center gap-3 text-left group cursor-pointer"
+            >
+              <div className="w-11 h-11 rounded-xl bg-slate-200/60 dark:bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red group-hover:border-brand-red transition-all">
                 <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain filter drop-shadow" />
               </div>
               <div>
-                <span className="block font-display font-bold text-xl text-slate-900 dark:text-white">
+                <span className="block font-display font-bold text-xl text-slate-900 dark:text-white group-hover:text-brand-red transition-colors">
                   TUNIKABOND <span className="text-brand-red">LIDER</span>
                 </span>
                 <span className="block text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-medium">
                   Fasad & Tom Yechimlari
                 </span>
               </div>
-            </a>
+            </button>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               {t.footer.desc}
             </p>
@@ -39,34 +51,58 @@ export const Footer = ({ t }) => {
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
               <li>
-                <a href="#calculator" className="hover:text-brand-red transition-colors">
+                <button
+                  type="button"
+                  onClick={() => handleNav('home')}
+                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
+                >
+                  {t.nav.home || "Bosh sahifa"}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => handleNav('calculator')}
+                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
+                >
                   {t.nav.calculator}
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#products" className="hover:text-brand-red transition-colors">
-                  {t.nav.products}
-                </a>
+                <button
+                  type="button"
+                  onClick={() => handleNav('products')}
+                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
+                >
+                  {t.nav.products} & {t.nav.swatches}
+                </button>
               </li>
               <li>
-                <a href="#swatches" className="hover:text-brand-red transition-colors">
-                  {t.nav.swatches}
-                </a>
+                <button
+                  type="button"
+                  onClick={() => handleNav('portfolio')}
+                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
+                >
+                  {t.nav.portfolio} & Ustalar
+                </button>
               </li>
               <li>
-                <a href="#portfolio" className="hover:text-brand-red transition-colors">
-                  {t.nav.portfolio}
-                </a>
+                <button
+                  type="button"
+                  onClick={() => handleNav('about')}
+                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
+                >
+                  {t.nav.about} & {t.nav.faq}
+                </button>
               </li>
               <li>
-                <a href="#why-us" className="hover:text-brand-red transition-colors">
-                  {t.nav.about}
-                </a>
-              </li>
-              <li>
-                <a href="#faq" className="hover:text-brand-red transition-colors">
-                  {t.nav.faq}
-                </a>
+                <button
+                  type="button"
+                  onClick={() => handleNav('contact')}
+                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
+                >
+                  {t.nav.contact}
+                </button>
               </li>
             </ul>
           </div>

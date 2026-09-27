@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ShieldCheck, Award, Ruler, Building2, Sparkles, CheckCircle2 } from 'lucide-react';
 
-export const Hero = ({ t, onOpenLeadModal }) => {
+export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
   // Animated counters for trust metrics
   const [counts, setCounts] = useState({ exp: 0, projects: 0, warranty: 0, measure: 0 });
 
@@ -33,6 +33,26 @@ export const Hero = ({ t, onOpenLeadModal }) => {
     return () => clearInterval(timer);
   }, []);
 
+  const handleCalcClick = (e) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate('calculator');
+    } else {
+      const el = document.getElementById('calculator');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleCatalogClick = (e) => {
+    e.preventDefault();
+    if (onNavigate) {
+      onNavigate('products');
+    } else {
+      const el = document.getElementById('products');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
       {/* Background Decorative Gradients & Precision Architectural Laser Grid */}
@@ -42,9 +62,6 @@ export const Hero = ({ t, onOpenLeadModal }) => {
         
         {/* Architectural 3D grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-
-        {/* Sweeping Precision Laser Scan Line */}
-        <div className="absolute inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-brand-red/60 to-transparent shadow-[0_0_15px_#C40000] animate-[laserScan_6s_ease-in-out_infinite] opacity-60" />
 
         {/* Angled Atmospheric Light Beam (Gcore video style) */}
         <div 
@@ -86,23 +103,25 @@ export const Hero = ({ t, onOpenLeadModal }) => {
 
           {/* Action CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <a
-              href="#calculator"
-              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-bold text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-105 active:scale-95 transition-all"
+            <button
+              type="button"
+              onClick={handleCalcClick}
+              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-bold text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               {/* Metallic specular light sweep */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
               <span>{t.hero.ctaCalculate}</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
 
-            <a
-              href="#products"
-              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-100 dark:bg-brand-surface/80 hover:bg-slate-200 dark:hover:bg-brand-surface border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-semibold text-base hover:border-brand-red/40 transition-all hover:scale-105 active:scale-95"
+            <button
+              type="button"
+              onClick={handleCatalogClick}
+              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-100 dark:bg-brand-surface/80 hover:bg-slate-200 dark:hover:bg-brand-surface border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-semibold text-base hover:border-brand-red/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <Building2 className="w-5 h-5 text-brand-red" />
               <span>{t.hero.ctaCatalog}</span>
-            </a>
+            </button>
           </div>
 
           {/* 4 Hard Numbers / Trust Proof Cards with Dynamic Count-Up */}
