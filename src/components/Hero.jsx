@@ -55,22 +55,10 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
 
   return (
     <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
-      {/* Background Decorative Gradients & Precision Architectural Laser Grid */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Background Decorative Ambient Gradients (Clean, zero lines) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-red/10 rounded-full blur-[150px]" />
         <div className="absolute -top-40 right-10 w-[400px] h-[400px] bg-brand-amber/5 rounded-full blur-[120px]" />
-        
-        {/* Architectural 3D grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-
-        {/* Angled Atmospheric Light Beam (Gcore video style) */}
-        <div 
-          className="absolute -top-24 -right-10 w-[500px] h-[500px] opacity-40 pointer-events-none rotate-12"
-          style={{
-            background: 'radial-gradient(ellipse at 80% 20%, rgba(245, 158, 11, 0.3) 0%, rgba(196, 0, 0, 0.2) 30%, transparent 70%)',
-            filter: 'blur(50px)'
-          }}
-        />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
