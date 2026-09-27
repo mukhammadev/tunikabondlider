@@ -157,7 +157,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-dark text-slate-100 flex flex-col font-sans selection:bg-brand-red selection:text-white">
+    <div className="min-h-screen bg-brand-dark text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-brand-red selection:text-white">
       
       {/* Brand Intro & Splash Screen Animation on Site Load & Refresh */}
       {showBrandIntro && (

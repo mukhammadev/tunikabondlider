@@ -217,7 +217,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
             
             {/* 1. Building Type Selector */}
             <div>
-              <label className="block text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+              <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                 <Building className="w-4 h-4 text-brand-red" />
                 <span>{t.calculator.buildingType}</span>
               </label>
@@ -229,8 +229,8 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     onClick={() => setBuildingType(key)}
                     className={`p-3.5 rounded-xl border text-left font-medium text-xs sm:text-sm transition-all flex items-center justify-between ${
                       buildingType === key
-                        ? 'bg-brand-red/15 border-brand-red text-white font-bold shadow-sm'
-                        : 'bg-brand-dark/50 border-white/10 text-slate-300 hover:border-white/20 hover:text-white'
+                        ? 'bg-brand-red/10 dark:bg-brand-red/15 border-brand-red text-brand-red dark:text-white font-bold shadow-sm'
+                        : 'bg-slate-100 dark:bg-brand-dark/50 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300 hover:border-brand-red/40 hover:text-brand-red'
                     }`}
                   >
                     <span>{label}</span>
@@ -242,10 +242,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
             {/* 2. Material Selector with 1m² prices */}
             <div>
-              <label className="block text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+              <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
                 <Layers className="w-4 h-4 text-brand-red" />
                 <span>{t.calculator.materialType}</span>
-                <span className="text-[11px] font-normal text-slate-400 ml-auto">(1 m² narxlari)</span>
+                <span className="text-[11px] font-normal text-slate-500 dark:text-slate-400 ml-auto">(1 m² narxlari)</span>
               </label>
               <div className="space-y-2.5">
                 {Object.entries(t.calculator.materialTypes).map(([key, label]) => {
@@ -258,19 +258,19 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                       onClick={() => setMaterialType(key)}
                       className={`w-full p-3.5 rounded-xl border text-left font-medium text-xs sm:text-sm transition-all flex items-center justify-between gap-3 ${
                         isSelected
-                          ? 'bg-brand-red/15 border-brand-red text-white font-bold shadow-sm'
-                          : 'bg-brand-dark/50 border-white/10 text-slate-300 hover:border-white/20 hover:text-white'
+                          ? 'bg-brand-red/10 dark:bg-brand-red/15 border-brand-red text-brand-red dark:text-white font-bold shadow-sm'
+                          : 'bg-slate-100 dark:bg-brand-dark/50 border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-300 hover:border-brand-red/40 hover:text-brand-red'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isSelected ? 'bg-brand-red' : 'bg-slate-600'}`} />
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isSelected ? 'bg-brand-red' : 'bg-slate-400 dark:bg-slate-600'}`} />
                         <span className="truncate">{label}</span>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-lg border ${
                           isSelected 
                             ? 'bg-brand-red text-white border-brand-red' 
-                            : 'bg-white/5 text-slate-300 border-white/10'
+                            : 'bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-white/10'
                         }`}>
                           {new Intl.NumberFormat('uz-UZ').format(unitPrice)} so'm / m²
                         </span>
@@ -285,10 +285,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
             {/* 3. Area Slider & Number Box */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-bold text-slate-200">
+                <label className="text-sm font-bold text-slate-800 dark:text-slate-200">
                   {t.calculator.areaLabel}
                 </label>
-                <div className="flex items-center gap-1.5 bg-brand-dark px-3 py-1.5 rounded-xl border border-white/15">
+                <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-brand-dark px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/15">
                   <input
                     type="number"
                     min="10"
@@ -297,7 +297,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     onChange={(e) => setArea(Math.max(10, Math.min(3000, Number(e.target.value) || 10)))}
                     className="w-16 bg-transparent text-right font-display font-bold text-brand-red text-base focus:outline-none"
                   />
-                  <span className="text-xs text-slate-400 font-bold">{t.calculator.sqm}</span>
+                  <span className="text-xs text-slate-600 dark:text-slate-400 font-bold">{t.calculator.sqm}</span>
                 </div>
               </div>
 
@@ -308,10 +308,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                 step="5"
                 value={area}
                 onChange={(e) => setArea(Number(e.target.value))}
-                className="w-full h-2.5 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-red"
+                className="w-full h-2.5 bg-slate-200 dark:bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-red"
               />
 
-              <div className="flex justify-between text-[11px] text-slate-500 mt-2 font-medium">
+              <div className="flex justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-medium">
                 <span>10 m²</span>
                 <span>250 m²</span>
                 <span>500 m²</span>
@@ -321,20 +321,20 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
             {/* 4. Installation Toggle */}
             <div className="pt-2">
-              <label className="flex items-center justify-between p-3.5 rounded-xl bg-brand-dark/60 border border-white/10 cursor-pointer hover:border-brand-red/30 transition-colors">
+              <label className="flex items-center justify-between p-3.5 rounded-xl bg-slate-100 dark:bg-brand-dark/60 border border-slate-200 dark:border-white/10 cursor-pointer hover:border-brand-red/30 transition-colors">
                 <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
                     checked={includeInstallation}
                     onChange={(e) => setIncludeInstallation(e.target.checked)}
-                    className="w-5 h-5 rounded border-white/20 text-brand-red focus:ring-brand-red bg-brand-card cursor-pointer accent-brand-red"
+                    className="w-5 h-5 rounded border-slate-300 dark:border-white/20 text-brand-red focus:ring-brand-red bg-white dark:bg-brand-card cursor-pointer accent-brand-red"
                   />
-                  <span className="text-xs sm:text-sm text-slate-200 font-medium">
+                  <span className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-medium">
                     {t.calculator.includeInstallation}
                   </span>
                 </div>
                 {includeInstallation && (
-                  <span className="text-[11px] font-bold text-slate-400">
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
                     +{new Intl.NumberFormat('uz-UZ').format(currentInstallPrice)} so'm/m²
                   </span>
                 )}
@@ -342,24 +342,24 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
             </div>
 
             {/* 5. Active 1m² breakdown pill */}
-            <div className="p-4 rounded-2xl bg-brand-dark/80 border border-brand-red/30 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+            <div className="p-4 rounded-2xl bg-slate-100 dark:bg-brand-dark/80 border border-slate-200 dark:border-brand-red/30 flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
               <div className="space-y-0.5">
-                <div className="text-slate-400 font-medium flex items-center gap-1.5">
+                <div className="text-slate-600 dark:text-slate-400 font-medium flex items-center gap-1.5">
                   <span>Tanlangan 1 m² narxi:</span>
-                  <span className="text-[10px] bg-brand-red/20 text-brand-red px-1.5 py-0.5 rounded font-bold uppercase">Aniq bozor narxi</span>
+                  <span className="text-[10px] bg-brand-red/10 dark:bg-brand-red/20 text-brand-red px-1.5 py-0.5 rounded font-bold uppercase">Aniq bozor narxi</span>
                 </div>
-                <div className="text-white font-bold flex items-center gap-2">
+                <div className="text-slate-900 dark:text-white font-bold flex items-center gap-2">
                   <span className="text-brand-red text-base sm:text-lg">
                     {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} so'm / m²
                   </span>
-                  <span className="text-slate-400 text-xs font-normal">
+                  <span className="text-slate-600 dark:text-slate-400 text-xs font-normal">
                     ({new Intl.NumberFormat('uz-UZ').format(currentMatPrice)} material {includeInstallation ? `+ ${new Intl.NumberFormat('uz-UZ').format(currentInstallPrice)} montaj` : ''})
                   </span>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-slate-400 font-medium">Bino hajmi:</div>
-                <div className="text-white font-bold text-base sm:text-lg">{area} m²</div>
+                <div className="text-slate-600 dark:text-slate-400 font-medium">Bino hajmi:</div>
+                <div className="text-slate-900 dark:text-white font-bold text-base sm:text-lg">{area} m²</div>
               </div>
             </div>
 
@@ -394,23 +394,23 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-xs uppercase tracking-wider text-slate-400 font-bold">
+                    <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">
                       1 m² Boshlang'ich Narxi
                     </div>
                     <div className="font-display font-extrabold text-3xl sm:text-4xl text-brand-red tracking-tight">
-                      {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} <span className="text-lg text-slate-300 font-medium">so'm / m²</span>
+                      {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} <span className="text-lg text-slate-700 dark:text-slate-300 font-medium">so'm / m²</span>
                     </div>
-                    <p className="text-xs text-slate-400">
-                      Tanlangan maydon: <strong className="text-white font-bold">{area} m²</strong>
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      Tanlangan maydon: <strong className="text-slate-900 dark:text-white font-bold">{area} m²</strong>
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-300 leading-relaxed text-left space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-white">
+                  <div className="p-4 rounded-2xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 leading-relaxed text-left space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
                       <Sparkles className="w-4 h-4 text-brand-red" />
                       <span>Umumiy narxni ko'rish uchun:</span>
                     </div>
-                    <p className="text-slate-400">
+                    <p className="text-slate-600 dark:text-slate-400">
                       Maydon va materialni tanlab, <strong>"Hisoblash"</strong> tugmasini bosing. Tizim sizga umumiy smeta, bajarish muddati va rasmiy kafolat shartlarini darhol ko'rsatadi.
                     </p>
                   </div>
@@ -424,7 +424,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     <span>Hisoblash (Umumiy summani ko'rish)</span>
                   </button>
 
-                  <div className="pt-2 text-[11px] text-slate-500">
+                  <div className="pt-2 text-[11px] text-slate-500 dark:text-slate-400">
                     * Mutaxassisimizning manzilga borib lazerli o'lchov olishi 100% bepul.
                   </div>
                 </div>
@@ -432,37 +432,37 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                 /* Post-calculation State: Shows calculated Total & Action buttons */
                 <div className="animate-fadeIn">
                   {/* Price Display */}
-                  <div className="mb-6 pb-6 border-b border-white/10">
-                    <span className="block text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">
+                  <div className="mb-6 pb-6 border-b border-slate-200 dark:border-white/10">
+                    <span className="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold mb-1">
                       {t.calculator.estimatedCost}
                     </span>
-                    <div className="font-display font-extrabold text-3xl sm:text-4xl text-white red-gradient-text tracking-tight">
-                      {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} <span className="text-lg text-slate-300 font-medium">so'm</span>
+                    <div className="font-display font-extrabold text-3xl sm:text-4xl text-slate-900 dark:text-white red-gradient-text tracking-tight">
+                      {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} <span className="text-lg text-slate-700 dark:text-slate-300 font-medium">so'm</span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-2">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
                       (1 m²: {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} so'm • {includeInstallation ? "montaji bilan" : "faqat material"})
                     </p>
                   </div>
 
                   {/* Breakdown details */}
                   <div className="space-y-3.5 mb-8 text-xs sm:text-sm">
-                    <div className="flex items-center justify-between text-slate-300">
+                    <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                       <span className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-brand-red" />
                         <span>{t.calculator.estimatedTime}</span>
                       </span>
-                      <span className="font-bold text-white">~{estimatedDays} {t.calculator.days}</span>
+                      <span className="font-bold text-slate-900 dark:text-white">~{estimatedDays} {t.calculator.days}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-slate-300">
+                    <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                       <span className="flex items-center gap-2">
                         <Shield className="w-4 h-4 text-brand-red" />
                         <span>Rasmiy kafolat:</span>
                       </span>
-                      <span className="font-bold text-white">10 yil shartnoma bilan</span>
+                      <span className="font-bold text-slate-900 dark:text-white">10 yil shartnoma bilan</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-slate-300">
+                    <div className="flex items-center justify-between text-slate-700 dark:text-slate-300">
                       <span className="flex items-center gap-2">
                         <Check className="w-4 h-4 text-brand-red" />
                         <span>Mutaxassis o'lchovi:</span>
@@ -486,7 +486,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     <button
                       type="button"
                       onClick={handlePrintEstimate}
-                      className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      className="py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
                       title="Smetani PDF / Qog'ozga chop etish"
                     >
                       <Printer className="w-3.5 h-3.5 text-brand-red" />
@@ -496,7 +496,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     <button
                       type="button"
                       onClick={() => setTelegramModalOpen(true)}
-                      className="py-2.5 px-3 rounded-xl bg-[#0088cc]/20 hover:bg-[#0088cc]/30 border border-[#0088cc]/40 text-[#29b6f6] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      className="py-2.5 px-3 rounded-xl bg-[#0088cc]/10 dark:bg-[#0088cc]/20 hover:bg-[#0088cc]/20 dark:hover:bg-[#0088cc]/30 border border-[#0088cc]/30 dark:border-[#0088cc]/40 text-[#0088cc] dark:text-[#29b6f6] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors"
                       title="Hisobni telefon raqamingiz bilan Telegram orqali adminga yuborish"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -504,7 +504,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-slate-400 text-center mt-4 leading-normal">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center mt-4 leading-normal">
                     {t.calculator.consultationNotice}
                   </p>
                 </div>
@@ -524,14 +524,14 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
           onClick={() => setTelegramModalOpen(false)}
         >
           <div 
-            className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-7 border border-brand-red/30 shadow-glow-red relative bg-brand-surface/95 animate-scaleUp text-left"
+            className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-7 border border-brand-red/30 shadow-glow-red relative animate-scaleUp text-left"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               type="button"
               onClick={() => setTelegramModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="absolute top-5 right-5 p-2 rounded-full text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
               aria-label="Yopish"
             >
               <X className="w-5 h-5" />
@@ -542,10 +542,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center border border-emerald-500/30">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h3 className="font-display font-bold text-xl text-white">
+                <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white">
                   Ma'lumotlar muvaffaqiyatli saqlandi!
                 </h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                   Smeta va telefon raqamingiz admin bazasiga yozildi hamda Telegram chat ochilmoqda...
                 </p>
               </div>
@@ -553,34 +553,34 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               <form onSubmit={handleSendTelegramWithPhone} className="space-y-4 sm:space-y-5">
                 {/* Modal Title & Icon */}
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-[#0088cc]/20 border border-[#0088cc]/40 flex items-center justify-center text-[#29b6f6] shrink-0">
+                  <div className="w-11 h-11 rounded-2xl bg-[#0088cc]/20 border border-[#0088cc]/40 flex items-center justify-center text-[#0088cc] dark:text-[#29b6f6] shrink-0">
                     <Send className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-lg text-white">
+                    <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">
                       Telegramga smetani yuborish
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
                       Admin aloqaga chiqishi uchun raqamingizni kiriting
                     </p>
                   </div>
                 </div>
 
                 {/* Calculation Quick Pill */}
-                <div className="p-3.5 rounded-2xl bg-brand-dark/70 border border-white/10 text-xs space-y-1.5">
-                  <div className="flex justify-between text-slate-400">
+                <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-brand-dark/70 border border-slate-200 dark:border-white/10 text-xs space-y-1.5">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Bino & Maydon:</span>
-                    <strong className="text-white font-medium">
+                    <strong className="text-slate-900 dark:text-white font-medium">
                       {t.calculator.buildingTypes[buildingType]} • {area} m²
                     </strong>
                   </div>
-                  <div className="flex justify-between text-slate-400">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Tanlangan Material:</span>
-                    <strong className="text-slate-200 font-medium">
+                    <strong className="text-slate-800 dark:text-slate-200 font-medium">
                       {t.calculator.materialTypes[materialType]}
                     </strong>
                   </div>
-                  <div className="flex justify-between text-slate-400 pt-1 border-t border-white/5">
+                  <div className="flex justify-between text-slate-600 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-white/5">
                     <span>Jami taxminiy narx:</span>
                     <strong className="text-brand-red font-bold font-mono text-sm">
                       {new Intl.NumberFormat('uz-UZ').format(calculatedTotal)} so'm
@@ -590,7 +590,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
 
                 {/* Name Input */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-brand-red" />
                     <span>Ismingiz (ixtiyoriy)</span>
                   </label>
@@ -599,13 +599,13 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     value={tgName}
                     onChange={(e) => setTgName(e.target.value)}
                     placeholder="Masalan: Azizbek"
-                    className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-brand-dark/80 border border-slate-200 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red text-sm"
                   />
                 </div>
 
                 {/* Phone Input (Required) */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
                     <Phone className="w-3.5 h-3.5 text-brand-red" />
                     <span>Telefon raqamingiz <span className="text-brand-red">*</span></span>
                   </label>
@@ -615,9 +615,9 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     value={tgPhone}
                     onChange={handleTgPhoneChange}
                     placeholder="+998 (90) 123-45-67"
-                    className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red text-sm font-semibold font-mono"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-brand-dark/80 border border-slate-200 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red text-sm font-semibold font-mono"
                   />
-                  <span className="text-[11px] text-slate-400 mt-1 block">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
                     Admin hisob-kitob bo'yicha sizga qo'ng'iroq qiladi yoki Telegramdan aloqaga chiqadi.
                   </span>
                 </div>

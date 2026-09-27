@@ -46,7 +46,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
               className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeTab === tab.id
                   ? 'bg-brand-red text-white shadow-glow-red font-bold'
-                  : 'bg-brand-dark/70 text-slate-300 hover:text-white hover:bg-brand-surface border border-white/10'
+                  : 'bg-slate-100 dark:bg-brand-dark/70 text-slate-700 dark:text-slate-300 hover:text-brand-red hover:bg-slate-200 dark:hover:bg-brand-surface border border-slate-200 dark:border-white/10'
               }`}
             >
               {tab.label}
@@ -97,19 +97,19 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                     <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white group-hover:text-brand-red transition-colors mb-2 leading-snug">
                       {name}
                     </h3>
-                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
+                    <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
                       {desc}
                     </p>
 
                     {/* Quick Specs List */}
-                    <div className="space-y-2 mb-6 text-xs text-slate-300">
-                      <div className="flex justify-between py-1.5 border-b border-white/10">
-                        <span className="text-slate-400">{t.products.thicknessLabel}</span>
-                        <span className="font-semibold text-white">{product.thickness}</span>
+                    <div className="space-y-2 mb-6 text-xs text-slate-700 dark:text-slate-300">
+                      <div className="flex justify-between py-1.5 border-b border-slate-200 dark:border-white/10">
+                        <span className="text-slate-500 dark:text-slate-400">{t.products.thicknessLabel}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{product.thickness}</span>
                       </div>
-                      <div className="flex justify-between py-1.5 border-b border-white/10">
-                        <span className="text-slate-400">{t.products.coatingLabel}</span>
-                        <span className="font-semibold text-white">{product.coating}</span>
+                      <div className="flex justify-between py-1.5 border-b border-slate-200 dark:border-white/10">
+                        <span className="text-slate-500 dark:text-slate-400">{t.products.coatingLabel}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{product.coating}</span>
                       </div>
                     </div>
                   </div>
@@ -118,7 +118,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                 {/* Footer with Price and Button */}
                 <div className="p-6 pt-0">
                   <div className="mb-4">
-                    <span className="block text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                    <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
                       Zavod narxi:
                     </span>
                     <span className="font-display font-extrabold text-base text-brand-red">
@@ -128,7 +128,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
 
                   <button
                     onClick={() => onSelectProduct(product)}
-                    className="w-full py-3 px-4 rounded-xl bg-brand-surface hover:bg-brand-red hover:text-white border border-white/10 hover:border-brand-red text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 group/btn"
+                    className="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-brand-surface hover:bg-brand-red hover:text-white border border-slate-200 dark:border-white/10 hover:border-brand-red text-slate-900 dark:text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 group/btn"
                   >
                     <span>{t.products.detailsBtn}</span>
                     <ArrowRight className="w-4 h-4 text-brand-red group-hover/btn:text-white group-hover/btn:translate-x-1 transition-transform" />

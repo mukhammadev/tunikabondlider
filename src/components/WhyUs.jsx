@@ -47,7 +47,7 @@ export const WhyUs = ({ t }) => {
               {t.whyUs.p1Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-black/5 dark:border-white/5 border-t border-white/5 flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
               <span className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
                 <Sparkles className="w-3.5 h-3.5 text-brand-red" />
                 Yuridik Shartnoma
@@ -55,7 +55,7 @@ export const WhyUs = ({ t }) => {
               <span>•</span>
               <span>Zavod Sertifikati</span>
               <span>•</span>
-              <span className="text-emerald-400 font-bold">100% Ishonch</span>
+              <span className="text-emerald-500 dark:text-emerald-400 font-bold">100% Ishonch</span>
             </div>
           </div>
 
@@ -65,7 +65,7 @@ export const WhyUs = ({ t }) => {
               <Ruler className="w-7 h-7" />
             </div>
 
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-black/5 dark:bg-white/5 bg-white/5 text-slate-500 dark:text-slate-400 border-black/10 dark:border-white/10 border border-white/10 mb-3">
+            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-3">
               MILLIMETR ANIKLIK
             </div>
 
@@ -83,7 +83,7 @@ export const WhyUs = ({ t }) => {
               <Clock className="w-7 h-7" />
             </div>
 
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-3">
+            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/20 mb-3">
               O'Z VAQTIDA
             </div>
 
@@ -101,7 +101,7 @@ export const WhyUs = ({ t }) => {
               <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
                 <Banknote className="w-7 h-7" />
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                 O'RTAKASHLARSIZ
               </span>
             </div>
@@ -113,7 +113,7 @@ export const WhyUs = ({ t }) => {
               {t.whyUs.p4Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-black/5 dark:border-white/5 border-t border-white/5 flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
               <span className="text-slate-900 dark:text-white font-bold">1 m² 75 000 so'mdan</span>
               <span>•</span>
               <span>Halol hisob-kitob</span>
@@ -128,7 +128,7 @@ export const WhyUs = ({ t }) => {
               <SunMedium className="w-7 h-7" />
             </div>
 
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-black/5 dark:bg-white/5 bg-white/5 text-slate-500 dark:text-slate-400 border-black/10 dark:border-white/10 border border-white/10 mb-3">
+            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-3">
               -40°C DAN +60°C GACHA
             </div>
 
@@ -146,7 +146,7 @@ export const WhyUs = ({ t }) => {
               <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
                 <Eye className="w-7 h-7" />
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">
                 3D MODELLASHTIRISH
               </span>
             </div>
@@ -158,7 +158,7 @@ export const WhyUs = ({ t }) => {
               {t.whyUs.p6Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-black/5 dark:border-white/5 border-t border-white/5 flex items-center gap-2 text-xs text-brand-red font-bold">
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex items-center gap-2 text-xs text-brand-red font-bold">
               <span>Binongizni qurilishdan oldin ko'ring</span>
               <ArrowRight className="w-4 h-4" />
             </div>

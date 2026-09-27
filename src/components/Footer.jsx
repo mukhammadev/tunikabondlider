@@ -7,7 +7,7 @@ export const Footer = ({ t }) => {
   };
 
   return (
-    <footer className="bg-slate-100/80 dark:bg-brand-surface/80 bg-brand-surface/90 border-black/10 dark:border-white/10 border-t border-white/10 pt-16 pb-12 relative">
+    <footer className="bg-slate-100 dark:bg-brand-surface/80 border-t border-slate-200 dark:border-white/10 pt-16 pb-12 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
@@ -15,7 +15,7 @@ export const Footer = ({ t }) => {
           {/* Brand Info */}
           <div className="space-y-4">
             <a href="#" className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-black/5 dark:bg-white/5 bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red">
+              <div className="w-11 h-11 rounded-xl bg-slate-200/60 dark:bg-white/5 border border-brand-red/40 p-1.5 flex items-center justify-center shadow-glow-red">
                 <img src="/favi.svg" alt="Tunikabond Lider" className="w-full h-full object-contain filter drop-shadow" />
               </div>
               <div>
@@ -27,7 +27,7 @@ export const Footer = ({ t }) => {
                 </span>
               </div>
             </a>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               {t.footer.desc}
             </p>
           </div>
@@ -133,7 +133,7 @@ export const Footer = ({ t }) => {
                 href="https://t.me/tunikabondLiderkanali"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-black/5 dark:bg-white/5 bg-white/5 hover:bg-brand-red/15 border-black/10 dark:border-white/10 border border-white/10 hover:border-brand-red/40 text-slate-700 dark:text-slate-200 hover:text-white transition-all text-xs font-semibold"
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-200/60 hover:bg-brand-red/10 dark:bg-white/5 dark:hover:bg-brand-red/15 border border-slate-300 dark:border-white/10 hover:border-brand-red/40 text-slate-700 dark:text-slate-200 transition-all text-xs font-semibold"
               >
                 <Send className="w-4 h-4 text-brand-red" />
                 <span>Kanal: @tunikabondLiderkanali</span>
@@ -144,7 +144,7 @@ export const Footer = ({ t }) => {
                 href="https://www.instagram.com/tunikabond_lider"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-black/5 dark:bg-white/5 bg-white/5 hover:bg-brand-red/15 border-black/10 dark:border-white/10 border border-white/10 hover:border-brand-red/40 text-slate-700 dark:text-slate-200 hover:text-white transition-all text-xs font-semibold"
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-200/60 hover:bg-brand-red/10 dark:bg-white/5 dark:hover:bg-brand-red/15 border border-slate-300 dark:border-white/10 hover:border-brand-red/40 text-slate-700 dark:text-slate-200 transition-all text-xs font-semibold"
               >
                 <svg className="w-4 h-4 text-brand-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
@@ -160,7 +160,7 @@ export const Footer = ({ t }) => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-black/10 dark:border-white/10 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             © {new Date().getFullYear()} Tunikabond Lider. {t.footer.rights}
           </div>
@@ -169,7 +169,7 @@ export const Footer = ({ t }) => {
             <span>{t.footer.developedWith}</span>
             <button
               onClick={scrollToTop}
-              className="p-2 rounded-lg bg-black/5 dark:bg-white/5 bg-white/5 hover:bg-brand-red hover:text-white text-slate-600 dark:text-slate-300 transition-colors"
+              className="p-2 rounded-lg bg-slate-200 hover:bg-brand-red hover:text-white dark:bg-white/5 dark:hover:bg-brand-red text-slate-700 dark:text-slate-300 transition-colors"
               aria-label="Scroll to top"
             >
               <ArrowUp className="w-4 h-4" />

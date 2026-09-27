@@ -119,27 +119,27 @@ export const LiveActivityToast = ({ onOpenLeadModal }) => {
           : 'translate-y-12 opacity-0 scale-95 pointer-events-none'
       }`}
     >
-      <div className="relative rounded-2xl bg-[#0F141F]/90 backdrop-blur-xl border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.6)] p-3.5 sm:p-4 overflow-hidden group hover:border-brand-red/50 transition-colors">
+      <div className="relative rounded-2xl bg-white/95 dark:bg-[#0F141F]/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] p-3.5 sm:p-4 overflow-hidden group hover:border-brand-red/50 transition-colors">
         
         {/* Subtle moving laser sweep inside card */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full animate-[shimmer_3s_infinite] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-black/[0.02] dark:via-white/[0.04] to-transparent -translate-x-full animate-[shimmer_3s_infinite] pointer-events-none" />
 
         {/* Top bar: live indicator & dismiss button */}
         <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <span className="uppercase tracking-wider font-mono text-[10px]">Jonli Faollik</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400 font-mono text-[10px]">{current.time}</span>
+            <span className="text-slate-300 dark:text-slate-600">•</span>
+            <span className="text-slate-500 dark:text-slate-400 font-mono text-[10px]">{current.time}</span>
           </div>
 
           <button
             type="button"
             onClick={() => setIsDismissed(true)}
-            className="text-slate-500 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+            className="text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Yopish"
           >
             <X className="w-3.5 h-3.5" />
@@ -154,20 +154,20 @@ export const LiveActivityToast = ({ onOpenLeadModal }) => {
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-bold text-white truncate">{current.title}</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white truncate">{current.title}</span>
               <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-brand-red/20 text-brand-red border border-brand-red/30">
                 {current.tag}
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-0.5 line-clamp-2 leading-relaxed">
+            <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5 line-clamp-2 leading-relaxed">
               {current.description}
             </p>
           </div>
         </div>
 
         {/* Action button inside toast */}
-        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between gap-2">
-          <span className="text-[10px] text-slate-400 font-medium">
+        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-2">
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
             10 yillik rasmiy kafolat bilan
           </span>
           <button

@@ -66,12 +66,12 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
         {/* Section 1: Official Warranty & Certifications */}
         <div className="mb-20">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Ishonch va Kafolat</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-white tracking-tight mb-4">
-              Rasmiy Kafolat va <span className="text-gradient-red">Sifat Sertifikatlari</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
+              Rasmiy Kafolat va <span className="red-gradient-text">Sifat Sertifikatlari</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
               Biz faqat so'zda emas, balki qonuniy kuchga ega 10 yillik rasmiy shartnoma va sifat sertifikatlari bilan xizmat ko'rsatamiz.
@@ -84,27 +84,27 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
               return (
                 <div
                   key={idx}
-                  className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 hover:border-brand-red/40 hover:shadow-glow-red/20 transition-all flex flex-col justify-between group"
+                  className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 hover:border-brand-red/40 hover:shadow-glow-red/20 transition-all flex flex-col justify-between group"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <div className="w-12 h-12 rounded-2xl bg-brand-red/10 border border-brand-red/30 flex items-center justify-center text-brand-red group-hover:scale-110 transition-transform">
                         <Icon className="w-6 h-6" />
                       </div>
-                      <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-white/10 text-emerald-300 border border-white/10">
+                      <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 dark:bg-white/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20 dark:border-white/10">
                         {cert.badge}
                       </span>
                     </div>
 
-                    <h3 className="font-display font-bold text-lg sm:text-xl text-white mb-3">
+                    <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-3">
                       {cert.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                       {cert.desc}
                     </p>
                   </div>
 
-                  <div className="pt-6 mt-6 border-t border-white/10 flex items-center gap-2 text-xs font-semibold text-brand-red">
+                  <div className="pt-6 mt-6 border-t border-slate-200 dark:border-white/10 flex items-center gap-2 text-xs font-semibold text-brand-red">
                     <CheckCircle className="w-4 h-4" />
                     <span>Har bir shartnomada qayd etiladi</span>
                   </div>
@@ -121,8 +121,8 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
               <ThumbsUp className="w-3.5 h-3.5" />
               <span>Mijozlarimiz Fikrlari</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-white tracking-tight mb-4">
-              Mijozlarimiz Biz Haqimizda <span className="text-gradient-red">Nima Deydi?</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
+              Mijozlarimiz Biz Haqimizda <span className="red-gradient-text">Nima Deydi?</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
               Yuzlab muvaffaqiyatli topshirilgan fasad va tom loyihalarimiz egalarining samimiy baholari.
@@ -133,7 +133,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
             {reviews.map((rev, idx) => (
               <div
                 key={idx}
-                className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between relative hover:border-brand-red/40 transition-all shadow-lg hover:shadow-glow-red/10"
+                className="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-white/10 flex flex-col justify-between relative hover:border-brand-red/40 transition-all shadow-lg hover:shadow-glow-red/10"
               >
                 <div>
                   {/* Rating Stars */}
@@ -141,39 +141,39 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
                     {[...Array(rev.rating)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-amber-400" />
                     ))}
-                    <span className="text-xs font-bold text-slate-400 ml-2">5.0 / 5.0</span>
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-2">5.0 / 5.0</span>
                   </div>
 
                   {/* Comment with clean styling and no overlapping icon */}
-                  <div className="mb-6 pl-3.5 border-l-2 border-brand-red/70 py-1 bg-white/[0.02] rounded-r-xl">
-                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                  <div className="mb-6 pl-3.5 border-l-2 border-brand-red/70 py-1 bg-slate-100/80 dark:bg-white/[0.02] rounded-r-xl">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                       {rev.comment}
                     </p>
                   </div>
                 </div>
 
                 {/* Author Info */}
-                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
                   <div>
-                    <h4 className="font-display font-bold text-sm sm:text-base text-white">
+                    <h4 className="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                       {rev.name}
                     </h4>
-                    <p className="text-[11px] text-slate-400">{rev.role}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">{rev.role}</p>
                     <p className="text-[10px] text-brand-red font-semibold mt-0.5">{rev.project}</p>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-medium">{rev.date}</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{rev.date}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* CTA Box */}
-          <div className="mt-14 p-8 rounded-3xl bg-gradient-to-r from-brand-surface via-brand-surface/90 to-brand-surface border border-brand-red/30 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="mt-14 p-8 rounded-3xl bg-white dark:bg-gradient-to-r dark:from-brand-surface dark:via-brand-surface/90 dark:to-brand-surface border border-slate-200 dark:border-brand-red/30 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="font-display font-bold text-xl sm:text-2xl text-white">
+              <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900 dark:text-white">
                 Binongiz uchun eng sifatli fasad yechimini xohlaysizmi?
               </h3>
-              <p className="text-xs sm:text-sm text-slate-300 mt-1">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
                 Katalog va hisob-kitob bilan tanishish uchun usta-muhandisimiz bilan bepul bog'laning.
               </p>
             </div>

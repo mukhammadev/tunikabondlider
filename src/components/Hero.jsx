@@ -98,7 +98,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
 
             <a
               href="#products"
-              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-100/80 dark:bg-brand-surface/80 hover:bg-brand-surface border-black/10 dark:border-white/10 border border-white/10 text-slate-900 dark:text-white font-semibold text-base hover:border-brand-red/40 transition-all hover:scale-105 active:scale-95"
+              className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-100 dark:bg-brand-surface/80 hover:bg-slate-200 dark:hover:bg-brand-surface border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-semibold text-base hover:border-brand-red/40 transition-all hover:scale-105 active:scale-95"
             >
               <Building2 className="w-5 h-5 text-brand-red" />
               <span>{t.hero.ctaCatalog}</span>
@@ -117,7 +117,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                   {counts.exp}+
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">{t.hero.statExp}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">{t.hero.statExp}</p>
             </div>
 
             <div className="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group hover:border-brand-red/50">
@@ -129,7 +129,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                   {counts.projects}+
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">{t.hero.statProjects}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">{t.hero.statProjects}</p>
             </div>
 
             <div className="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group hover:border-brand-red/50">
@@ -141,7 +141,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                   {counts.warranty} Yil
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">{t.hero.statWarranty}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">{t.hero.statWarranty}</p>
             </div>
 
             <div className="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden group hover:border-brand-red/50">
@@ -153,7 +153,7 @@ export const Hero = ({ t, onOpenLeadModal }) => {
                   {counts.measure}%
                 </div>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">{t.hero.statMeasurement}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">{t.hero.statMeasurement}</p>
             </div>
 
           </div>

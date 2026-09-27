@@ -85,14 +85,14 @@ export const ContactSection = ({ t }) => {
                     <UserCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <span className="block text-[11px] text-slate-300 uppercase tracking-wider font-semibold">
+                    <span className="block text-[11px] text-slate-500 dark:text-slate-300 uppercase tracking-wider font-semibold">
                       Telegram Admin & Menejer
                     </span>
                     <a 
                       href="https://t.me/Muhammadazez" 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="font-display font-black text-base text-white hover:text-brand-red transition-colors flex items-center gap-1.5"
+                      className="font-display font-black text-base text-slate-900 dark:text-white hover:text-brand-red transition-colors flex items-center gap-1.5"
                     >
                       <span>@Muhammadazez</span>
                     </a>
@@ -111,7 +111,7 @@ export const ContactSection = ({ t }) => {
 
               {/* Phone numbers */}
               <div>
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-400 mb-2">
+                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-2">
                   {t.contact.phoneTitle}
                 </span>
                 <div className="space-y-2">
@@ -145,29 +145,29 @@ export const ContactSection = ({ t }) => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-400 mb-2">
+              <div className="pt-4 border-t border-slate-200 dark:border-white/10">
+                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-2">
                   {t.contact.addressTitle}
                 </span>
-                <div className="flex items-start gap-3 text-sm text-slate-300">
+                <div className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
                   <MapPin className="w-5 h-5 text-brand-red flex-shrink-0 mt-0.5" />
                   <span>{t.contact.addressText}</span>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-400 mb-2">
+              <div className="pt-4 border-t border-slate-200 dark:border-white/10">
+                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-2">
                   {t.contact.workHoursTitle}
                 </span>
-                <div className="flex items-start gap-3 text-sm text-slate-300">
+                <div className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
                   <Clock className="w-5 h-5 text-brand-red flex-shrink-0 mt-0.5" />
                   <span>{t.contact.workHoursText}</span>
                 </div>
               </div>
 
               {/* Social Channels */}
-              <div className="pt-4 border-t border-white/10">
-                <span className="block text-xs uppercase tracking-wider font-bold text-slate-400 mb-3">
+              <div className="pt-4 border-t border-slate-200 dark:border-white/10">
+                <span className="block text-xs uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 mb-3">
                   {t.contact.socialsTitle}
                 </span>
                 <div className="flex items-center gap-3">
@@ -175,7 +175,7 @@ export const ContactSection = ({ t }) => {
                     href="https://t.me/tunikabondLiderkanali"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-surface border border-white/15 text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold"
                   >
                     <span>Telegram Kanal</span>
                   </a>
@@ -183,7 +183,7 @@ export const ContactSection = ({ t }) => {
                     href="https://www.instagram.com/tunikabond_lider"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-surface border border-white/15 text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold"
                   >
                     <span>Instagram</span>
                   </a>
@@ -193,7 +193,7 @@ export const ContactSection = ({ t }) => {
             </div>
 
             {/* Google Map Box */}
-            <div className="rounded-3xl overflow-hidden border border-white/10 shadow-lg h-56 bg-brand-surface">
+            <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg h-56 bg-slate-100 dark:bg-brand-surface">
               <iframe
                 title="Office Location"
                 src="https://www.google.com/maps/embed?pb=!1m13!1m8!1m3!1d6002.201579445047!2d69.285698!3d41.219574!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDEzJzEwLjUiTiA2OcKwMTcnMDguNSJF!5e0!3m2!1sru!2s!4v1764096417694!5m2!1sru!2s"
@@ -240,7 +240,7 @@ export const ContactSection = ({ t }) => {
 
                   {/* Name field */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       {t.contact.formName} *
                     </label>
                     <input
@@ -249,13 +249,13 @@ export const ContactSection = ({ t }) => {
                       placeholder={t.contact.formNamePlaceholder}
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-black/10 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
+                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
                     />
                   </div>
 
                   {/* Phone field */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       {t.contact.formPhone} *
                     </label>
                     <input
@@ -264,31 +264,31 @@ export const ContactSection = ({ t }) => {
                       placeholder="+998 (90) 123-45-67"
                       value={formData.phone}
                       onChange={handlePhoneChange}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-black/10 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm font-semibold tracking-wide"
+                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm font-semibold tracking-wide"
                     />
                   </div>
 
                   {/* Desired Service */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       {t.contact.formService}
                     </label>
                     <select
                       value={formData.service}
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-brand-dark/70 border border-white/15 text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
+                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
                     >
-                      <option value="Tunikabond Fasad Paneli">Tunikabond Fasad Panellari</option>
-                      <option value="Alyukabond Kompozit">Alyukabond Kompozit Panellari</option>
-                      <option value="Zamonaviy Karnizlar">Zamonaviy Karnizlar</option>
-                      <option value="Profnastil va Tom Yopish">Profnastil va Tom Yopish</option>
-                      <option value="Bepul O'lchash va Smeta">Bepul Usta Chaqirish (O'lchash)</option>
+                      <option value="Tunikabond Fasad Paneli" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Tunikabond Fasad Panellari</option>
+                      <option value="Alyukabond Kompozit" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Alyukabond Kompozit Panellari</option>
+                      <option value="Zamonaviy Karnizlar" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Zamonaviy Karnizlar</option>
+                      <option value="Profnastil va Tom Yopish" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Profnastil va Tom Yopish</option>
+                      <option value="Bepul O'lchash va Smeta" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Bepul Usta Chaqirish (O'lchash)</option>
                     </select>
                   </div>
 
                   {/* Message field */}
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       {t.contact.formMessage}
                     </label>
                     <textarea
@@ -296,7 +296,7 @@ export const ContactSection = ({ t }) => {
                       placeholder={t.contact.formMessagePlaceholder}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-black/10 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm resize-none"
+                      className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm resize-none"
                     />
                   </div>
 
@@ -316,7 +316,7 @@ export const ContactSection = ({ t }) => {
                     )}
                   </button>
 
-                  <p className="text-[11px] text-slate-500 text-center">
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center">
                     Tugmani bosish orqali siz shaxsiy ma'lumotlaringizni qayta ishlashga rozilik bildirasiz.
                   </p>
 

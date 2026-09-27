@@ -45,7 +45,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
               className={`px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 activeCategory === cat.id
                   ? 'bg-brand-red text-white shadow-glow-red font-bold'
-                  : 'bg-brand-surface/80 text-slate-300 hover:bg-brand-card hover:text-white border border-white/10'
+                  : 'bg-slate-100 dark:bg-brand-surface/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-brand-card hover:text-brand-red border border-slate-200 dark:border-white/10'
               }`}
             >
               {cat.label}
@@ -74,15 +74,15 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-sm sm:text-base text-white group-hover:text-brand-red transition-colors leading-snug mb-1">
+                  <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-brand-red transition-colors leading-snug mb-1">
                     {name}
                   </h3>
-                  <p className="text-xs text-slate-400 font-medium mb-3">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-3">
                     {item.texture}
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+                <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span>{item.finish}</span>
                   <span className="text-brand-red font-bold">Ko'rish →</span>
                 </div>
@@ -95,13 +95,13 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
 
       {/* Swatch Detail Modal */}
       {selectedSwatch && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/80 backdrop-blur-md animate-fadeIn">
-          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/80 backdrop-blur-md animate-fadeIn">
+          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/20 shadow-2xl relative">
             
             {/* Close button */}
             <button
               onClick={() => setSelectedSwatch(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white hover:bg-white/20 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full bg-black/5 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/20 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -116,27 +116,27 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
               </div>
             </div>
 
-            <h3 className="font-display font-extrabold text-2xl text-white mb-2">
+            <h3 className="font-display font-extrabold text-2xl text-slate-900 dark:text-white mb-2">
               {selectedSwatch.name[currentLang] || selectedSwatch.name.uz}
             </h3>
 
             {/* Specs Table */}
             <div className="space-y-3 mb-8 text-xs sm:text-sm">
-              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
                 <span>{t.swatches.ralCode}</span>
-                <span className="font-bold text-white">{selectedSwatch.code}</span>
+                <span className="font-bold text-slate-900 dark:text-white">{selectedSwatch.code}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
                 <span>{t.swatches.coating}</span>
-                <span className="font-bold text-white">{selectedSwatch.coating}</span>
+                <span className="font-bold text-slate-900 dark:text-white">{selectedSwatch.coating}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
                 <span>Faktura / Yuzasi:</span>
-                <span className="font-bold text-white">{selectedSwatch.finish}</span>
+                <span className="font-bold text-slate-900 dark:text-white">{selectedSwatch.finish}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-white/10 text-slate-300">
+              <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
                 <span>{t.swatches.application}</span>
-                <span className="font-bold text-white text-right max-w-[240px]">{selectedSwatch.application}</span>
+                <span className="font-bold text-slate-900 dark:text-white text-right max-w-[240px]">{selectedSwatch.application}</span>
               </div>
             </div>
 

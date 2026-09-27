@@ -60,9 +60,21 @@
         "closes": "19:00"
       }
     }
+    <!-- Immediate Theme Initialization to prevent flash -->
+    <script>
+      (function() {
+        var saved = localStorage.getItem('tl_theme');
+        if (saved === 'light') {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        }
+      })();
     </script>
   </head>
-  <body class="bg-brand-dark text-slate-100 font-sans antialiased selection:bg-brand-gold selection:text-brand-dark min-h-screen">
+  <body class="bg-brand-dark text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-brand-red selection:text-white min-h-screen">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -58,13 +58,13 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn">
-      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/85 backdrop-blur-md animate-fadeIn">
+      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/20 shadow-2xl relative">
         
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white hover:bg-white/20 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -74,10 +74,10 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
             <div className="w-16 h-16 rounded-full bg-brand-red/20 text-brand-red flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-10 h-10" />
             </div>
-            <h3 className="font-display font-extrabold text-2xl text-white mb-2">
+            <h3 className="font-display font-extrabold text-2xl text-slate-900 dark:text-white mb-2">
               Arizangiz qabul qilindi!
             </h3>
-            <p className="text-slate-300 text-sm max-w-sm mx-auto">
+            <p className="text-slate-600 dark:text-slate-300 text-sm max-w-sm mx-auto">
               Mutaxassisimiz va admin <strong className="text-brand-red font-bold">@Muhammadazez</strong> tez orada siz bilan bog'lanadi.
             </p>
           </div>
@@ -89,25 +89,25 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
               <span>Bepul o'lchov va smeta</span>
             </div>
 
-            <h3 className="font-display font-extrabold text-2xl text-white mb-2">
+            <h3 className="font-display font-extrabold text-2xl text-slate-900 dark:text-white mb-2">
               {initialData?.service ? initialData.service : "Bepul Usta Chaqirish"}
             </h3>
 
             {initialData?.calcData && (
-              <div className="p-3.5 rounded-xl bg-brand-red/10 border border-brand-red/30 mb-6 text-xs text-slate-200">
+              <div className="p-3.5 rounded-xl bg-brand-red/10 border border-brand-red/30 mb-6 text-xs text-slate-700 dark:text-slate-200">
                 <span className="font-bold text-brand-red block mb-1">Hisoblangan xarajat:</span>
-                <div>Hajmi: <strong className="text-white">{initialData.calcData.area} m²</strong> | Material: <strong className="text-white">{initialData.calcData.material}</strong></div>
+                <div>Hajmi: <strong className="text-slate-900 dark:text-white">{initialData.calcData.area} m²</strong> | Material: <strong className="text-slate-900 dark:text-white">{initialData.calcData.material}</strong></div>
                 <div>Taxminiy summa: <strong className="text-brand-red font-bold">{initialData.calcData.cost}</strong></div>
               </div>
             )}
 
-            <p className="text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed">
               Raqamingizni qoldiring, mutaxassisimiz bepul namuna va lazerli o'lchov asbobi bilan tashrif buyuradi.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                   Ismingiz *
                 </label>
                 <input
@@ -116,12 +116,12 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   placeholder="Jasur Aliyev"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-brand-dark/80 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                   Telefon raqamingiz *
                 </label>
                 <input
@@ -130,12 +130,12 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   placeholder="+998 (90) 123-45-67"
                   value={phone}
                   onChange={handlePhoneChange}
-                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm font-semibold tracking-wide"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-brand-dark/80 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm font-semibold tracking-wide"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                   Manzilingiz yoki qo'shimcha izoh
                 </label>
                 <input
@@ -143,18 +143,18 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                   placeholder="Masalan: Yunusobod 14-mavze, kottedj"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-brand-dark/80 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-brand-dark/80 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red text-sm"
                 />
               </div>
 
               {/* Optional Photo Attachment */}
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                   <span>Bino yoki uy rasmi (ixtiyoriy)</span>
                   {uploadingPhoto && <span className="text-[10px] text-brand-red animate-pulse">Yuklanmoqda...</span>}
                 </label>
                 <div className="flex items-center gap-2">
-                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-white/20 hover:border-brand-red/60 bg-white/5 cursor-pointer transition-colors text-xs text-slate-300">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-white/20 hover:border-brand-red/60 bg-slate-100 dark:bg-white/5 cursor-pointer transition-colors text-xs text-slate-700 dark:text-slate-300">
                     <Camera className="w-4 h-4 text-brand-red" />
                     <span className="truncate">{photoName ? photoName : "Rasmni tanlang yoki suratga oling"}</span>
                     <input
@@ -205,7 +205,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                 )}
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 pt-2">
+              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 pt-2">
                 <ShieldCheck className="w-3.5 h-3.5 text-brand-red" />
                 <span>100% Bepul va majburiyatlarsiz</span>
               </div>

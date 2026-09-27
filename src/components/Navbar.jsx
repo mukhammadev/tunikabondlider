@@ -53,7 +53,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 <span className={`block font-display font-extrabold text-sm tracking-wide whitespace-nowrap group-hover:text-brand-red transition-colors ${isLight ? 'text-slate-900' : 'text-white'}`}>
                   TUNIKABOND <span className="text-brand-red">LIDER</span>
                 </span>
-                <span className={`hidden xl:block text-[9px] uppercase tracking-[0.15em] font-medium mt-0.5 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span className={`hidden xl:block text-[9px] uppercase tracking-[0.15em] font-medium mt-0.5 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                   Fasad &amp; Tom
                 </span>
               </div>
@@ -65,7 +65,11 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors hover:text-brand-red ${isLight ? 'text-slate-600 hover:bg-black/5' : 'text-slate-300 hover:bg-white/6'}`}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors hover:text-brand-red ${
+                    isLight 
+                      ? 'text-slate-800 hover:text-brand-red hover:bg-black/5' 
+                      : 'text-slate-200 hover:text-brand-red hover:bg-white/10'
+                  }`}
                 >
                   {link.label}
                 </a>
@@ -90,7 +94,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               ) : (
                 <button
                   onClick={onOpenAdmin}
-                  className={`p-1.5 rounded-lg transition-colors hover:text-brand-red ${isLight ? 'text-slate-500 hover:bg-black/6' : 'text-slate-400 hover:bg-white/8'}`}
+                  className={`p-1.5 rounded-lg transition-colors hover:text-brand-red ${isLight ? 'text-slate-700 hover:bg-black/5' : 'text-slate-300 hover:bg-white/10'}`}
                   title="Admin"
                 >
                   <Lock className="w-3.5 h-3.5" />
@@ -98,7 +102,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               )}
 
               {/* Language */}
-              <div className={`flex items-center rounded-lg p-0.5 border text-[11px] font-bold ${isLight ? 'bg-black/4 border-black/8' : 'bg-white/6 border-white/10'}`}>
+              <div className={`flex items-center rounded-lg p-0.5 border text-[11px] font-bold ${isLight ? 'bg-black/5 border-slate-200' : 'bg-white/10 border-white/15'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
                   <button
                     key={lng}
@@ -106,7 +110,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                     className={`px-2 py-1 rounded-md transition-all uppercase ${
                       currentLang === lng
                         ? 'bg-brand-red text-white'
-                        : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'
+                        : isLight ? 'text-slate-700 hover:text-slate-900' : 'text-slate-300 hover:text-white'
                     }`}
                   >
                     {lng}
@@ -119,7 +123,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 type="button"
                 onClick={toggleTheme}
                 className={`p-1.5 rounded-lg border transition-all hover:border-brand-red/50 active:scale-95 ${
-                  isLight ? 'bg-black/4 border-black/8 text-slate-600' : 'bg-white/6 border-white/10 text-slate-300'
+                  isLight ? 'bg-black/5 border-slate-200 text-slate-800' : 'bg-white/10 border-white/15 text-slate-200'
                 }`}
                 title={isLight ? "Tungi rejim" : "Kunduzgi rejim"}
               >
@@ -140,7 +144,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
               <button
                 type="button"
                 onClick={toggleTheme}
-                className={`p-2 rounded-xl border active:scale-95 transition-all ${isLight ? 'bg-black/4 border-black/8 text-slate-600' : 'bg-white/6 border-white/10 text-slate-300'}`}
+                className={`p-2 rounded-xl border active:scale-95 transition-all ${isLight ? 'bg-black/5 border-slate-200 text-slate-800' : 'bg-white/10 border-white/15 text-slate-200'}`}
                 aria-label="Kun/Tun"
               >
                 {isLight ? <Moon className="w-4 h-4 text-indigo-500" /> : <Sun className="w-4 h-4 text-amber-400" />}
@@ -148,7 +152,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 rounded-xl border active:scale-95 transition-all hover:text-brand-red ${isLight ? 'bg-black/4 border-black/8 text-slate-700' : 'bg-white/6 border-white/10 text-slate-200'}`}
+                className={`p-2 rounded-xl border active:scale-95 transition-all hover:text-brand-red ${isLight ? 'bg-black/5 border-slate-200 text-slate-800' : 'bg-white/10 border-white/15 text-slate-200'}`}
                 aria-label="Menyu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5 text-brand-red" /> : <Menu className="w-5 h-5" />}
@@ -161,16 +165,16 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
         {/* ══ MOBILE DRAWER ══ */}
         {mobileMenuOpen && (
           <div className={`md:hidden rounded-2xl border shadow-2xl px-4 pt-3 pb-4 animate-slideDown ${
-            isLight ? 'bg-white border-black/8' : 'bg-[#0d1120]/97 border-white/10'
+            isLight ? 'bg-white/98 border-slate-200 shadow-2xl text-slate-900' : 'bg-[#0d1120]/98 border-white/15 shadow-2xl text-white'
           }`}>
 
             {/* Language */}
-            <div className={`flex items-center justify-between px-2 py-2 rounded-xl border mb-2 ${isLight ? 'bg-black/3 border-black/6' : 'bg-white/5 border-white/10'}`}>
-              <span className={`text-xs font-semibold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Til:</span>
-              <div className={`flex rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-black/5 border-black/8' : 'bg-white/8 border-white/10'}`}>
+            <div className={`flex items-center justify-between px-2 py-2 rounded-xl border mb-2 ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'}`}>
+              <span className={`text-xs font-semibold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>Til:</span>
+              <div className={`flex rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-white border-slate-200' : 'bg-white/8 border-white/10'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
                   <button key={lng} onClick={() => setLang(lng)}
-                    className={`px-3 py-1 rounded uppercase transition-all ${currentLang === lng ? 'bg-brand-red text-white' : isLight ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'}`}
+                    className={`px-3 py-1 rounded uppercase transition-all ${currentLang === lng ? 'bg-brand-red text-white' : isLight ? 'text-slate-700 hover:text-slate-900' : 'text-slate-400 hover:text-white'}`}
                   >{lng}</button>
                 ))}
               </div>
@@ -182,7 +186,7 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
                 const Icon = link.icon;
                 return (
                   <a key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium hover:text-brand-red transition-colors ${isLight ? 'text-slate-700 hover:bg-black/4' : 'text-slate-200 hover:bg-white/5'}`}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium hover:text-brand-red transition-colors ${isLight ? 'text-slate-800 hover:bg-slate-100' : 'text-slate-200 hover:bg-white/5'}`}
                   >
                     <Icon className="w-3.5 h-3.5 text-brand-red shrink-0" />
                     <span className="truncate">{link.label}</span>
@@ -192,10 +196,10 @@ export const Navbar = ({ currentLang, setLang, t, onOpenLeadModal, currentUser, 
             </div>
 
             {/* Actions */}
-            <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isLight ? 'border-black/6' : 'border-white/10'}`}>
+            <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
               <button
                 onClick={() => { setMobileMenuOpen(false); onOpenAdmin(); }}
-                className={`w-full py-2 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 ${isLight ? 'bg-black/3 border-black/8 text-slate-700' : 'bg-white/5 border-white/12 text-slate-300'}`}
+                className={`w-full py-2 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 ${isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 border-white/12 text-slate-300'}`}
               >
                 <Lock className="w-4 h-4 text-brand-red" />
                 Admin / CMS Panel

@@ -186,16 +186,16 @@ const AIFacadeTab = ({ onOpenLeadModal }) => {
 
       {/* Processing state */}
       {status === 'processing' && (
-        <div className="rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 border-white/10 bg-brand-surface/40 dark:bg-brand-surface/40">
+        <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-brand-surface/40">
           <div className="relative h-64 sm:h-80">
             <img src={uploadedSrc} alt="Original" className="w-full h-full object-cover opacity-40" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/30">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40">
               <div className="w-14 h-14 rounded-2xl bg-brand-red/90 flex items-center justify-center shadow-glow-red">
                 <Loader2 className="w-7 h-7 text-white animate-spin" />
               </div>
               <div className="text-center">
                 <p className="font-bold text-white text-base">AI tahlil qilinmoqda…</p>
-                <p className="text-slate-300 text-sm mt-1">Tunikabond fasadi qo'llanilmoqda</p>
+                <p className="text-slate-200 text-sm mt-1">Tunikabond fasadi qo'llanilmoqda</p>
               </div>
               <div className="flex gap-1.5">
                 {[0,1,2].map(i => (
@@ -213,7 +213,7 @@ const AIFacadeTab = ({ onOpenLeadModal }) => {
           {/* Slider */}
           <div
             ref={containerRef}
-            className="relative h-72 sm:h-[420px] rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 border-white/15 shadow-2xl cursor-ew-resize select-none"
+            className="relative h-72 sm:h-[420px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/15 shadow-2xl cursor-ew-resize select-none"
             onMouseMove={(e) => { if (isDragging) handleSliderMove(e.clientX); }}
             onMouseDown={() => setIsDragging(true)}
             onMouseUp={() => setIsDragging(false)}
@@ -275,7 +275,7 @@ const AIFacadeTab = ({ onOpenLeadModal }) => {
             </button>
             <button
               onClick={reset}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-black/6 dark:bg-white/5 text-slate-700 dark:text-slate-200 bg-white/8 text-slate-300 border border-black/10 dark:border-white/10 border-white/10 text-sm font-semibold hover:text-brand-red transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/10 text-sm font-semibold hover:text-brand-red transition-all"
             >
               <RefreshCcw className="w-4 h-4" />
               Boshqa rasm
@@ -283,7 +283,7 @@ const AIFacadeTab = ({ onOpenLeadModal }) => {
           </div>
 
           {/* Notice */}
-          <p className="text-center text-xs text-slate-500 dark:text-slate-400 text-slate-500 px-4">
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400 px-4">
             Bu preview avtomatik AI-transformatsiya. Haqiqiy natija materialga, rangga va bino strukturasiga qarab farq qilishi mumkin.
           </p>
         </div>
@@ -337,7 +337,7 @@ const DemoSliderTab = ({ onOpenLeadModal }) => {
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               activeIdx === i
                 ? 'bg-brand-red text-white shadow-glow-red scale-105'
-                : 'bg-black/6 dark:bg-white/5 border-black/10 dark:border-white/10 text-slate-600 dark:text-slate-300 bg-white/5 border border-white/10 text-slate-400 hover:text-brand-red'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:text-brand-red'
             }`}>
             {p.title}
           </button>
@@ -347,7 +347,7 @@ const DemoSliderTab = ({ onOpenLeadModal }) => {
       {/* Slider */}
       <div
         ref={containerRef}
-        className="relative h-[360px] sm:h-[460px] lg:h-[520px] rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 border-white/15 shadow-2xl cursor-ew-resize select-none"
+        className="relative h-[360px] sm:h-[460px] lg:h-[520px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/15 shadow-2xl cursor-ew-resize select-none"
         onMouseMove={(e) => { if (isDragging) handleMove(e.clientX); }}
         onMouseDown={() => setIsDragging(true)}
         onMouseUp={() => setIsDragging(false)}
@@ -366,7 +366,7 @@ const DemoSliderTab = ({ onOpenLeadModal }) => {
           <img src={cur.beforeImg} alt="Oldin" className="absolute inset-0 h-full object-cover max-w-none"
             style={{ width: containerRef.current ? `${containerRef.current.clientWidth}px` : '100%' }} draggable={false} />
           <div className="absolute inset-0 bg-black/40 pointer-events-none" />
-          <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-md text-slate-300 text-xs font-black border border-white/20 uppercase tracking-wide pointer-events-none">
+          <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-md text-slate-200 text-xs font-black border border-white/20 uppercase tracking-wide pointer-events-none">
             OLDIN: Eskirgan bino
           </div>
         </div>
@@ -384,10 +384,10 @@ const DemoSliderTab = ({ onOpenLeadModal }) => {
       </div>
 
       {/* Project info strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 sm:p-6 rounded-2xl bg-slate-50/80 dark:bg-brand-surface/60 border-black/8 dark:border-white/10 bg-brand-surface/60 border border-white/10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 sm:p-6 rounded-2xl bg-white dark:bg-brand-surface/60 border border-slate-200 dark:border-white/10 shadow-sm">
         <div>
           <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Joylashuvi</span>
-          <span className="block text-sm font-bold text-slate-800 dark:text-white mt-0.5">{cur.location}</span>
+          <span className="block text-sm font-bold text-slate-900 dark:text-white mt-0.5">{cur.location}</span>
         </div>
         <div>
           <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Maydon</span>
@@ -395,13 +395,13 @@ const DemoSliderTab = ({ onOpenLeadModal }) => {
         </div>
         <div>
           <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Montaj vaqti</span>
-          <span className="block text-sm font-bold text-emerald-400 text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1">
+          <span className="block text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1">
             <Clock className="w-3.5 h-3.5 inline" /> {cur.duration}
           </span>
         </div>
         <div>
           <span className="block text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Mahsulot</span>
-          <span className="block text-xs font-semibold text-slate-700 dark:text-slate-200 text-slate-300 mt-0.5 truncate" title={cur.material}>{cur.material}</span>
+          <span className="block text-xs font-semibold text-slate-700 dark:text-slate-200 mt-0.5 truncate" title={cur.material}>{cur.material}</span>
         </div>
       </div>
     </div>
@@ -433,7 +433,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
             Taqqoslang
           </h2>
           <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300">
-            Tayyor loyihalarimizni ko'ring yoki <strong className="text-slate-800 dark:text-white">o'z bino rasmingizni yuklang</strong> — AI orqali Tunikabond qilingan holatini ko'rasiz.
+            Tayyor loyihalarimizni ko'ring yoki <strong className="text-slate-900 dark:text-white">o'z bino rasmingizni yuklang</strong> — AI orqali Tunikabond qilingan holatini ko'rasiz.
           </p>
         </div>
 
@@ -444,7 +444,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all ${
               activeTab === 'demo'
                 ? 'bg-brand-red text-white shadow-glow-red scale-105'
-                : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-slate-600 dark:text-slate-300 bg-white/8 border border-white/15 text-slate-300 hover:text-white'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-300 dark:border-white/15 text-slate-700 dark:text-slate-300 hover:text-brand-red'
             }`}
           >
             <MoveHorizontal className="w-4 h-4" />
@@ -455,7 +455,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-bold transition-all ${
               activeTab === 'ai'
                 ? 'bg-gradient-to-r from-brand-red to-brand-redHover text-white shadow-glow-red scale-105'
-                : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-slate-600 dark:text-slate-300 bg-white/8 border border-white/15 text-slate-300 hover:text-white'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-300 dark:border-white/15 text-slate-700 dark:text-slate-300 hover:text-brand-red'
             }`}
           >
             <Wand2 className="w-4 h-4" />
@@ -474,7 +474,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
 
         {/* Value prop cards */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
-          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border-black/8 dark:border-white/10 bg-white/5 border border-white/10 flex items-start gap-4">
+          <div className="p-5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm flex items-start gap-4">
             <div className="p-2.5 rounded-xl bg-brand-red/10 text-brand-red shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
@@ -483,7 +483,7 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Rang, chidamlilik va havo injiqliklariga.</p>
             </div>
           </div>
-          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border-black/8 dark:border-white/10 bg-white/5 border border-white/10 flex items-start gap-4">
+          <div className="p-5 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm flex items-start gap-4">
             <div className="p-2.5 rounded-xl bg-brand-red/10 text-brand-red shrink-0">
               <Flame className="w-5 h-5" />
             </div>
@@ -492,14 +492,14 @@ export const BeforeAfter = ({ onOpenLeadModal }) => {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">A2 sinfidagi yonmaydigan materiallar.</p>
             </div>
           </div>
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-brand-red/20 to-brand-red/5 border border-brand-red/30 flex flex-col justify-between">
+          <div className="p-5 rounded-2xl bg-brand-red text-white shadow-glow-red flex flex-col justify-between">
             <div>
               <h4 className="font-bold text-white text-sm">Sizning binongiz ham?</h4>
-              <p className="text-xs text-slate-300 mt-1">Mutaxassis 1 kunda bepul o'lchab beradi.</p>
+              <p className="text-xs text-white/80 mt-1">Mutaxassis 1 kunda bepul o'lchab beradi.</p>
             </div>
             <button
               onClick={() => onOpenLeadModal("Oldin-Keyin bo'limidan buyurtma")}
-              className="mt-3 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red transition-all"
+              className="mt-3 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-brand-red text-xs font-bold transition-all shadow-md"
             >
               Bepul o'lchash
               <ArrowRight className="w-4 h-4" />
