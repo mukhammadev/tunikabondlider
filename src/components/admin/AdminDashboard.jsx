@@ -1038,9 +1038,23 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                   </label>
                 </div>
                 {productForm.image && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <img src={productForm.image} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-white/20" />
-                    <span className="text-[11px] text-slate-400 truncate max-w-xs">{productForm.image}</span>
+                  <div className="mt-2.5 flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <img src={productForm.image} alt="Preview" className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0 shadow-sm" />
+                      <div className="overflow-hidden">
+                        <span className="text-xs font-bold text-white block truncate">
+                          {productForm.image.startsWith('data:') ? 'Qurilmadan yuklangan rasm' : 'Tanlangan rasm'}
+                        </span>
+                        <span className="text-[11px] text-emerald-400 font-semibold block">✓ Rasm muvaffaqiyatli tanlandi</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setProductForm(prev => ({ ...prev, image: '' }))}
+                      className="px-2.5 py-1 text-xs text-rose-400 hover:text-white hover:bg-rose-500/20 rounded-lg transition-colors shrink-0"
+                    >
+                      O'chirish
+                    </button>
                   </div>
                 )}
               </div>
@@ -1224,9 +1238,23 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                   </label>
                 </div>
                 {portfolioForm.image && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <img src={portfolioForm.image} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-white/20" />
-                    <span className="text-[11px] text-slate-400 truncate max-w-xs">{portfolioForm.image}</span>
+                  <div className="mt-2.5 flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <img src={portfolioForm.image} alt="Preview" className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0 shadow-sm" />
+                      <div className="overflow-hidden">
+                        <span className="text-xs font-bold text-white block truncate">
+                          {portfolioForm.image.startsWith('data:') ? 'Qurilmadan yuklangan rasm' : 'Tanlangan rasm'}
+                        </span>
+                        <span className="text-[11px] text-emerald-400 font-semibold block">✓ Rasm muvaffaqiyatli tanlandi</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPortfolioForm(prev => ({ ...prev, image: '' }))}
+                      className="px-2.5 py-1 text-xs text-rose-400 hover:text-white hover:bg-rose-500/20 rounded-lg transition-colors shrink-0"
+                    >
+                      O'chirish
+                    </button>
                   </div>
                 )}
               </div>
@@ -1379,9 +1407,23 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                   </label>
                 </div>
                 {teamForm.photo && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <img src={teamForm.photo} alt="Preview" className="w-10 h-10 object-cover rounded-lg border border-white/20" />
-                    <span className="text-[11px] text-slate-400 truncate max-w-xs">{teamForm.photo}</span>
+                  <div className="mt-2.5 flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <img src={teamForm.photo} alt="Preview" className="w-12 h-12 object-cover rounded-lg border border-white/20 shrink-0 shadow-sm" />
+                      <div className="overflow-hidden">
+                        <span className="text-xs font-bold text-white block truncate">
+                          {teamForm.photo.startsWith('data:') ? 'Qurilmadan yuklangan rasm' : 'Tanlangan rasm'}
+                        </span>
+                        <span className="text-[11px] text-emerald-400 font-semibold block">✓ Rasm muvaffaqiyatli tanlandi</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setTeamForm(prev => ({ ...prev, photo: '' }))}
+                      className="px-2.5 py-1 text-xs text-rose-400 hover:text-white hover:bg-rose-500/20 rounded-lg transition-colors shrink-0"
+                    >
+                      O'chirish
+                    </button>
                   </div>
                 )}
               </div>
