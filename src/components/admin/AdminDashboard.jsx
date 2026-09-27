@@ -4,17 +4,26 @@ import {
   apiGetProducts, apiCreateProduct, apiUpdateProduct, apiDeleteProduct,
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
-  apiGetAdmins, apiRegister, apiUploadFile
+  apiGetAdmins, apiRegister, apiUploadFile,
+  apiGetCalcSettings, apiUpdateCalcSettings, DEFAULT_CALC_SETTINGS
 } from '../../services/api';
 import { 
   LayoutDashboard, Inbox, Package, Briefcase, Users, LogOut, 
   Plus, Trash2, Edit3, CheckCircle2, Clock, Phone, Send, X, 
   ExternalLink, Search, RefreshCw, Shield, AlertCircle,
-  Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck
+  Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck,
+  Calculator as CalculatorIcon, Check, DollarSign, RotateCcw, Save, Sparkles, Building2
 } from 'lucide-react';
 
-export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }) => {
-  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | admins
+export const AdminDashboard = ({ 
+  currentUser, 
+  onLogout, 
+  onClose, 
+  onDataChanged, 
+  calcSettings, 
+  onCalcSettingsChanged 
+}) => {
+  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | admins | calculator
   const [stats, setStats] = useState(null);
   const [leads, setLeads] = useState([]);
   const [productsList, setProductsList] = useState([]);
@@ -73,16 +82,29 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     role: 'Admin'
   });
 
+  // Calculator pricing form state
+  const [calcForm, setCalcForm] = useState(() => {
+    return calcSettings || DEFAULT_CALC_SETTINGS;
+  });
+  const [calcSaving, setCalcSaving] = useState(false);
+  const [calcSuccessMsg, setCalcSuccessMsg] = useState(false);
+
+  // Live calculator preview state in Admin
+  const [previewMat, setPreviewMat] = useState('tunikabond_premium');
+  const [previewInstall, setPreviewInstall] = useState('cottage');
+  const [previewArea, setPreviewArea] = useState(100);
+
   // Load all initial data
   const loadData = async () => {
     setLoading(true);
-    const [st, ld, pr, pf, ad, tm] = await Promise.all([
+    const [st, ld, pr, pf, ad, tm, cSet] = await Promise.all([
       apiGetStats(),
       apiGetLeads(),
       apiGetProducts(),
       apiGetPortfolio(),
       apiGetAdmins(),
-      apiGetTeam()
+      apiGetTeam(),
+      apiGetCalcSettings()
     ]);
     setStats(st);
     setLeads(ld);
@@ -90,12 +112,84 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
     setPortfolioList(pf);
     setAdminsList(ad);
     setTeamList(tm);
+    if (cSet && cSet.materialPrices) {
+      setCalcForm(cSet);
+      if (onCalcSettingsChanged) onCalcSettingsChanged(cSet);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (calcSettings && calcSettings.materialPrices) {
+      setCalcForm(calcSettings);
+    }
+  }, [calcSettings]);
+
+  // --- CALCULATOR ACTIONS ---
+  const handleMaterialPriceChange = (key, val) => {
+    const num = Math.max(0, parseInt(val.replace(/\D/g, ''), 10) || 0);
+    setCalcForm(prev => ({
+      ...prev,
+      materialPrices: {
+        ...prev.materialPrices,
+        [key]: num
+      }
+    }));
+  };
+
+  const handleInstallRateChange = (key, val) => {
+    const num = Math.max(0, parseInt(val.replace(/\D/g, ''), 10) || 0);
+    setCalcForm(prev => ({
+      ...prev,
+      installationRates: {
+        ...prev.installationRates,
+        [key]: num
+      }
+    }));
+  };
+
+  const handleSaveCalcSettings = async (e) => {
+    if (e) e.preventDefault();
+    setCalcSaving(true);
+    try {
+      const res = await apiUpdateCalcSettings(calcForm);
+      if (res.success) {
+        if (onCalcSettingsChanged) onCalcSettingsChanged(res.settings);
+        setCalcSuccessMsg(true);
+        setTimeout(() => setCalcSuccessMsg(false), 3500);
+      } else {
+        alert(res.error || "Xatolik yuz berdi");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Xatolik yuz berdi");
+    } finally {
+      setCalcSaving(false);
+    }
+  };
+
+  const handleResetCalcSettings = async () => {
+    if (window.confirm("Barcha kalkulyator narxlarini standart zavod qiymatlariga qaytarmoqchimisiz?")) {
+      setCalcSaving(true);
+      try {
+        const res = await apiUpdateCalcSettings(DEFAULT_CALC_SETTINGS);
+        if (res.success) {
+          setCalcForm(DEFAULT_CALC_SETTINGS);
+          if (onCalcSettingsChanged) onCalcSettingsChanged(DEFAULT_CALC_SETTINGS);
+          setCalcSuccessMsg(true);
+          setTimeout(() => setCalcSuccessMsg(false), 3500);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setCalcSaving(false);
+      }
+    }
+  };
 
   // --- LEADS ACTIONS ---
   const handleLeadStatusChange = async (leadId, newStatus) => {
@@ -490,6 +584,23 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                 <span>Jamoa & Ustalar</span>
               </div>
               <span className="text-xs text-slate-400">{teamList.length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('calculator')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'calculator' 
+                  ? 'bg-brand-red text-white shadow-glow-red' 
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <CalculatorIcon className="w-4 h-4" />
+                <span>Kalkulyator Narxlari</span>
+              </div>
+              <span className="text-[10px] bg-white/10 text-amber-300 px-2 py-0.5 rounded font-bold">
+                1 m²
+              </span>
             </button>
 
             <button
@@ -937,6 +1048,474 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                     </span>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: CALCULATOR PRICING SETTINGS */}
+          {activeTab === 'calculator' && (
+            <div className="space-y-6">
+              {/* Header and Action Buttons */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-display font-extrabold text-2xl text-white flex items-center gap-2.5">
+                    <CalculatorIcon className="w-6 h-6 text-brand-red" />
+                    <span>Kalkulyator Narxlari va Tariflar</span>
+                  </h2>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Saytdagi hisoblagichda 1 m² material va montaj xizmatlari narxlarini bevosita shu yerdan boshqaring.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleResetCalcSettings}
+                    disabled={calcSaving}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all border border-white/10"
+                    title="Standart narxlarga qaytarish"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Standartga qaytarish</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveCalcSettings}
+                    disabled={calcSaving}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover hover:scale-105 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 transition-all disabled:opacity-50"
+                  >
+                    {calcSaving ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    <span>{calcSaving ? "Saqlanmoqda..." : "Narxlarni saqlash"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Success Notification Alert */}
+              {calcSuccessMsg && (
+                <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-sm font-bold flex items-center justify-between animate-fadeIn">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 className="w-5 h-5 shrink-0" />
+                    <span>Kalkulyator narxlari muvaffaqiyatli saqlandi va saytda yangilandi!</span>
+                  </div>
+                  <span className="text-xs text-emerald-500 font-mono">Saqlandi ✓</span>
+                </div>
+              )}
+
+              {/* Main Content Grid: Materials & Installation */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                {/* 1. MATERIAL NARXLARI */}
+                <div className="glass-card rounded-2xl p-5 border border-white/10 bg-brand-surface/70 space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div>
+                      <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
+                        <Package className="w-4 h-4 text-brand-red" />
+                        <span>1. Materiallar narxi (1 m² uchun)</span>
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Mijoz tanlagan material bo'yicha 1 m² xomashyo narxi (so'mda)
+                      </p>
+                    </div>
+                    <span className="text-[11px] font-mono text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+                      5 ta material
+                    </span>
+                  </div>
+
+                  <div className="space-y-3.5">
+                    {/* Tunikabond Standart */}
+                    <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <span>Tunikabond Standart (0.40 mm)</span>
+                          <span className="text-[10px] text-slate-400 font-normal">Ekonomik fasad/naves</span>
+                        </label>
+                        <span className="text-[11px] font-mono text-slate-400">
+                          {new Intl.NumberFormat('uz-UZ').format(calcForm.materialPrices?.tunikabond_standard || 0)} so'm
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={calcForm.materialPrices?.tunikabond_standard || 0}
+                          onChange={(e) => handleMaterialPriceChange('tunikabond_standard', e.target.value)}
+                          className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                          so'm / m²
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Tunikabond Premium */}
+                    <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-brand-red/30 bg-gradient-to-r from-brand-red/5 to-transparent">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <span>Tunikabond Premium (0.45 mm)</span>
+                          <span className="text-[10px] bg-brand-red text-white px-1.5 py-0.2 rounded font-bold">Xit</span>
+                        </label>
+                        <span className="text-[11px] font-mono text-brand-red font-bold">
+                          {new Intl.NumberFormat('uz-UZ').format(calcForm.materialPrices?.tunikabond_premium || 0)} so'm
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={calcForm.materialPrices?.tunikabond_premium || 0}
+                          onChange={(e) => handleMaterialPriceChange('tunikabond_premium', e.target.value)}
+                          className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                          so'm / m²
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Alyukabond Standart */}
+                    <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <span>Alyukabond Standart (3 mm)</span>
+                          <span className="text-[10px] text-slate-400 font-normal">Alyuminiy kompozit panel</span>
+                        </label>
+                        <span className="text-[11px] font-mono text-slate-400">
+                          {new Intl.NumberFormat('uz-UZ').format(calcForm.materialPrices?.alyukabond_standard || 0)} so'm
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={calcForm.materialPrices?.alyukabond_standard || 0}
+                          onChange={(e) => handleMaterialPriceChange('alyukabond_standard', e.target.value)}
+                          className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                          so'm / m²
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Alyukabond Fireproof */}
+                    <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <span>Alyukabond A2 Olovbardosh (4 mm)</span>
+                          <span className="text-[10px] text-amber-300 font-normal">Yong'inga chidamli FR/A2</span>
+                        </label>
+                        <span className="text-[11px] font-mono text-slate-400">
+                          {new Intl.NumberFormat('uz-UZ').format(calcForm.materialPrices?.alyukabond_fireproof || 0)} so'm
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={calcForm.materialPrices?.alyukabond_fireproof || 0}
+                          onChange={(e) => handleMaterialPriceChange('alyukabond_fireproof', e.target.value)}
+                          className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                          so'm / m²
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Profnastil */}
+                    <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <span>Profnastil / Tom tunuka</span>
+                          <span className="text-[10px] text-slate-400 font-normal">Tom va yengil naves</span>
+                        </label>
+                        <span className="text-[11px] font-mono text-slate-400">
+                          {new Intl.NumberFormat('uz-UZ').format(calcForm.materialPrices?.profnastil || 0)} so'm
+                        </span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={calcForm.materialPrices?.profnastil || 0}
+                          onChange={(e) => handleMaterialPriceChange('profnastil', e.target.value)}
+                          className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                        />
+                        <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                          so'm / m²
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. MONTAJ & O'RNATISH NARXLARI */}
+                <div className="glass-card rounded-2xl p-5 border border-white/10 bg-brand-surface/70 space-y-4 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+                      <div>
+                        <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
+                          <Hammer className="w-4 h-4 text-brand-red" />
+                          <span>2. Montaj & O'rnatish narxi (1 m² uchun)</span>
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          Bino toifasiga qarab ustalarning o'rnatish xizmati haqi (so'mda)
+                        </p>
+                      </div>
+                      <span className="text-[11px] font-mono text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-full border border-sky-500/20">
+                        4 ta toifa
+                      </span>
+                    </div>
+
+                    <div className="space-y-3.5">
+                      {/* Hovli / Kottedj */}
+                      <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>Hovli va Kottedj fasadi</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Turar-joy uylari</span>
+                          </label>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            {new Intl.NumberFormat('uz-UZ').format(calcForm.installationRates?.cottage || 0)} so'm
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={calcForm.installationRates?.cottage || 0}
+                            onChange={(e) => handleInstallRateChange('cottage', e.target.value)}
+                            className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                          />
+                          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                            so'm / m²
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Savdo markazi / Ofis */}
+                      <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>Savdo markazi va Ofis binolari</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Baland tijoriy bino</span>
+                          </label>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            {new Intl.NumberFormat('uz-UZ').format(calcForm.installationRates?.commercial || 0)} so'm
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={calcForm.installationRates?.commercial || 0}
+                            onChange={(e) => handleInstallRateChange('commercial', e.target.value)}
+                            className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                          />
+                          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                            so'm / m²
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Karniz / Shift */}
+                      <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>Karniz, Shift va Koziryok</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Podshivka, karniz</span>
+                          </label>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            {new Intl.NumberFormat('uz-UZ').format(calcForm.installationRates?.cornice || 0)} so'm
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={calcForm.installationRates?.cornice || 0}
+                            onChange={(e) => handleInstallRateChange('cornice', e.target.value)}
+                            className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                          />
+                          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                            so'm / m²
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Naves / Tom */}
+                      <div className="p-3.5 rounded-xl bg-brand-dark/60 border border-white/5 hover:border-white/15 transition-all">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <span>Naves va Tom qismi</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Karkas usti yopish</span>
+                          </label>
+                          <span className="text-[11px] font-mono text-slate-400">
+                            {new Intl.NumberFormat('uz-UZ').format(calcForm.installationRates?.roof || 0)} so'm
+                          </span>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={calcForm.installationRates?.roof || 0}
+                            onChange={(e) => handleInstallRateChange('roof', e.target.value)}
+                            className="w-full px-4 py-2.5 pr-20 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                          />
+                          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                            so'm / m²
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-400">
+                    <span className="text-slate-300 font-bold block mb-1">💡 Eslatma:</span>
+                    Agar mijoz hisoblagichda "Faqat material (o'rnatishsiz)" ni tanlasa, montaj narxi 0 so'm deb olinadi.
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. JONLI SINOV & FORMULA TEKSHIRUV PANEL (Live Preview) */}
+              <div className="glass-card rounded-2xl p-5 sm:p-6 border border-brand-red/20 bg-brand-surface/70 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-lg bg-brand-red/20 text-brand-red flex items-center justify-center font-bold">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-base sm:text-lg text-white">
+                        Jonli Hisob Sinovi (Real-time Smeta Preview)
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Yuqoridagi narxlar asosida mijozga ko'rinadigan natijani darhol tekshiring
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 font-bold">
+                    Faol formula
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                      Sinov materiali
+                    </label>
+                    <select
+                      value={previewMat}
+                      onChange={(e) => setPreviewMat(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red"
+                    >
+                      <option value="tunikabond_standard">Tunikabond Standart (0.40 mm)</option>
+                      <option value="tunikabond_premium">Tunikabond Premium (0.45 mm)</option>
+                      <option value="alyukabond_standard">Alyukabond Standart (3 mm)</option>
+                      <option value="alyukabond_fireproof">Alyukabond A2 Olovbardosh (4 mm)</option>
+                      <option value="profnastil">Profnastil / Tom tunuka</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                      Sinov bino toifasi
+                    </label>
+                    <select
+                      value={previewInstall}
+                      onChange={(e) => setPreviewInstall(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red"
+                    >
+                      <option value="cottage">Hovli va Kottedj</option>
+                      <option value="commercial">Savdo markazi / Ofis</option>
+                      <option value="cornice">Karniz va Shift</option>
+                      <option value="roof">Naves va Tom</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                      Maydon hajmi: {previewArea} m²
+                    </label>
+                    <input
+                      type="range"
+                      min={10}
+                      max={500}
+                      step={5}
+                      value={previewArea}
+                      onChange={(e) => setPreviewArea(Number(e.target.value))}
+                      className="w-full h-2 bg-brand-dark rounded-lg appearance-none cursor-pointer accent-brand-red mt-3"
+                    />
+                  </div>
+                </div>
+
+                {/* Calculation formula breakdown */}
+                {(() => {
+                  const mPrice = Number(calcForm.materialPrices?.[previewMat] || 0);
+                  const iPrice = Number(calcForm.installationRates?.[previewInstall] || 0);
+                  const perSqm = mPrice + iPrice;
+                  const grandTotal = perSqm * previewArea;
+
+                  return (
+                    <div className="p-4 rounded-xl bg-brand-dark/80 border border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <span className="text-[11px] text-slate-400 block mb-0.5">Material (1 m²)</span>
+                        <span className="font-mono font-bold text-white text-sm sm:text-base">
+                          {new Intl.NumberFormat('uz-UZ').format(mPrice)} so'm
+                        </span>
+                      </div>
+
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <span className="text-[11px] text-slate-400 block mb-0.5">Montaj (1 m²)</span>
+                        <span className="font-mono font-bold text-white text-sm sm:text-base">
+                          {new Intl.NumberFormat('uz-UZ').format(iPrice)} so'm
+                        </span>
+                      </div>
+
+                      <div className="p-2 rounded-lg bg-white/5">
+                        <span className="text-[11px] text-slate-400 block mb-0.5">Jami 1 m² narxi</span>
+                        <span className="font-mono font-bold text-amber-300 text-sm sm:text-base">
+                          {new Intl.NumberFormat('uz-UZ').format(perSqm)} so'm
+                        </span>
+                      </div>
+
+                      <div className="p-2 rounded-lg bg-brand-red/20 border border-brand-red/30">
+                        <span className="text-[11px] text-red-200 block mb-0.5">Jami smeta ({previewArea} m²)</span>
+                        <span className="font-mono font-black text-white text-sm sm:text-base">
+                          {new Intl.NumberFormat('uz-UZ').format(grandTotal)} so'm
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Bottom Save Action Bar */}
+              <div className="p-4 rounded-2xl bg-brand-surface/90 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 sticky bottom-4 shadow-2xl backdrop-blur-xl">
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>Narxlarni o'zgartirgach, saqlash tugmasini bosing. Mijozlar yangi narxlarni ko'radi.</span>
+                </div>
+
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleResetCalcSettings}
+                    disabled={calcSaving}
+                    className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white text-xs font-bold transition-all border border-white/10"
+                  >
+                    Standartga qaytarish
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveCalcSettings}
+                    disabled={calcSaving}
+                    className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover hover:scale-105 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  >
+                    {calcSaving ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    <span>{calcSaving ? "Saqlanmoqda..." : "Narxlarni saqlash"}</span>
+                  </button>
+                </div>
               </div>
             </div>
           )}

@@ -557,3 +557,61 @@ export const apiUploadFile = async (file) => {
 };
 
 export const apiExportLeadsUrl = () => '/api/leads/export';
+
+// --- CALCULATOR SETTINGS API ---
+export const DEFAULT_CALC_SETTINGS = {
+  materialPrices: {
+    tunikabond_standard: 115000,
+    tunikabond_premium: 135000,
+    alyukabond_standard: 155000,
+    alyukabond_fireproof: 235000,
+    profnastil: 75000
+  },
+  installationRates: {
+    cottage: 65000,
+    commercial: 75000,
+    cornice: 50000,
+    roof: 45000
+  }
+};
+
+const STORAGE_CALC_KEY = 'tl_dynamic_calc_settings';
+
+export const apiGetCalcSettings = async () => {
+  try {
+    const res = await fetch('/api/calculator/settings');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.materialPrices) return data;
+    }
+  } catch {}
+
+  try {
+    const saved = localStorage.getItem(STORAGE_CALC_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.materialPrices) return parsed;
+    }
+  } catch {}
+
+  return DEFAULT_CALC_SETTINGS;
+};
+
+export const apiUpdateCalcSettings = async (settings) => {
+  try {
+    const res = await fetch('/api/calculator/settings', {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(settings)
+    });
+    if (res.ok) {
+      // Backend updated
+    }
+  } catch {}
+
+  try {
+    localStorage.setItem(STORAGE_CALC_KEY, JSON.stringify(settings));
+  } catch {}
+
+  return { success: true, settings };
+};

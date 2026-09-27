@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { submitLead } from '../services/telegram';
 
-export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
+export const Calculator = ({ t, onOpenLeadModalWithCalc, calcSettings }) => {
   const [buildingType, setBuildingType] = useState('cottage');
   const [materialType, setMaterialType] = useState('tunikabond_premium');
   const [area, setArea] = useState(120);
@@ -18,8 +18,8 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [tgLoading, setTgLoading] = useState(false);
   const [tgSuccess, setTgSuccess] = useState(false);
 
-  // Material unit prices (so'm per sq.m) - Amaldagi aniq bozor narxlari
-  const materialPrices = {
+  // Material unit prices (so'm per sq.m) - Dynamic from Admin CMS / LocalStorage
+  const materialPrices = calcSettings?.materialPrices || {
     tunikabond_standard: 115000,
     tunikabond_premium: 135000,
     alyukabond_standard: 155000,
@@ -27,8 +27,8 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
     profnastil: 75000
   };
 
-  // Installation cost per sq.m (karkas, profil, montaj va usta xizmati)
-  const installationRates = {
+  // Installation cost per sq.m - Dynamic from Admin CMS / LocalStorage
+  const installationRates = calcSettings?.installationRates || {
     cottage: 65000,
     commercial: 75000,
     cornice: 50000,

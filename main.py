@@ -25,6 +25,7 @@ LEADS_FILE = os.path.join(DATA_DIR, "leads.json")
 PRODUCTS_FILE = os.path.join(DATA_DIR, "products.json")
 PORTFOLIO_FILE = os.path.join(DATA_DIR, "portfolio.json")
 TEAM_FILE = os.path.join(DATA_DIR, "team.json")
+CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003209002534")
@@ -767,6 +768,39 @@ def modify_team_member(member_id):
 
         save_json(TEAM_FILE, team)
         return jsonify({"success": True, "message": "Xodim ma'lumotlari yangilandi"}), 200
+
+
+# --- CALCULATOR SETTINGS ENDPOINT ---
+
+DEFAULT_CALC_SETTINGS = {
+    "materialPrices": {
+        "tunikabond_standard": 115000,
+        "tunikabond_premium": 135000,
+        "alyukabond_standard": 155000,
+        "alyukabond_fireproof": 235000,
+        "profnastil": 75000
+    },
+    "installationRates": {
+        "cottage": 65000,
+        "commercial": 75000,
+        "cornice": 50000,
+        "roof": 45000
+    }
+}
+
+@app.route("/api/calculator/settings", methods=["GET", "PUT", "OPTIONS"])
+def handle_calculator_settings():
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    if request.method == "GET":
+        settings = load_json(CALC_FILE, DEFAULT_CALC_SETTINGS)
+        return jsonify(settings), 200
+
+    if request.method == "PUT":
+        data = request.get_json() or {}
+        save_json(CALC_FILE, data)
+        return jsonify({"success": True, "settings": data}), 200
 
 
 # --- STATS ENDPOINT ---

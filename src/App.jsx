@@ -21,7 +21,7 @@ import { HomeNavigationBento } from './components/HomeNavigationBento';
 import { PageBanner } from './components/PageBanner';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam } from './services/api';
+import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetCalcSettings, DEFAULT_CALC_SETTINGS } from './services/api';
 
 const VALID_PAGES = ['home', 'calculator', 'products', 'portfolio', 'about', 'contact'];
 
@@ -81,10 +81,11 @@ export function App() {
   // Splash Brand Intro animation on site load & refresh
   const [showBrandIntro, setShowBrandIntro] = useState(true);
 
-  // Dynamic products, portfolio & team state from CMS
+  // Dynamic products, portfolio, team & calculator state from CMS
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
   const [teamList, setTeamList] = useState([]);
+  const [calcSettings, setCalcSettings] = useState(DEFAULT_CALC_SETTINGS);
 
   // Modals state
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -109,16 +110,20 @@ export function App() {
     document.documentElement.lang = currentLang;
   }, [currentLang]);
 
-  // Fetch dynamic products, portfolio and team members
+  // Fetch dynamic products, portfolio, team members and calculator pricing
   const loadDynamicData = async () => {
-    const [prods, ports, teams] = await Promise.all([
+    const [prods, ports, teams, cSettings] = await Promise.all([
       apiGetProducts(),
       apiGetPortfolio(),
-      apiGetTeam()
+      apiGetTeam(),
+      apiGetCalcSettings()
     ]);
     setProductsList(prods);
     setPortfolioList(ports);
     setTeamList(teams);
+    if (cSettings && cSettings.materialPrices) {
+      setCalcSettings(cSettings);
+    }
   };
 
   useEffect(() => {
@@ -255,6 +260,7 @@ export function App() {
             <Calculator
               t={t}
               onOpenLeadModalWithCalc={handleOpenCalcModal}
+              calcSettings={calcSettings}
             />
             <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-20 text-center">
               <div className="p-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/40 shadow-sm">
@@ -414,6 +420,8 @@ export function App() {
           onLogout={handleLogout}
           onClose={() => setAdminDashboardOpen(false)}
           onDataChanged={loadDynamicData}
+          calcSettings={calcSettings}
+          onCalcSettingsChanged={(newSettings) => setCalcSettings(newSettings)}
         />
       )}
 
