@@ -10,7 +10,6 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
   const [materialType, setMaterialType] = useState('tunikabond_premium');
   const [area, setArea] = useState(120);
   const [includeInstallation, setIncludeInstallation] = useState(true);
-  const [hasCalculated, setHasCalculated] = useState(false);
 
   // Telegram phone modal state
   const [telegramModalOpen, setTelegramModalOpen] = useState(false);
@@ -363,16 +362,7 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               </div>
             </div>
 
-            {/* 6. Prominent Hisoblash Button */}
-            <button
-              type="button"
-              onClick={() => setHasCalculated(true)}
-              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2.5"
-            >
-              <CalcIcon className="w-5 h-5" />
-              <span>{hasCalculated ? "Qayta hisoblash" : "Hisoblash (Umumiy narxni ko'rish)"}</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
+
 
           </div>
 
@@ -383,54 +373,10 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
               {/* Highlight badge */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red/15 text-brand-red text-xs font-bold mb-6">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>{hasCalculated ? "Hisoblangan smeta" : "1 m² Narxi va Hisoblash"}</span>
+                <span>Hisoblangan smeta</span>
               </div>
 
-              {!hasCalculated ? (
-                /* Pre-calculation State: Shows 1m2 clearly, prompts to click Hisoblash */
-                <div className="text-center py-6 sm:py-8 space-y-6 animate-fadeIn">
-                  <div className="w-20 h-20 rounded-3xl bg-brand-red/10 border-2 border-brand-red/30 text-brand-red mx-auto flex items-center justify-center shadow-glow-red">
-                    <CalcIcon className="w-10 h-10 animate-pulse" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">
-                      1 m² Boshlang'ich Narxi
-                    </div>
-                    <div className="font-display font-extrabold text-3xl sm:text-4xl text-brand-red tracking-tight">
-                      {new Intl.NumberFormat('uz-UZ').format(totalPricePerSqm)} <span className="text-lg text-slate-700 dark:text-slate-300 font-medium">so'm / m²</span>
-                    </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
-                      Tanlangan maydon: <strong className="text-slate-900 dark:text-white font-bold">{area} m²</strong>
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-2xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 leading-relaxed text-left space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-                      <Sparkles className="w-4 h-4 text-brand-red" />
-                      <span>Umumiy narxni ko'rish uchun:</span>
-                    </div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      Maydon va materialni tanlab, <strong>"Hisoblash"</strong> tugmasini bosing. Tizim sizga umumiy smeta, bajarish muddati va rasmiy kafolat shartlarini darhol ko'rsatadi.
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setHasCalculated(true)}
-                    className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm sm:text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-                  >
-                    <CalcIcon className="w-5 h-5" />
-                    <span>Hisoblash (Umumiy summani ko'rish)</span>
-                  </button>
-
-                  <div className="pt-2 text-[11px] text-slate-500 dark:text-slate-400">
-                    * Mutaxassisimizning manzilga borib lazerli o'lchov olishi 100% bepul.
-                  </div>
-                </div>
-              ) : (
-                /* Post-calculation State: Shows calculated Total & Action buttons */
-                <div className="animate-fadeIn">
+              <div className="animate-fadeIn">
                   {/* Price Display */}
                   <div className="mb-6 pb-6 border-b border-slate-200 dark:border-white/10">
                     <span className="block text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold mb-1">
@@ -508,7 +454,6 @@ export const Calculator = ({ t, onOpenLeadModalWithCalc }) => {
                     {t.calculator.consultationNotice}
                   </p>
                 </div>
-              )}
 
             </div>
           </div>
