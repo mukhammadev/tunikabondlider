@@ -41,7 +41,7 @@ export const Navbar = ({
   };
 
   return (
-    <header className="fixed top-3 sm:top-4 left-0 right-0 z-40 px-3 sm:px-5 pointer-events-none">
+    <header className="fixed top-3 sm:top-4 left-0 right-0 z-50 px-3 sm:px-5 pointer-events-none">
       <div className="max-w-[1150px] mx-auto pointer-events-auto flex flex-col gap-2">
 
         {/* ══ PILL BAR ══ */}
@@ -49,11 +49,11 @@ export const Navbar = ({
           className={`w-full rounded-2xl overflow-hidden transition-all duration-300 ${
             isLight
               ? isScrolled
-                ? 'bg-white/98 border border-black/10 shadow-lg shadow-black/10'
+                ? 'bg-white border border-slate-200 shadow-xl shadow-slate-900/10'
                 : 'bg-white/95 backdrop-blur-xl border border-black/8 shadow-md'
               : isScrolled
-                ? 'bg-[#0d1120]/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/60'
-                : 'bg-[#0d1120]/85 backdrop-blur-xl border border-white/8 shadow-xl shadow-black/40'
+                ? 'bg-[#0d1120] border border-white/15 shadow-2xl shadow-black/80'
+                : 'bg-[#0d1120]/90 backdrop-blur-xl border border-white/10 shadow-xl shadow-black/40'
           }`}
         >
           <div className="flex items-center h-14 px-4 sm:px-5 gap-3">
