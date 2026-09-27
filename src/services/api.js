@@ -490,11 +490,11 @@ export const apiDeleteTeamMember = async (memberId) => {
 };
 
 // --- BULLETPROOF FILE UPLOAD API ---
-// Works on both Flask backend and static host (Vercel / GitHub Pages)
+// Works instantly on static hosts (Vercel, GitHub Pages) and Flask backend
 export const apiUploadFile = async (file) => {
   if (!file) return { success: false, error: "Fayl tanlanmadi" };
 
-  // 1. Create client-side optimized Base64 preview
+  // 1. Create client-side optimized Base64 preview instantly
   let localDataUrl = null;
   try {
     localDataUrl = await compressImageFile(file, 1000, 1000, 0.85);
@@ -502,31 +502,48 @@ export const apiUploadFile = async (file) => {
     console.error("Compression error:", e);
   }
 
-  // 2. Try server upload if backend is active
-  try {
-    const formData = new FormData();
-    formData.append('file', file);
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-
-    const res = await fetch('/api/upload/', {
-      method: 'POST',
-      body: formData,
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.success && data.url) {
-        return { success: true, url: data.url, filename: data.filename || file.name };
-      }
-    }
-  } catch (err) {
-    // Serverless or static host fallback
+  // Fallback to raw FileReader if compression failed
+  if (!localDataUrl) {
+    try {
+      localDataUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result || null);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+    } catch {}
   }
 
-  // 3. Instant bulletproof fallback: Base64 Data URL
+  // 2. Only attempt server upload if on localhost / local Flask backend
+  const isLocalhost = typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+  if (isLocalhost) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+      const res = await fetch('/api/upload/', {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && data.url) {
+          return { success: true, url: data.url, filename: data.filename || file.name };
+        }
+      }
+    } catch (err) {
+      // Backend not running on localhost, fallback to Data URL
+    }
+  }
+
+  // 3. Guaranteed instant result (zero network latency, works 100% on Vercel)
   if (localDataUrl) {
     return { 
       success: true, 
@@ -536,7 +553,7 @@ export const apiUploadFile = async (file) => {
     };
   }
 
-  return { success: false, error: "Rasmni yuklashda xatolik yuz berdi" };
+  return { success: false, error: "Rasmni o'qishda xatolik yuz berdi" };
 };
 
 export const apiExportLeadsUrl = () => '/api/leads/export';

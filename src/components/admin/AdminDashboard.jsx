@@ -1053,15 +1053,21 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                       accept="image/*"
                       className="hidden"
                       onChange={async (e) => {
-                        const file = e.target.files[0];
+                        const file = e.target.files?.[0];
                         if (file) {
                           setUploadingImage(true);
-                          const res = await apiUploadFile(file);
-                          setUploadingImage(false);
-                          if (res.success) {
-                            setProductForm(prev => ({ ...prev, image: res.url }));
-                          } else {
-                            alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                          try {
+                            const res = await apiUploadFile(file);
+                            if (res.success && res.url) {
+                              setProductForm(prev => ({ ...prev, image: res.url }));
+                            } else {
+                              alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                            }
+                          } catch (err) {
+                            console.error("Product upload error:", err);
+                          } finally {
+                            setUploadingImage(false);
+                            e.target.value = '';
                           }
                         }
                       }}
@@ -1253,15 +1259,21 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                       accept="image/*"
                       className="hidden"
                       onChange={async (e) => {
-                        const file = e.target.files[0];
+                        const file = e.target.files?.[0];
                         if (file) {
                           setUploadingImage(true);
-                          const res = await apiUploadFile(file);
-                          setUploadingImage(false);
-                          if (res.success) {
-                            setPortfolioForm(prev => ({ ...prev, image: res.url }));
-                          } else {
-                            alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                          try {
+                            const res = await apiUploadFile(file);
+                            if (res.success && res.url) {
+                              setPortfolioForm(prev => ({ ...prev, image: res.url }));
+                            } else {
+                              alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                            }
+                          } catch (err) {
+                            console.error("Portfolio upload error:", err);
+                          } finally {
+                            setUploadingImage(false);
+                            e.target.value = '';
                           }
                         }
                       }}
@@ -1422,15 +1434,21 @@ export const AdminDashboard = ({ currentUser, onLogout, onClose, onDataChanged }
                       accept="image/*"
                       className="hidden"
                       onChange={async (e) => {
-                        const file = e.target.files[0];
+                        const file = e.target.files?.[0];
                         if (file) {
                           setUploadingImage(true);
-                          const res = await apiUploadFile(file);
-                          setUploadingImage(false);
-                          if (res.success) {
-                            setTeamForm(prev => ({ ...prev, photo: res.url }));
-                          } else {
-                            alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                          try {
+                            const res = await apiUploadFile(file);
+                            if (res.success && res.url) {
+                              setTeamForm(prev => ({ ...prev, photo: res.url }));
+                            } else {
+                              alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                            }
+                          } catch (err) {
+                            console.error("Team upload error:", err);
+                          } finally {
+                            setUploadingImage(false);
+                            e.target.value = '';
                           }
                         }
                       }}
