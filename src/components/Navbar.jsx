@@ -106,25 +106,6 @@ export const Navbar = ({
             {/* ── Desktop right controls ── */}
             <div className="hidden md:flex items-center gap-1.5 shrink-0 ml-auto xl:ml-0">
 
-              {/* Admin */}
-              {currentUser ? (
-                <button
-                  onClick={onOpenAdmin}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-brand-red text-white text-xs font-bold shadow-glow-red hover:scale-105 transition-all"
-                >
-                  <Shield className="w-3 h-3" />
-                  <span>CMS</span>
-                </button>
-              ) : (
-                <button
-                  onClick={onOpenAdmin}
-                  className={`p-1.5 rounded-lg transition-colors hover:text-brand-red ${isLight ? 'text-slate-700 hover:bg-black/5' : 'text-slate-300 hover:bg-white/10'}`}
-                  title="Admin"
-                >
-                  <Lock className="w-3.5 h-3.5" />
-                </button>
-              )}
-
               {/* Language */}
               <div className={`flex items-center rounded-lg p-0.5 border text-[11px] font-bold ${isLight ? 'bg-black/5 border-slate-200' : 'bg-white/10 border-white/15'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
@@ -239,13 +220,6 @@ export const Navbar = ({
 
             {/* Actions */}
             <div className={`mt-3 pt-3 border-t flex flex-col gap-2 ${isLight ? 'border-slate-200' : 'border-white/10'}`}>
-              <button
-                onClick={() => { setMobileMenuOpen(false); onOpenAdmin(); }}
-                className={`w-full py-2 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 ${isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-white/5 border-white/12 text-slate-300'}`}
-              >
-                <Lock className="w-4 h-4 text-brand-red" />
-                Admin / CMS Panel
-              </button>
               <button
                 onClick={() => { setMobileMenuOpen(false); onOpenLeadModal(t.nav.requestMeasurement); }}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red"

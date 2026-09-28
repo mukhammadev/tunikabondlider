@@ -1,0 +1,25 @@
+{
+  "name": "Tunikabond Lider Boshqaruv Ilovasi",
+  "short_name": "TL Admin",
+  "description": "Tunikabond Lider korxonasining rasmiy boshqaruv mobil ilovasi",
+  "start_url": "/admin.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0F17",
+  "theme_color": "#E11D48",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/favi.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

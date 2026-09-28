@@ -28,6 +28,10 @@ const VALID_PAGES = ['home', 'calculator', 'products', 'portfolio', 'about', 'co
 export function App() {
   const getPageFromHash = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
+    if (hash === 'admin') {
+      window.location.href = '/admin.html';
+      return 'home';
+    }
     if (VALID_PAGES.includes(hash)) return hash;
     return 'home';
   };
@@ -44,6 +48,11 @@ export function App() {
 
   useEffect(() => {
     const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (hash === 'admin') {
+        window.location.href = '/admin.html';
+        return;
+      }
       const page = getPageFromHash();
       setCurrentPage(page);
       window.scrollTo({ top: 0, behavior: 'smooth' });

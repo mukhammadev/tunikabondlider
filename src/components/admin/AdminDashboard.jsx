@@ -21,7 +21,8 @@ export const AdminDashboard = ({
   onClose, 
   onDataChanged, 
   calcSettings, 
-  onCalcSettingsChanged 
+  onCalcSettingsChanged,
+  isStandaloneApp = false
 }) => {
   const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | admins | calculator
   const [stats, setStats] = useState(null);
@@ -498,13 +499,25 @@ export const AdminDashboard = ({
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
 
-          <button
-            onClick={onClose}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            <span>Saytga qaytish</span>
-          </button>
+          {isStandaloneApp ? (
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Saytni ochish</span>
+            </a>
+          ) : (
+            <button
+              onClick={onClose}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Saytga qaytish</span>
+            </button>
+          )}
 
           <button
             onClick={onLogout}
@@ -519,8 +532,8 @@ export const AdminDashboard = ({
       {/* Main Container */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* Sidebar Tabs */}
-        <aside className="w-56 sm:w-64 bg-brand-surface/70 border-r border-white/10 p-4 flex flex-col justify-between flex-shrink-0">
+        {/* Sidebar Tabs (Hidden on mobile screens, shown on tablets & desktop) */}
+        <aside className="hidden md:flex w-64 bg-brand-surface/70 border-r border-white/10 p-4 flex-col justify-between flex-shrink-0">
           <nav className="space-y-1.5">
             <button
               onClick={() => setActiveTab('leads')}
@@ -626,7 +639,7 @@ export const AdminDashboard = ({
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 p-6 overflow-y-auto bg-brand-dark/50">
+        <main className="flex-1 p-4 sm:p-6 overflow-y-auto bg-brand-dark/50 pb-24 md:pb-6">
           
           {/* TAB 1: LEADS (Arizalar) */}
           {activeTab === 'leads' && (
@@ -1521,6 +1534,76 @@ export const AdminDashboard = ({
           )}
 
         </main>
+
+        {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet screens only) */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-2 py-2 flex items-center justify-around shadow-2xl safe-area-bottom">
+          <button
+            onClick={() => setActiveTab('leads')}
+            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all relative ${
+              activeTab === 'leads' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <div className="relative">
+              <Inbox className="w-5 h-5" />
+              {leads.filter(l => l.status === 'new' || !l.status).length > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 w-4 h-4 rounded-full bg-brand-red text-white text-[9px] font-black flex items-center justify-center">
+                  {leads.filter(l => l.status === 'new' || !l.status).length}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px]">Arizalar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+              activeTab === 'products' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Package className="w-5 h-5" />
+            <span className="text-[10px]">Mahsulot</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('portfolio')}
+            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+              activeTab === 'portfolio' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Briefcase className="w-5 h-5" />
+            <span className="text-[10px]">Obyekt</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('team')}
+            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+              activeTab === 'team' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Hammer className="w-5 h-5" />
+            <span className="text-[10px]">Ustalar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('calculator')}
+            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+              activeTab === 'calculator' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <CalculatorIcon className="w-5 h-5" />
+            <span className="text-[10px]">Kalkulyator</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('admins')}
+            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+              activeTab === 'admins' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Users className="w-5 h-5" />
+            <span className="text-[10px]">Adminlar</span>
+          </button>
+        </div>
       </div>
 
       {/* --- PRODUCT CREATE/EDIT MODAL --- */}

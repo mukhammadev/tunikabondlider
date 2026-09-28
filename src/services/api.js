@@ -29,6 +29,32 @@ export const clearAuthSession = () => {
   localStorage.removeItem(USER_KEY);
 };
 
+export const getApiBase = () => {
+  const custom = localStorage.getItem('tl_custom_api_url');
+  if (custom && custom.trim()) {
+    return custom.trim().replace(/\/$/, '');
+  }
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim()) {
+    return envUrl.trim().replace(/\/$/, '');
+  }
+  return '';
+};
+
+export const setCustomApiUrl = (url) => {
+  if (url) {
+    localStorage.setItem('tl_custom_api_url', url.trim());
+  } else {
+    localStorage.removeItem('tl_custom_api_url');
+  }
+};
+
+export const apiFetch = (path, options = {}) => {
+  const base = getApiBase();
+  const url = base ? `${base}${path}` : path;
+  return fetch(url, options);
+};
+
 const getHeaders = () => {
   const token = getAuthToken();
   const headers = { 'Content-Type': 'application/json' };
@@ -41,7 +67,7 @@ const getHeaders = () => {
 // --- AUTH API ---
 export const apiLogin = async (username, password) => {
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await apiFetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -70,7 +96,7 @@ export const apiLogin = async (username, password) => {
 
 export const apiRegister = async (username, password, fullName, role = 'Admin') => {
   try {
-    const res = await fetch('/api/auth/register', {
+    const res = await apiFetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password, fullName, role })
@@ -87,7 +113,7 @@ export const apiRegister = async (username, password, fullName, role = 'Admin') 
 
 export const apiGetAdmins = async () => {
   try {
-    const res = await fetch('/api/auth/admins');
+    const res = await apiFetch('/api/auth/admins');
     if (res.ok) return await res.json();
   } catch {}
   return [
@@ -99,7 +125,7 @@ export const apiGetAdmins = async () => {
 // --- STATS API ---
 export const apiGetStats = async () => {
   try {
-    const res = await fetch('/api/stats/');
+    const res = await apiFetch('/api/stats/');
     if (res.ok) return await res.json();
   } catch {}
 
@@ -123,7 +149,7 @@ export const apiGetStats = async () => {
 export const apiGetLeads = async () => {
   let leads = [];
   try {
-    const res = await fetch('/api/leads/');
+    const res = await apiFetch('/api/leads/');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -163,7 +189,7 @@ export const apiGetLeads = async () => {
 
 export const apiUpdateLead = async (leadId, patchData) => {
   try {
-    const res = await fetch(`/api/leads/${leadId}`, {
+    const res = await apiFetch(`/api/leads/${leadId}`, {
       method: 'PATCH',
       headers: getHeaders(),
       body: JSON.stringify(patchData)
@@ -185,7 +211,7 @@ export const apiUpdateLead = async (leadId, patchData) => {
 
 export const apiDeleteLead = async (leadId) => {
   try {
-    const res = await fetch(`/api/leads/${leadId}`, {
+    const res = await apiFetch(`/api/leads/${leadId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
@@ -258,7 +284,7 @@ export const compressImageFile = (file, maxWidth = 1000, maxHeight = 1000, quali
 // --- PRODUCTS API ---
 export const apiGetProducts = async () => {
   try {
-    const res = await fetch('/api/products/');
+    const res = await apiFetch('/api/products/');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) return data;
@@ -279,7 +305,7 @@ export const apiGetProducts = async () => {
 export const apiCreateProduct = async (productData) => {
   const newProduct = { ...productData, id: productData.id || `prod-${Date.now()}` };
   try {
-    const res = await fetch('/api/products/', {
+    const res = await apiFetch('/api/products/', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(newProduct)
@@ -298,7 +324,7 @@ export const apiCreateProduct = async (productData) => {
 
 export const apiUpdateProduct = async (productId, productData) => {
   try {
-    const res = await fetch(`/api/products/${productId}`, {
+    const res = await apiFetch(`/api/products/${productId}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(productData)
@@ -317,7 +343,7 @@ export const apiUpdateProduct = async (productId, productData) => {
 
 export const apiDeleteProduct = async (productId) => {
   try {
-    const res = await fetch(`/api/products/${productId}`, {
+    const res = await apiFetch(`/api/products/${productId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
@@ -336,7 +362,7 @@ export const apiDeleteProduct = async (productId) => {
 // --- PORTFOLIO API ---
 export const apiGetPortfolio = async () => {
   try {
-    const res = await fetch('/api/portfolio/');
+    const res = await apiFetch('/api/portfolio/');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) return data;
@@ -357,7 +383,7 @@ export const apiGetPortfolio = async () => {
 export const apiCreatePortfolio = async (itemData) => {
   const newItem = { ...itemData, id: itemData.id || `port-${Date.now()}` };
   try {
-    const res = await fetch('/api/portfolio/', {
+    const res = await apiFetch('/api/portfolio/', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(newItem)
@@ -376,7 +402,7 @@ export const apiCreatePortfolio = async (itemData) => {
 
 export const apiUpdatePortfolio = async (itemId, itemData) => {
   try {
-    const res = await fetch(`/api/portfolio/${itemId}`, {
+    const res = await apiFetch(`/api/portfolio/${itemId}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(itemData)
@@ -395,7 +421,7 @@ export const apiUpdatePortfolio = async (itemId, itemData) => {
 
 export const apiDeletePortfolio = async (itemId) => {
   try {
-    const res = await fetch(`/api/portfolio/${itemId}`, {
+    const res = await apiFetch(`/api/portfolio/${itemId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
@@ -414,7 +440,7 @@ export const apiDeletePortfolio = async (itemId) => {
 // --- TEAM & MASTERS API ---
 export const apiGetTeam = async () => {
   try {
-    const res = await fetch('/api/team/');
+    const res = await apiFetch('/api/team/');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) return data;
@@ -435,7 +461,7 @@ export const apiGetTeam = async () => {
 export const apiCreateTeamMember = async (memberData) => {
   const newMember = { ...memberData, id: memberData.id || `team-${Date.now()}` };
   try {
-    const res = await fetch('/api/team/', {
+    const res = await apiFetch('/api/team/', {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(newMember)
@@ -454,7 +480,7 @@ export const apiCreateTeamMember = async (memberData) => {
 
 export const apiUpdateTeamMember = async (memberId, memberData) => {
   try {
-    const res = await fetch(`/api/team/${memberId}`, {
+    const res = await apiFetch(`/api/team/${memberId}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(memberData)
@@ -473,7 +499,7 @@ export const apiUpdateTeamMember = async (memberId, memberData) => {
 
 export const apiDeleteTeamMember = async (memberId) => {
   try {
-    const res = await fetch(`/api/team/${memberId}`, {
+    const res = await apiFetch(`/api/team/${memberId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
@@ -525,7 +551,7 @@ export const apiUploadFile = async (file) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1200);
 
-      const res = await fetch('/api/upload/', {
+      const res = await apiFetch('/api/upload/', {
         method: 'POST',
         body: formData,
         signal: controller.signal
@@ -579,7 +605,7 @@ const STORAGE_CALC_KEY = 'tl_dynamic_calc_settings';
 
 export const apiGetCalcSettings = async () => {
   try {
-    const res = await fetch('/api/calculator/settings');
+    const res = await apiFetch('/api/calculator/settings');
     if (res.ok) {
       const data = await res.json();
       if (data && data.materialPrices) return data;
@@ -599,7 +625,7 @@ export const apiGetCalcSettings = async () => {
 
 export const apiUpdateCalcSettings = async (settings) => {
   try {
-    const res = await fetch('/api/calculator/settings', {
+    const res = await apiFetch('/api/calculator/settings', {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(settings)
@@ -615,3 +641,64 @@ export const apiUpdateCalcSettings = async (settings) => {
 
   return { success: true, settings };
 };
+
+// --- DATA BACKUP & RESTORE API ---
+export const apiExportAllData = async () => {
+  const [leads, products, portfolio, team, calcSettings] = await Promise.all([
+    apiGetLeads(),
+    apiGetProducts(),
+    apiGetPortfolio(),
+    apiGetTeam(),
+    apiGetCalcSettings()
+  ]);
+
+  const backup = {
+    appName: "Tunikabond Lider CMS",
+    version: "2.0",
+    exportedAt: new Date().toISOString(),
+    data: {
+      leads,
+      products,
+      portfolio,
+      team,
+      calcSettings
+    }
+  };
+
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tunikabond_lider_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+export const apiImportData = async (jsonData) => {
+  try {
+    const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    const payload = data.data || data;
+
+    if (payload.calcSettings) {
+      await apiUpdateCalcSettings(payload.calcSettings);
+    }
+    if (Array.isArray(payload.products)) {
+      localStorage.setItem('tunikabond_custom_products', JSON.stringify(payload.products));
+    }
+    if (Array.isArray(payload.portfolio)) {
+      localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(payload.portfolio));
+    }
+    if (Array.isArray(payload.team)) {
+      localStorage.setItem('tunikabond_custom_team', JSON.stringify(payload.team));
+    }
+    if (Array.isArray(payload.leads)) {
+      localStorage.setItem('tunikabond_leads', JSON.stringify(payload.leads));
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};
+
