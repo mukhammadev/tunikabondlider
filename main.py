@@ -26,6 +26,7 @@ PRODUCTS_FILE = os.path.join(DATA_DIR, "products.json")
 PORTFOLIO_FILE = os.path.join(DATA_DIR, "portfolio.json")
 TEAM_FILE = os.path.join(DATA_DIR, "team.json")
 CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
+SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003209002534")
@@ -266,9 +267,162 @@ def init_default_portfolio():
         save_json(PORTFOLIO_FILE, default_port)
 
 
+def init_default_swatches():
+    if not os.path.exists(SWATCHES_FILE):
+        default_swatches = [
+            {
+                "id": "wood-oak",
+                "category": "wood",
+                "name": {
+                    "uz": "Oltin Eman (Golden Oak)",
+                    "ru": "Золотой Дуб (Golden Oak)",
+                    "en": "Golden Oak Wood"
+                },
+                "code": "WOOD-801",
+                "colorHex": "#A05A2C",
+                "bgGradient": "linear-gradient(135deg, #b06a3b 0%, #7d3f18 100%)",
+                "texture": "Yog'och teksturasi (Bo'rtma)",
+                "finish": "Mat / Strukturaviy",
+                "coating": "PVDF 3-qavat",
+                "application": "Hovli uylari, karnizlar, darvoza atrofi, terassa shiftlari"
+            },
+            {
+                "id": "wood-walnut",
+                "category": "wood",
+                "name": {
+                    "uz": "To'q Yong'oq (Dark Walnut)",
+                    "ru": "Темный Орех (Dark Walnut)",
+                    "en": "Dark Walnut Wood"
+                },
+                "code": "WOOD-804",
+                "colorHex": "#4A2E18",
+                "bgGradient": "linear-gradient(135deg, #59381e 0%, #301a0a 100%)",
+                "texture": "Chuqur yog'och tomirlari",
+                "finish": "Mat / Tabiiy tekstura",
+                "coating": "PVDF 3-qavat",
+                "application": "Kottedj fasadlari, premium qoplama"
+            },
+            {
+                "id": "met-anthracite",
+                "category": "metallic",
+                "name": {
+                    "uz": "Antratsit Metallik (Sparkle)",
+                    "ru": "Антрацит Металлик (Sparkle)",
+                    "en": "Sparkling Anthracite Metallic"
+                },
+                "code": "MET-7021",
+                "colorHex": "#2F353B",
+                "bgGradient": "linear-gradient(135deg, #3d454d 0%, #1e2226 100%)",
+                "texture": "Yengil metallik yaltiroqligi",
+                "finish": "Yarim mat / Yaltiroq",
+                "coating": "PVDF Metallik",
+                "application": "High-Tech uylar, biznes markazlar"
+            },
+            {
+                "id": "met-champagne",
+                "category": "metallic",
+                "name": {
+                    "uz": "Shampan Oltini (Champagne Gold)",
+                    "ru": "Шампань Золото (Champagne Gold)",
+                    "en": "Champagne Metallic Gold"
+                },
+                "code": "MET-1035",
+                "colorHex": "#C5A059",
+                "bgGradient": "linear-gradient(135deg, #dfbe7b 0%, #a48039 100%)",
+                "texture": "Oltinsimon nozik porlash",
+                "finish": "Metallik yaltiroq",
+                "coating": "PVDF Premium",
+                "application": "Savdo binosi ustunlari, bezaklar"
+            },
+            {
+                "id": "met-silver",
+                "category": "metallic",
+                "name": {
+                    "uz": "Kumush Rang Metallik (Silver Metallic)",
+                    "ru": "Серебристый Металлик (Silver)",
+                    "en": "Architectural Silver Metallic"
+                },
+                "code": "RAL 9006",
+                "colorHex": "#A5A9B4",
+                "bgGradient": "linear-gradient(135deg, #c4c8d4 0%, #7e838f 100%)",
+                "texture": "Klassik metallik",
+                "finish": "Yarim yaltiroq",
+                "coating": "PVDF / Poliester",
+                "application": "Barcha turdagi tijoriy fasadlar"
+            },
+            {
+                "id": "ral-graphite",
+                "category": "ral",
+                "name": {
+                    "uz": "To'q Grafit (Graphite Gray)",
+                    "ru": "Темный Графит (Graphite Gray)",
+                    "en": "Graphite Gray"
+                },
+                "code": "RAL 7016",
+                "colorHex": "#373F43",
+                "bgGradient": "linear-gradient(135deg, #444d52 0%, #262c2f 100%)",
+                "texture": "Silliq / Mat",
+                "finish": "Super mat",
+                "coating": "Poliester",
+                "application": "Zamonaviy tomlar, karnizlar, fasadlar"
+            },
+            {
+                "id": "ral-chocolate",
+                "category": "ral",
+                "name": {
+                    "uz": "Shokolad Jigarrang (Chocolate Brown)",
+                    "ru": "Шоколадный Коричневый (Chocolate)",
+                    "en": "Chocolate Brown"
+                },
+                "code": "RAL 8017",
+                "colorHex": "#45322E",
+                "bgGradient": "linear-gradient(135deg, #57403b 0%, #2e1f1c 100%)",
+                "texture": "Klassik jigarrang",
+                "finish": "Yarim mat / Yaltiroq",
+                "coating": "Poliester",
+                "application": "Tom qoplamalari, karnizlar, darvozalar"
+            },
+            {
+                "id": "ral-white",
+                "category": "ral",
+                "name": {
+                    "uz": "Sof Oq (Signal White)",
+                    "ru": "Сигнальный Белый (Signal White)",
+                    "en": "Signal White"
+                },
+                "code": "RAL 9003",
+                "colorHex": "#F4F4F4",
+                "bgGradient": "linear-gradient(135deg, #ffffff 0%, #d8d8d8 100%)",
+                "texture": "Silliq oyna effekti",
+                "finish": "Yaltiroq / Mat",
+                "coating": "Poliester / PVDF",
+                "application": "Shiftlar, interyer, dorixonalar va klinikalar"
+            },
+            {
+                "id": "special-mirror",
+                "category": "special",
+                "name": {
+                    "uz": "Oyna Effekti (Mirror Silver)",
+                    "ru": "Зеркальный Хром (Mirror Silver)",
+                    "en": "Architectural Mirror Silver"
+                },
+                "code": "SPEC-MR01",
+                "colorHex": "#E5E7EB",
+                "bgGradient": "linear-gradient(135deg, #ffffff 0%, #9ca3af 50%, #ffffff 100%)",
+                "texture": "100% Oyna yuzasi",
+                "finish": "Super Yaltiroq Xrom",
+                "coating": "Anodlangan qatlam",
+                "application": "Fasad dekorlari, ichki dizayn, brend ustunlari"
+            }
+        ]
+        save_json(SWATCHES_FILE, default_swatches)
+        logger.info("Initialized default swatches (9 items)")
+
+
 init_default_admins()
 init_default_products()
 init_default_portfolio()
+init_default_swatches()
 
 
 # CORS handler for cross-origin local requests
@@ -803,6 +957,56 @@ def handle_calculator_settings():
         return jsonify({"success": True, "settings": data}), 200
 
 
+# --- SWATCHES (RANGLAR VA TEKSTURALAR) ENDPOINTS ---
+
+@app.route("/api/swatches/", methods=["GET", "POST", "OPTIONS"])
+def handle_swatches():
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    swatches = load_json(SWATCHES_FILE, [])
+
+    if request.method == "GET":
+        return jsonify(swatches), 200
+
+    data = request.get_json() or {}
+    new_swatch = {
+        "id": data.get("id") or f"swatch-{int(datetime.now().timestamp())}",
+        **data
+    }
+    swatches.insert(0, new_swatch)
+    save_json(SWATCHES_FILE, swatches)
+    return jsonify({"success": True, "swatch": new_swatch}), 201
+
+
+@app.route("/api/swatches/<swatch_id>", methods=["PUT", "DELETE", "OPTIONS"])
+def modify_swatch(swatch_id):
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    swatches = load_json(SWATCHES_FILE, [])
+
+    if request.method == "DELETE":
+        new_swatches = [s for s in swatches if str(s.get("id")) != str(swatch_id)]
+        save_json(SWATCHES_FILE, new_swatches)
+        return jsonify({"success": True, "message": "Rang o'chirildi"}), 200
+
+    if request.method == "PUT":
+        data = request.get_json() or {}
+        found = False
+        for s in swatches:
+            if str(s.get("id")) == str(swatch_id):
+                s.update(data)
+                found = True
+                break
+
+        if not found:
+            return jsonify({"error": "Rang topilmadi"}), 404
+
+        save_json(SWATCHES_FILE, swatches)
+        return jsonify({"success": True, "message": "Rang yangilandi"}), 200
+
+
 # --- STATS ENDPOINT ---
 
 @app.route("/api/stats/", methods=["GET"])
@@ -812,6 +1016,7 @@ def get_stats():
     portfolio = load_json(PORTFOLIO_FILE, [])
     admins = load_json(ADMINS_FILE, [])
     team = load_json(TEAM_FILE, [])
+    swatches = load_json(SWATCHES_FILE, [])
 
     new_leads = len([l for l in leads if l.get("status") == "new"])
 
@@ -821,7 +1026,8 @@ def get_stats():
         "totalProducts": len(products),
         "totalProjects": len(portfolio),
         "totalAdmins": len(admins),
-        "totalTeam": len(team)
+        "totalTeam": len(team),
+        "totalSwatches": len(swatches)
     }), 200
 
 

@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { swatches } from '../data/swatches';
 import { Palette, X, ArrowRight } from 'lucide-react';
 
-export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => {
+export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatchesList = [] }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedSwatch, setSelectedSwatch] = useState(null);
 
+  const allSwatches = (swatchesList && swatchesList.length > 0) ? swatchesList : swatches;
+
   const filteredSwatches = activeCategory === 'all'
-    ? swatches
-    : swatches.filter(item => item.category === activeCategory);
+    ? allSwatches
+    : allSwatches.filter(item => item.category === activeCategory);
+
+  const getSwatchName = (item) => {
+    if (!item || !item.name) return '';
+    if (typeof item.name === 'object') {
+      return item.name[currentLang] || item.name.uz || item.name.ru || '';
+    }
+    return String(item.name);
+  };
 
   const categories = [
     { id: 'all', label: t.swatches.all },
@@ -56,7 +66,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
         {/* Swatches Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {filteredSwatches.map((item) => {
-            const name = item.name[currentLang] || item.name.uz;
+            const name = getSwatchName(item);
             return (
               <div
                 key={item.id}
@@ -67,7 +77,11 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
                   {/* Swatch Sample Box */}
                   <div 
                     className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow-red"
-                    style={{ background: item.bgGradient }}
+                    style={{ 
+                      background: item.image 
+                        ? `url(${item.image}) center/cover no-repeat` 
+                        : (item.bgGradient || item.colorHex || '#444')
+                    }}
                   >
                     <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/20 shadow-sm">
                       {item.code}
@@ -109,7 +123,11 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
             {/* Modal swatch header */}
             <div 
               className="w-full h-44 rounded-2xl mb-6 relative overflow-hidden shadow-inner border border-white/20 flex items-end p-4"
-              style={{ background: selectedSwatch.bgGradient }}
+              style={{ 
+                background: selectedSwatch.image 
+                  ? `url(${selectedSwatch.image}) center/cover no-repeat` 
+                  : (selectedSwatch.bgGradient || selectedSwatch.colorHex || '#444')
+              }}
             >
               <div className="px-3 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md text-xs font-bold text-white border border-white/20 shadow-sm">
                 {selectedSwatch.code}
@@ -117,7 +135,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
             </div>
 
             <h3 className="font-display font-extrabold text-2xl text-slate-900 dark:text-white mb-2">
-              {selectedSwatch.name[currentLang] || selectedSwatch.name.uz}
+              {getSwatchName(selectedSwatch)}
             </h3>
 
             {/* Specs Table */}
@@ -143,7 +161,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch }) => 
             {/* Action CTA */}
             <button
               onClick={() => {
-                const swatchName = selectedSwatch.name[currentLang] || selectedSwatch.name.uz;
+                const swatchName = getSwatchName(selectedSwatch);
                 onOpenLeadModalWithSwatch(`${swatchName} (${selectedSwatch.code})`);
                 setSelectedSwatch(null);
               }}

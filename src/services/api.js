@@ -6,6 +6,7 @@
 import { products as initialProducts } from '../data/products';
 import { portfolio as initialPortfolio } from '../data/portfolio';
 import { initialTeam } from '../data/team';
+import { swatches as initialSwatches } from '../data/swatches';
 
 const TOKEN_KEY = 'tl_admin_token';
 const USER_KEY = 'tl_admin_user';
@@ -642,13 +643,102 @@ export const apiUpdateCalcSettings = async (settings) => {
   return { success: true, settings };
 };
 
+// --- SWATCHES (RANGLAR VA TEKSTURALAR) API ---
+export const apiGetSwatches = async () => {
+  try {
+    const res = await apiFetch('/api/swatches/');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {}
+
+  try {
+    const saved = localStorage.getItem('tunikabond_custom_swatches');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+
+  return initialSwatches;
+};
+
+export const apiCreateSwatch = async (swatchData) => {
+  const newSwatch = {
+    ...swatchData,
+    id: swatchData.id || `swatch-${Date.now()}`
+  };
+  try {
+    const res = await apiFetch('/api/swatches/', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(newSwatch)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.swatch) newSwatch.id = data.swatch.id;
+    }
+  } catch {}
+
+  try {
+    const existing = await apiGetSwatches();
+    const updated = [newSwatch, ...existing];
+    localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(updated));
+  } catch {}
+
+  return { success: true, swatch: newSwatch };
+};
+
+export const apiUpdateSwatch = async (swatchId, swatchData) => {
+  try {
+    const res = await apiFetch(`/api/swatches/${swatchId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(swatchData)
+    });
+    if (res.ok) {
+      // Backend updated
+    }
+  } catch {}
+
+  try {
+    const existing = await apiGetSwatches();
+    const updated = existing.map(s => String(s.id) === String(swatchId) ? { ...s, ...swatchData } : s);
+    localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(updated));
+  } catch {}
+
+  return { success: true };
+};
+
+export const apiDeleteSwatch = async (swatchId) => {
+  try {
+    const res = await apiFetch(`/api/swatches/${swatchId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      // Backend deleted
+    }
+  } catch {}
+
+  try {
+    const existing = await apiGetSwatches();
+    const updated = existing.filter(s => String(s.id) !== String(swatchId));
+    localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(updated));
+  } catch {}
+
+  return { success: true };
+};
+
 // --- DATA BACKUP & RESTORE API ---
 export const apiExportAllData = async () => {
-  const [leads, products, portfolio, team, calcSettings] = await Promise.all([
+  const [leads, products, portfolio, team, swatchesList, calcSettings] = await Promise.all([
     apiGetLeads(),
     apiGetProducts(),
     apiGetPortfolio(),
     apiGetTeam(),
+    apiGetSwatches(),
     apiGetCalcSettings()
   ]);
 
@@ -661,6 +751,7 @@ export const apiExportAllData = async () => {
       products,
       portfolio,
       team,
+      swatches: swatchesList,
       calcSettings
     }
   };
@@ -692,6 +783,9 @@ export const apiImportData = async (jsonData) => {
     }
     if (Array.isArray(payload.team)) {
       localStorage.setItem('tunikabond_custom_team', JSON.stringify(payload.team));
+    }
+    if (Array.isArray(payload.swatches)) {
+      localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(payload.swatches));
     }
     if (Array.isArray(payload.leads)) {
       localStorage.setItem('tunikabond_leads', JSON.stringify(payload.leads));

@@ -21,7 +21,7 @@ import { HomeNavigationBento } from './components/HomeNavigationBento';
 import { PageBanner } from './components/PageBanner';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetCalcSettings, DEFAULT_CALC_SETTINGS } from './services/api';
+import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetCalcSettings, DEFAULT_CALC_SETTINGS, apiGetSwatches } from './services/api';
 
 const VALID_PAGES = ['home', 'calculator', 'products', 'portfolio', 'about', 'contact'];
 
@@ -90,10 +90,11 @@ export function App() {
   // Splash Brand Intro animation on site load & refresh
   const [showBrandIntro, setShowBrandIntro] = useState(true);
 
-  // Dynamic products, portfolio, team & calculator state from CMS
+  // Dynamic products, portfolio, team, swatches & calculator state from CMS
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
   const [teamList, setTeamList] = useState([]);
+  const [swatchesList, setSwatchesList] = useState([]);
   const [calcSettings, setCalcSettings] = useState(DEFAULT_CALC_SETTINGS);
 
   // Modals state
@@ -119,17 +120,21 @@ export function App() {
     document.documentElement.lang = currentLang;
   }, [currentLang]);
 
-  // Fetch dynamic products, portfolio, team members and calculator pricing
+  // Fetch dynamic products, portfolio, team members, swatches and calculator pricing
   const loadDynamicData = async () => {
-    const [prods, ports, teams, cSettings] = await Promise.all([
+    const [prods, ports, teams, cSettings, swt] = await Promise.all([
       apiGetProducts(),
       apiGetPortfolio(),
       apiGetTeam(),
-      apiGetCalcSettings()
+      apiGetCalcSettings(),
+      apiGetSwatches()
     ]);
     setProductsList(prods);
     setPortfolioList(ports);
     setTeamList(teams);
+    if (swt && Array.isArray(swt) && swt.length > 0) {
+      setSwatchesList(swt);
+    }
     if (cSettings && cSettings.materialPrices) {
       setCalcSettings(cSettings);
     }
@@ -308,6 +313,7 @@ export function App() {
               currentLang={currentLang}
               t={t}
               onOpenLeadModalWithSwatch={handleOpenSwatchModal}
+              swatchesList={swatchesList}
             />
           </div>
         )}
@@ -431,6 +437,7 @@ export function App() {
           onDataChanged={loadDynamicData}
           calcSettings={calcSettings}
           onCalcSettingsChanged={(newSettings) => setCalcSettings(newSettings)}
+          swatchesList={swatchesList}
         />
       )}
 

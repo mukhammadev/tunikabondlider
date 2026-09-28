@@ -5,14 +5,16 @@ import {
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
   apiGetAdmins, apiRegister, apiUploadFile,
-  apiGetCalcSettings, apiUpdateCalcSettings, DEFAULT_CALC_SETTINGS
+  apiGetCalcSettings, apiUpdateCalcSettings, DEFAULT_CALC_SETTINGS,
+  apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch
 } from '../../services/api';
 import { 
   LayoutDashboard, Inbox, Package, Briefcase, Users, LogOut, 
   Plus, Trash2, Edit3, CheckCircle2, Clock, Phone, Send, X, 
   ExternalLink, Search, RefreshCw, Shield, AlertCircle,
   Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck,
-  Calculator as CalculatorIcon, Check, DollarSign, RotateCcw, Save, Sparkles, Building2
+  Calculator as CalculatorIcon, Check, DollarSign, RotateCcw, Save, Sparkles, Building2,
+  Palette
 } from 'lucide-react';
 
 export const AdminDashboard = ({ 
@@ -22,17 +24,37 @@ export const AdminDashboard = ({
   onDataChanged, 
   calcSettings, 
   onCalcSettingsChanged,
-  isStandaloneApp = false
+  isStandaloneApp = false,
+  swatchesList: propSwatchesList
 }) => {
-  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | admins | calculator
+  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | swatches | calculator | admins
   const [stats, setStats] = useState(null);
   const [leads, setLeads] = useState([]);
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
   const [teamList, setTeamList] = useState([]);
+  const [swatchesList, setSwatchesList] = useState(propSwatchesList || []);
   const [adminsList, setAdminsList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  // Swatch CRUD state
+  const [swatchModalOpen, setSwatchModalOpen] = useState(false);
+  const [editingSwatch, setEditingSwatch] = useState(null);
+  const [swatchCategoryFilter, setSwatchCategoryFilter] = useState('all');
+  const [swatchForm, setSwatchForm] = useState({
+    nameUz: '',
+    nameRu: '',
+    category: 'wood',
+    code: '',
+    colorHex: '#A05A2C',
+    bgGradient: '',
+    image: '',
+    texture: "Yog'och teksturasi (Bo'rtma)",
+    finish: 'Mat / Strukturaviy',
+    coating: 'PVDF 3-qavat',
+    application: "Hovli uylari, karnizlar, darvoza atrofi"
+  });
 
   // Modals for CRUD
   const [productModalOpen, setProductModalOpen] = useState(false);
@@ -98,14 +120,15 @@ export const AdminDashboard = ({
   // Load all initial data
   const loadData = async () => {
     setLoading(true);
-    const [st, ld, pr, pf, ad, tm, cSet] = await Promise.all([
+    const [st, ld, pr, pf, ad, tm, cSet, swt] = await Promise.all([
       apiGetStats(),
       apiGetLeads(),
       apiGetProducts(),
       apiGetPortfolio(),
       apiGetAdmins(),
       apiGetTeam(),
-      apiGetCalcSettings()
+      apiGetCalcSettings(),
+      apiGetSwatches()
     ]);
     setStats(st);
     setLeads(ld);
@@ -113,6 +136,9 @@ export const AdminDashboard = ({
     setPortfolioList(pf);
     setAdminsList(ad);
     setTeamList(tm);
+    if (swt && Array.isArray(swt)) {
+      setSwatchesList(swt);
+    }
     if (cSet && cSet.materialPrices) {
       setCalcForm(cSet);
       if (onCalcSettingsChanged) onCalcSettingsChanged(cSet);
@@ -123,6 +149,12 @@ export const AdminDashboard = ({
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (propSwatchesList && Array.isArray(propSwatchesList) && propSwatchesList.length > 0) {
+      setSwatchesList(propSwatchesList);
+    }
+  }, [propSwatchesList]);
 
   useEffect(() => {
     if (calcSettings && calcSettings.materialPrices) {
@@ -468,6 +500,99 @@ export const AdminDashboard = ({
     }
   };
 
+  // --- SWATCHES (RANGLAR) ACTIONS ---
+  const handleOpenSwatchCreate = () => {
+    setEditingSwatch(null);
+    setSwatchForm({
+      nameUz: '',
+      nameRu: '',
+      category: 'wood',
+      code: 'WOOD-801',
+      colorHex: '#A05A2C',
+      bgGradient: 'linear-gradient(135deg, #b06a3b 0%, #7d3f18 100%)',
+      image: '',
+      texture: "Yog'och teksturasi (Bo'rtma)",
+      finish: 'Mat / Strukturaviy',
+      coating: 'PVDF 3-qavat',
+      application: "Hovli uylari, karnizlar, darvoza atrofi"
+    });
+    setSwatchModalOpen(true);
+  };
+
+  const handleOpenSwatchEdit = (swatch) => {
+    setEditingSwatch(swatch);
+    const nameUz = typeof swatch.name === 'object' ? (swatch.name.uz || swatch.name.ru || '') : (swatch.name || '');
+    const nameRu = typeof swatch.name === 'object' ? (swatch.name.ru || '') : '';
+    setSwatchForm({
+      nameUz: nameUz,
+      nameRu: nameRu,
+      category: swatch.category || 'wood',
+      code: swatch.code || '',
+      colorHex: swatch.colorHex || '#A05A2C',
+      bgGradient: swatch.bgGradient || '',
+      image: swatch.image || '',
+      texture: swatch.texture || '',
+      finish: swatch.finish || 'Mat',
+      coating: swatch.coating || 'PVDF 3-qavat',
+      application: swatch.application || ''
+    });
+    setSwatchModalOpen(true);
+  };
+
+  const handleSaveSwatch = async (e) => {
+    e.preventDefault();
+    if (!swatchForm.nameUz) {
+      alert("Iltimos, rang yoki tekstura nomini kiriting");
+      return;
+    }
+    if (!swatchForm.code) {
+      alert("Iltimos, rang kodini (masalan: WOOD-801 yoki RAL 7016) kiriting");
+      return;
+    }
+
+    let finalGradient = swatchForm.bgGradient;
+    if (!finalGradient && swatchForm.colorHex) {
+      finalGradient = `linear-gradient(135deg, ${swatchForm.colorHex} 0%, #1e1e1e 100%)`;
+    }
+
+    const payload = {
+      category: swatchForm.category,
+      name: {
+        uz: swatchForm.nameUz,
+        ru: swatchForm.nameRu || swatchForm.nameUz,
+        en: swatchForm.nameUz
+      },
+      code: swatchForm.code,
+      colorHex: swatchForm.colorHex,
+      bgGradient: finalGradient,
+      image: swatchForm.image,
+      texture: swatchForm.texture,
+      finish: swatchForm.finish,
+      coating: swatchForm.coating,
+      application: swatchForm.application
+    };
+
+    if (editingSwatch) {
+      await apiUpdateSwatch(editingSwatch.id, payload);
+      setSwatchesList(swatchesList.map(s => s.id === editingSwatch.id ? { ...s, ...payload } : s));
+    } else {
+      const res = await apiCreateSwatch(payload);
+      if (res.swatch) {
+        setSwatchesList([res.swatch, ...swatchesList]);
+      }
+    }
+    setSwatchModalOpen(false);
+    if (onDataChanged) onDataChanged();
+  };
+
+  const handleDeleteSwatch = async (swatchId) => {
+    if (window.confirm("Haqiqatan ham ushbu rang namunasini o'chirmoqchimisiz?")) {
+      await apiDeleteSwatch(swatchId);
+      setSwatchesList(swatchesList.filter(s => s.id !== swatchId));
+      if (onDataChanged) onDataChanged();
+    }
+  };
+
   return (
     <div className="dark fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn">
       
@@ -597,6 +722,21 @@ export const AdminDashboard = ({
                 <span>Jamoa & Ustalar</span>
               </div>
               <span className="text-xs text-slate-400">{teamList.length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('swatches')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'swatches' 
+                  ? 'bg-brand-red text-white shadow-glow-red' 
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Palette className="w-4 h-4" />
+                <span>Ranglar & Teksturalar</span>
+              </div>
+              <span className="text-xs text-slate-400">{swatchesList.length}</span>
             </button>
 
             <button
@@ -1012,6 +1152,140 @@ export const AdminDashboard = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: COLOR SWATCHES (RANGLAR VA TEKSTURALAR) */}
+          {activeTab === 'swatches' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="font-display font-extrabold text-2xl text-white flex items-center gap-2.5">
+                    <span>Ranglar & Teksturalar ({swatchesList.length})</span>
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-brand-red/20 text-brand-red border border-brand-red/30">
+                      Katalog
+                    </span>
+                  </h2>
+                  <p className="text-xs text-slate-400">
+                    Saytdagi ranglar va teksturalar palitrasini boshqarish, yangi ranglar qo'shish yoki o'chirish
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleOpenSwatchCreate}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all self-start sm:self-auto cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Yangi rang qo'shish</span>
+                </button>
+              </div>
+
+              {/* Filter pills */}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'all', label: "Barchasi" },
+                  { id: 'wood', label: "Yog'och teksturali" },
+                  { id: 'metallic', label: "Metallik" },
+                  { id: 'ral', label: "RAL klassik" },
+                  { id: 'special', label: "Maxsus / Xrom" }
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSwatchCategoryFilter(cat.id)}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      swatchCategoryFilter === cat.id
+                        ? 'bg-brand-red text-white shadow-glow-red'
+                        : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                    }`}
+                  >
+                    {cat.label} ({
+                      cat.id === 'all' 
+                        ? swatchesList.length 
+                        : swatchesList.filter(s => s.category === cat.id).length
+                    })
+                  </button>
+                ))}
+              </div>
+
+              {/* Swatches Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                {swatchesList
+                  .filter(s => swatchCategoryFilter === 'all' || s.category === swatchCategoryFilter)
+                  .map((swatch) => {
+                    const name = typeof swatch.name === 'object' ? (swatch.name.uz || swatch.name.ru || '') : (swatch.name || '');
+                    return (
+                      <div 
+                        key={swatch.id} 
+                        className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40 bg-brand-surface/70 transition-all"
+                      >
+                        <div>
+                          {/* Sample Box */}
+                          <div 
+                            className="relative h-36 rounded-xl overflow-hidden mb-3 border border-white/15 shadow-inner"
+                            style={{
+                              background: swatch.image 
+                                ? `url(${swatch.image}) center/cover no-repeat` 
+                                : (swatch.bgGradient || swatch.colorHex || '#444')
+                            }}
+                          >
+                            <span className="absolute top-2 right-2 px-2.5 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-black text-white border border-white/20 shadow">
+                              {swatch.code}
+                            </span>
+                            <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-brand-red/90 text-white text-[9px] font-bold uppercase tracking-wider">
+                              {swatch.category === 'wood' ? "Yog'och" : swatch.category === 'metallic' ? "Metallik" : swatch.category === 'ral' ? "RAL" : "Maxsus"}
+                            </span>
+                          </div>
+
+                          <h3 className="font-display font-bold text-sm sm:text-base text-white mb-1 group-hover:text-brand-red transition-colors">
+                            {name}
+                          </h3>
+                          {typeof swatch.name === 'object' && swatch.name.ru && (
+                            <p className="text-[11px] text-slate-400 mb-2 italic">
+                              {swatch.name.ru}
+                            </p>
+                          )}
+                          <p className="text-xs text-slate-300 font-medium mb-3">
+                            {swatch.texture}
+                          </p>
+
+                          <div className="space-y-1.5 text-xs text-slate-300 border-t border-white/10 pt-2.5 mb-3">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Yuzasi / Faktura:</span>
+                              <span className="font-semibold text-white">{swatch.finish}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Qoplama:</span>
+                              <span className="font-semibold text-white">{swatch.coating}</span>
+                            </div>
+                            {swatch.application && (
+                              <div className="pt-1 text-[11px] text-slate-400 line-clamp-2">
+                                <span className="text-slate-400 font-medium">Qo'llanishi: </span>
+                                {swatch.application}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2.5 border-t border-white/10">
+                          <button
+                            onClick={() => handleOpenSwatchEdit(swatch)}
+                            className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Tahrirlash</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSwatch(swatch.id)}
+                            className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
+                            title="O'chirish"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
@@ -1536,10 +1810,10 @@ export const AdminDashboard = ({
         </main>
 
         {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet screens only) */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-2 py-2 flex items-center justify-around shadow-2xl safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-1 py-1.5 flex items-center justify-around shadow-2xl safe-area-bottom">
           <button
             onClick={() => setActiveTab('leads')}
-            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all relative ${
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all relative ${
               activeTab === 'leads' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -1556,7 +1830,7 @@ export const AdminDashboard = ({
 
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
               activeTab === 'products' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -1566,7 +1840,7 @@ export const AdminDashboard = ({
 
           <button
             onClick={() => setActiveTab('portfolio')}
-            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
               activeTab === 'portfolio' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -1576,7 +1850,7 @@ export const AdminDashboard = ({
 
           <button
             onClick={() => setActiveTab('team')}
-            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
               activeTab === 'team' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -1585,8 +1859,18 @@ export const AdminDashboard = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('swatches')}
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+              activeTab === 'swatches' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Palette className="w-5 h-5" />
+            <span className="text-[10px]">Ranglar</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('calculator')}
-            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
               activeTab === 'calculator' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -1596,7 +1880,7 @@ export const AdminDashboard = ({
 
           <button
             onClick={() => setActiveTab('admins')}
-            className={`flex flex-col items-center gap-1 py-1 px-2 rounded-xl transition-all ${
+            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
               activeTab === 'admins' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -2240,6 +2524,263 @@ export const AdminDashboard = ({
                 className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red hover:shadow-glow-red-lg transition-all"
               >
                 Adminni ro'yxatga olish
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- ADD / EDIT SWATCH MODAL --- */}
+      {swatchModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
+          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setSwatchModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="font-display font-extrabold text-2xl text-white mb-2 flex items-center gap-2">
+              <Palette className="w-6 h-6 text-brand-red" />
+              <span>{editingSwatch ? "Rangni tahrirlash" : "Yangi rang / tekstura qo'shish"}</span>
+            </h3>
+            <p className="text-xs text-slate-400 mb-5">
+              Ushbu namuna saytdagi "Ranglar va Teksturalar" katalogida ko'rinadi
+            </p>
+
+            <form onSubmit={handleSaveSwatch} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Rang yoki tekstura nomi (O'zbekcha) *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={swatchForm.nameUz}
+                  onChange={(e) => setSwatchForm({ ...swatchForm, nameUz: e.target.value })}
+                  placeholder="Masalan: Oltin Eman (Golden Oak) yoki Grafit"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Nomi (Ruscha - ixtiyoriy)
+                </label>
+                <input
+                  type="text"
+                  value={swatchForm.nameRu}
+                  onChange={(e) => setSwatchForm({ ...swatchForm, nameRu: e.target.value })}
+                  placeholder="Золотой Дуб или Графит"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Toifasi *
+                  </label>
+                  <select
+                    value={swatchForm.category}
+                    onChange={(e) => setSwatchForm({ ...swatchForm, category: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  >
+                    <option value="wood">Yog'och teksturali</option>
+                    <option value="metallic">Metallik</option>
+                    <option value="ral">RAL klassik</option>
+                    <option value="special">Maxsus / Oyna / Xrom</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Kodi (RAL yoki kod) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={swatchForm.code}
+                    onChange={(e) => setSwatchForm({ ...swatchForm, code: e.target.value })}
+                    placeholder="RAL 7016 yoki WOOD-801"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              {/* LIVE SAMPLE PREVIEW */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Namuna ko'rinishi (Jonli oldindan ko'rish)
+                </label>
+                <div 
+                  className="w-full h-28 rounded-2xl relative overflow-hidden border border-white/20 shadow-inner flex items-end p-3 transition-all"
+                  style={{
+                    background: swatchForm.image 
+                      ? `url(${swatchForm.image}) center/cover no-repeat` 
+                      : (swatchForm.bgGradient || swatchForm.colorHex || '#444')
+                  }}
+                >
+                  <span className="px-3 py-1 rounded-lg bg-slate-900/85 backdrop-blur-md text-xs font-bold text-white border border-white/20 shadow-sm">
+                    {swatchForm.code || "KOD-001"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Color Picker & Hex */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Rang palitrasi (Hex / Tanlash)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={swatchForm.colorHex.startsWith('#') ? swatchForm.colorHex : '#A05A2C'}
+                      onChange={(e) => {
+                        const hex = e.target.value;
+                        setSwatchForm({ 
+                          ...swatchForm, 
+                          colorHex: hex,
+                          bgGradient: `linear-gradient(135deg, ${hex} 0%, #1e1e1e 100%)`
+                        });
+                      }}
+                      className="w-10 h-10 rounded-xl cursor-pointer bg-transparent border-0"
+                    />
+                    <input
+                      type="text"
+                      value={swatchForm.colorHex}
+                      onChange={(e) => {
+                        const hex = e.target.value;
+                        setSwatchForm({ 
+                          ...swatchForm, 
+                          colorHex: hex,
+                          bgGradient: hex ? `linear-gradient(135deg, ${hex} 0%, #1e1e1e 100%)` : swatchForm.bgGradient
+                        });
+                      }}
+                      placeholder="#373F43"
+                      className="flex-1 px-3 py-2 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red font-mono"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Faktura / Yuzasi
+                  </label>
+                  <input
+                    type="text"
+                    value={swatchForm.finish}
+                    onChange={(e) => setSwatchForm({ ...swatchForm, finish: e.target.value })}
+                    placeholder="Mat / Yaltiroq / Strukturaviy"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              {/* Upload sample texture photo */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Yoki haqiqiy tunikabond namunasi rasmini yuklang
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={swatchForm.image}
+                    onChange={(e) => setSwatchForm({ ...swatchForm, image: e.target.value })}
+                    placeholder="https://... yoki yonidagi tugma orqali fayl tanlang"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                  <label className="cursor-pointer px-4 py-2.5 rounded-xl bg-brand-red/20 hover:bg-brand-red/30 border border-brand-red/40 text-xs font-bold text-white flex items-center gap-1.5 transition-colors shrink-0">
+                    <Upload className="w-4 h-4 text-brand-red" />
+                    <span>{uploadingImage ? "Yuklanmoqda..." : "Rasm"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setUploadingImage(true);
+                          try {
+                            const res = await apiUploadFile(file);
+                            if (res.success && res.url) {
+                              setSwatchForm(prev => ({ ...prev, image: res.url }));
+                            } else {
+                              alert(res.error || "Rasm yuklashda xatolik yuz berdi");
+                            }
+                          } catch (err) {
+                            console.error("Swatch upload error:", err);
+                          } finally {
+                            setUploadingImage(false);
+                            e.target.value = '';
+                          }
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+                {swatchForm.image && (
+                  <div className="mt-2 flex items-center justify-between p-2 rounded-xl bg-white/5 border border-white/10">
+                    <span className="text-[11px] text-emerald-400 font-semibold">✓ Namuna rasmi muvaffaqiyatli tanlandi</span>
+                    <button
+                      type="button"
+                      onClick={() => setSwatchForm(prev => ({ ...prev, image: '' }))}
+                      className="text-xs text-red-400 hover:text-red-300"
+                    >
+                      Rasmni olib tashlash
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Tekstura tavsifi
+                  </label>
+                  <input
+                    type="text"
+                    value={swatchForm.texture}
+                    onChange={(e) => setSwatchForm({ ...swatchForm, texture: e.target.value })}
+                    placeholder="Yog'och tomirlari / Silliq mat"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Qoplama turi
+                  </label>
+                  <input
+                    type="text"
+                    value={swatchForm.coating}
+                    onChange={(e) => setSwatchForm({ ...swatchForm, coating: e.target.value })}
+                    placeholder="PVDF 3-qavat / Poliester"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Qo'llaniladigan joylar (Tavsiya)
+                </label>
+                <input
+                  type="text"
+                  value={swatchForm.application}
+                  onChange={(e) => setSwatchForm({ ...swatchForm, application: e.target.value })}
+                  placeholder="Kottedj fasadlari, tom karnizlari, darvoza atrofi..."
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/80 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red hover:shadow-glow-red-lg transition-all cursor-pointer"
+              >
+                {editingSwatch ? "O'zgarishlarni saqlash" : "Rangni katalogga qo'shish"}
               </button>
             </form>
           </div>
