@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Ruler, Clock, Banknote, SunMedium, Eye, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Ruler, Clock, Banknote, SunMedium, CheckCircle2, Sparkles } from 'lucide-react';
 
 export const WhyUs = ({ t }) => {
   return (
@@ -122,45 +122,39 @@ export const WhyUs = ({ t }) => {
             </div>
           </div>
 
-          {/* Bento Card 5: Ob-havoga Chidamlilik (Spans 1 col) */}
-          <div className="glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
-            <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform mb-6">
-              <SunMedium className="w-7 h-7" />
-            </div>
-
-            <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-3">
-              -40°C DAN +60°C GACHA
-            </div>
-
-            <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
-              {t.whyUs.p5Title}
-            </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-              {t.whyUs.p5Desc}
-            </p>
-          </div>
-
-          {/* Bento Card 6: 3D Vizualizatsiya (Spans 2 cols on md/lg) */}
-          <div className="md:col-span-2 glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
-            <div className="flex items-center justify-between mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform">
-                <Eye className="w-7 h-7" />
+          {/* Bento Card 5: Ob-havoga Chidamlilik (Spans 3 cols full width) */}
+          <div className="md:col-span-3 glass-panel p-5 sm:p-8 rounded-3xl relative overflow-hidden group hover:border-brand-red/50 transition-all hover:-translate-y-1">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-brand-red/15 flex items-center justify-center text-brand-red shadow-glow-red group-hover:scale-110 transition-transform shrink-0">
+                  <SunMedium className="w-7 h-7" />
+                </div>
+                <div>
+                  <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-1">
+                    -40°C DAN +60°C GACHA SINOVDAN O'TGAN
+                  </div>
+                  <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900 dark:text-white group-hover:text-brand-red transition-colors">
+                    {t.whyUs.p5Title}
+                  </h3>
+                </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-sky-100 dark:bg-sky-500/20 text-sky-800 dark:text-sky-400 border border-sky-300 dark:border-sky-500/30">
-                3D MODELLASHTIRISH
+              <span className="self-start sm:self-auto px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30">
+                100% HIMOYALANGAN
               </span>
             </div>
 
-            <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900 dark:text-white mb-3 group-hover:text-brand-red transition-colors">
-              {t.whyUs.p6Title}
-            </h3>
-            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-xl">
-              {t.whyUs.p6Desc}
+            <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed max-w-3xl">
+              {t.whyUs.p5Desc}
             </p>
 
-            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex items-center gap-2 text-xs text-brand-red font-bold">
-              <span>Binongizni qurilishdan oldin ko'ring</span>
-              <ArrowRight className="w-4 h-4" />
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-slate-600 dark:text-slate-400">
+              <span className="text-slate-900 dark:text-white font-bold">Ultrafiolet (UV) nurlaridan himoya</span>
+              <span>•</span>
+              <span>Zanglamas polimer qoplama</span>
+              <span>•</span>
+              <span>Yomg'ir va do'ldan shikastlanmaydi</span>
+              <span>•</span>
+              <span className="text-brand-red font-bold">Ranglar o'chmaydi</span>
             </div>
           </div>
 
