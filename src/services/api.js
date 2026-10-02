@@ -240,28 +240,121 @@ export const apiGetStats = async () => {
   };
 };
 
+export const CLOUD_LEADS_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fc19c245604c';
+export const CLOUD_CATALOG_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fc1b57946059';
+
+export const cloudPushLead = async (newLead) => {
+  try {
+    let cloudLeads = [];
+    try {
+      const res = await fetch(CLOUD_LEADS_URL);
+      if (res.ok) {
+        const json = await res.json();
+        if (json?.data?.leads && Array.isArray(json.data.leads)) {
+          cloudLeads = json.data.leads;
+        }
+      }
+    } catch {}
+
+    const filtered = cloudLeads.filter(l => String(l.id) !== String(newLead.id));
+    const updated = [newLead, ...filtered].slice(0, 100);
+
+    await fetch(CLOUD_LEADS_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'tunikabond_leads_v2',
+        data: { leads: updated }
+      })
+    });
+    return true;
+  } catch (e) {
+    console.warn('cloudPushLead error:', e);
+    return false;
+  }
+};
+
+export const cloudGetCatalogData = async () => {
+  try {
+    const res = await fetch(CLOUD_CATALOG_URL);
+    if (res.ok) {
+      const json = await res.json();
+      return json?.data || null;
+    }
+  } catch (e) {
+    console.warn('cloudGetCatalogData error:', e);
+  }
+  return null;
+};
+
+export const cloudSaveCatalogData = async (partialData) => {
+  try {
+    let existing = {};
+    try {
+      const res = await fetch(CLOUD_CATALOG_URL);
+      if (res.ok) {
+        const json = await res.json();
+        existing = json?.data || {};
+      }
+    } catch {}
+
+    const merged = { ...existing, ...partialData };
+    await fetch(CLOUD_CATALOG_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'tunikabond_catalog_store',
+        data: merged
+      })
+    });
+    return true;
+  } catch (e) {
+    console.warn('cloudSaveCatalogData error:', e);
+    return false;
+  }
+};
+
 // --- LEADS API ---
 export const apiGetLeads = async () => {
-  let leads = [];
+  let backendLeads = [];
   try {
     const res = await apiFetch('/api/leads/');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        leads = data;
+        backendLeads = data;
       }
     }
   } catch {}
 
-  if (!leads.length) {
-    try {
-      leads = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
-    } catch {}
-  }
+  let cloudLeads = [];
+  try {
+    const cloudRes = await fetch(CLOUD_LEADS_URL);
+    if (cloudRes.ok) {
+      const json = await cloudRes.json();
+      if (json?.data?.leads && Array.isArray(json.data.leads)) {
+        cloudLeads = json.data.leads;
+      }
+    }
+  } catch {}
+
+  let localLeads = [];
+  try {
+    localLeads = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
+  } catch {}
+
+  const map = new Map();
+  [...cloudLeads, ...backendLeads, ...localLeads].forEach(l => {
+    if (l && (l.id || l.phone)) {
+      const key = String(l.id || `${l.phone}_${l.timestamp || l.date}`);
+      if (!map.has(key)) {
+        map.set(key, l);
+      }
+    }
+  });
 
   const validStatuses = ['new', 'in_progress', 'completed', 'cancelled'];
-  const normalized = leads.map((l, index) => {
-    // Crucial: If status is undefined, null, or empty string, default strictly to 'new'
+  const normalized = Array.from(map.values()).map((l, index) => {
     let status = l.status;
     if (!status || !validStatuses.includes(status)) {
       status = 'new';
@@ -274,9 +367,11 @@ export const apiGetLeads = async () => {
     };
   });
 
-  // Heal corrupt items in localStorage
+  normalized.sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
+
+  // Heal and sync to local storage
   try {
-    localStorage.setItem('tunikabond_leads', JSON.stringify(normalized));
+    localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(normalized.slice(0, 100)));
   } catch {}
 
   return normalized;
@@ -284,21 +379,36 @@ export const apiGetLeads = async () => {
 
 export const apiUpdateLead = async (leadId, patchData) => {
   try {
-    const res = await apiFetch(`/api/leads/${leadId}`, {
+    await apiFetch(`/api/leads/${leadId}`, {
       method: 'PATCH',
       headers: getHeaders(),
       body: JSON.stringify(patchData)
     });
-    if (res.ok) {
-      // Backend updated
-    }
   } catch {}
 
-  // Sync to localStorage for static host / offline persistence
+  // Sync to localStorage
   try {
     const existing = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
     const updated = existing.map(l => (String(l.id) === String(leadId) ? { ...l, ...patchData } : l));
     localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Storage
+  try {
+    const cloudRes = await fetch(CLOUD_LEADS_URL);
+    if (cloudRes.ok) {
+      const json = await cloudRes.json();
+      const current = json?.data?.leads || [];
+      const updatedCloud = current.map(l => (String(l.id) === String(leadId) ? { ...l, ...patchData } : l));
+      await fetch(CLOUD_LEADS_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'tunikabond_leads_v2',
+          data: { leads: updatedCloud }
+        })
+      });
+    }
   } catch {}
 
   notifyDataChanged();
@@ -307,20 +417,35 @@ export const apiUpdateLead = async (leadId, patchData) => {
 
 export const apiDeleteLead = async (leadId) => {
   try {
-    const res = await apiFetch(`/api/leads/${leadId}`, {
+    await apiFetch(`/api/leads/${leadId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
-    if (res.ok) {
-      // Backend deleted
-    }
   } catch {}
 
-  // Sync to localStorage for static host / offline persistence
+  // Sync to localStorage
   try {
     const existing = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
     const updated = existing.filter(l => String(l.id) !== String(leadId));
     localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Storage
+  try {
+    const cloudRes = await fetch(CLOUD_LEADS_URL);
+    if (cloudRes.ok) {
+      const json = await cloudRes.json();
+      const current = json?.data?.leads || [];
+      const updatedCloud = current.filter(l => String(l.id) !== String(leadId));
+      await fetch(CLOUD_LEADS_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'tunikabond_leads_v2',
+          data: { leads: updatedCloud }
+        })
+      });
+    }
   } catch {}
 
   notifyDataChanged();
@@ -382,6 +507,17 @@ export const apiGetProducts = async () => {
       if (Array.isArray(data) && data.length > 0) return data;
     }
   } catch {}
+
+  // Cloud store sync (enables instant cross-device updates for all visitors)
+  try {
+    const cData = await cloudGetCatalogData();
+    if (cData?.products && Array.isArray(cData.products) && cData.products.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(cData.products));
+      } catch {}
+      return cData.products;
+    }
+  } catch {}
   
   try {
     const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY) || localStorage.getItem('tunikabond_custom_products');
@@ -408,11 +544,17 @@ export const apiCreateProduct = async (productData) => {
     }
   } catch {}
 
+  let updated = [newProduct];
   try {
     const current = await apiGetProducts();
-    const updated = [newProduct, ...current];
+    updated = [newProduct, ...current.filter(p => p.id !== newProduct.id)];
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ products: updated });
   } catch {}
 
   notifyDataChanged();
@@ -421,19 +563,24 @@ export const apiCreateProduct = async (productData) => {
 
 export const apiUpdateProduct = async (productId, productData) => {
   try {
-    const res = await apiFetch(`/api/products/${productId}`, {
+    await apiFetch(`/api/products/${productId}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(productData)
     });
-    if (res.ok) return true;
   } catch {}
 
+  let updated = [];
   try {
     const current = await apiGetProducts();
-    const updated = current.map(p => p.id === productId ? { ...p, ...productData } : p);
+    updated = current.map(p => p.id === productId ? { ...p, ...productData } : p);
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ products: updated });
   } catch {}
 
   notifyDataChanged();
@@ -442,18 +589,23 @@ export const apiUpdateProduct = async (productId, productData) => {
 
 export const apiDeleteProduct = async (productId) => {
   try {
-    const res = await apiFetch(`/api/products/${productId}`, {
+    await apiFetch(`/api/products/${productId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
-    if (res.ok) return true;
   } catch {}
 
+  let updated = [];
   try {
     const current = await apiGetProducts();
-    const updated = current.filter(p => p.id !== productId);
+    updated = current.filter(p => p.id !== productId);
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ products: updated });
   } catch {}
 
   notifyDataChanged();
@@ -467,6 +619,17 @@ export const apiGetPortfolio = async () => {
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {}
+
+  // Cloud store sync (enables instant cross-device updates for all visitors)
+  try {
+    const cData = await cloudGetCatalogData();
+    if (cData?.portfolio && Array.isArray(cData.portfolio) && cData.portfolio.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(cData.portfolio));
+      } catch {}
+      return cData.portfolio;
     }
   } catch {}
 
@@ -495,11 +658,17 @@ export const apiCreatePortfolio = async (itemData) => {
     }
   } catch {}
 
+  let updated = [newItem];
   try {
     const current = await apiGetPortfolio();
-    const updated = [newItem, ...current];
+    updated = [newItem, ...current.filter(i => i.id !== newItem.id)];
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ portfolio: updated });
   } catch {}
 
   notifyDataChanged();
@@ -508,19 +677,24 @@ export const apiCreatePortfolio = async (itemData) => {
 
 export const apiUpdatePortfolio = async (itemId, itemData) => {
   try {
-    const res = await apiFetch(`/api/portfolio/${itemId}`, {
+    await apiFetch(`/api/portfolio/${itemId}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(itemData)
     });
-    if (res.ok) return true;
   } catch {}
 
+  let updated = [];
   try {
     const current = await apiGetPortfolio();
-    const updated = current.map(item => item.id === itemId ? { ...item, ...itemData } : item);
+    updated = current.map(item => item.id === itemId ? { ...item, ...itemData } : item);
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ portfolio: updated });
   } catch {}
 
   notifyDataChanged();
@@ -529,18 +703,23 @@ export const apiUpdatePortfolio = async (itemId, itemData) => {
 
 export const apiDeletePortfolio = async (itemId) => {
   try {
-    const res = await apiFetch(`/api/portfolio/${itemId}`, {
+    await apiFetch(`/api/portfolio/${itemId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
-    if (res.ok) return true;
   } catch {}
 
+  let updated = [];
   try {
     const current = await apiGetPortfolio();
-    const updated = current.filter(item => item.id !== itemId);
+    updated = current.filter(item => item.id !== itemId);
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ portfolio: updated });
   } catch {}
 
   notifyDataChanged();
@@ -729,6 +908,17 @@ export const apiGetCalcSettings = async () => {
     }
   } catch {}
 
+  // Cloud sync
+  try {
+    const cData = await cloudGetCatalogData();
+    if (cData?.calcSettings?.materialPrices) {
+      try {
+        localStorage.setItem(STORAGE_CALC_KEY, JSON.stringify(cData.calcSettings));
+      } catch {}
+      return cData.calcSettings;
+    }
+  } catch {}
+
   try {
     const saved = localStorage.getItem(STORAGE_CALC_KEY);
     if (saved) {
@@ -742,18 +932,19 @@ export const apiGetCalcSettings = async () => {
 
 export const apiUpdateCalcSettings = async (settings) => {
   try {
-    const res = await apiFetch('/api/calculator/settings', {
+    await apiFetch('/api/calculator/settings', {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(settings)
     });
-    if (res.ok) {
-      // Backend updated
-    }
   } catch {}
 
   try {
     localStorage.setItem(STORAGE_CALC_KEY, JSON.stringify(settings));
+  } catch {}
+
+  try {
+    await cloudSaveCatalogData({ calcSettings: settings });
   } catch {}
 
   notifyDataChanged();
@@ -767,6 +958,17 @@ export const apiGetSwatches = async () => {
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch {}
+
+  // Cloud sync
+  try {
+    const cData = await cloudGetCatalogData();
+    if (cData?.swatches && Array.isArray(cData.swatches) && cData.swatches.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(cData.swatches));
+      } catch {}
+      return cData.swatches;
     }
   } catch {}
 
@@ -798,11 +1000,16 @@ export const apiCreateSwatch = async (swatchData) => {
     }
   } catch {}
 
+  let updated = [newSwatch];
   try {
     const existing = await apiGetSwatches();
-    const updated = [newSwatch, ...existing];
+    updated = [newSwatch, ...existing.filter(s => String(s.id) !== String(newSwatch.id))];
     localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
     localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
+  } catch {}
+
+  try {
+    await cloudSaveCatalogData({ swatches: updated });
   } catch {}
 
   notifyDataChanged();
@@ -811,21 +1018,23 @@ export const apiCreateSwatch = async (swatchData) => {
 
 export const apiUpdateSwatch = async (swatchId, swatchData) => {
   try {
-    const res = await apiFetch(`/api/swatches/${swatchId}`, {
+    await apiFetch(`/api/swatches/${swatchId}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(swatchData)
     });
-    if (res.ok) {
-      // Backend updated
-    }
+  } catch {}
+
+  let updated = [];
+  try {
+    const existing = await apiGetSwatches();
+    updated = existing.map(s => String(s.id) === String(swatchId) ? { ...s, ...swatchData } : s);
+    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
   try {
-    const existing = await apiGetSwatches();
-    const updated = existing.map(s => String(s.id) === String(swatchId) ? { ...s, ...swatchData } : s);
-    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
-    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
+    await cloudSaveCatalogData({ swatches: updated });
   } catch {}
 
   notifyDataChanged();
@@ -834,20 +1043,22 @@ export const apiUpdateSwatch = async (swatchId, swatchData) => {
 
 export const apiDeleteSwatch = async (swatchId) => {
   try {
-    const res = await apiFetch(`/api/swatches/${swatchId}`, {
+    await apiFetch(`/api/swatches/${swatchId}`, {
       method: 'DELETE',
       headers: getHeaders()
     });
-    if (res.ok) {
-      // Backend deleted
-    }
+  } catch {}
+
+  let updated = [];
+  try {
+    const existing = await apiGetSwatches();
+    updated = existing.filter(s => String(s.id) !== String(swatchId));
+    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
   try {
-    const existing = await apiGetSwatches();
-    const updated = existing.filter(s => String(s.id) !== String(swatchId));
-    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
-    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
+    await cloudSaveCatalogData({ swatches: updated });
   } catch {}
 
   notifyDataChanged();

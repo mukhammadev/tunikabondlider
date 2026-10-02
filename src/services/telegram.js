@@ -1,3 +1,5 @@
+import { cloudPushLead } from './api';
+
 /**
  * Lead handling service
  * Validates, formats, logs, and safely dispatches leads.
@@ -25,6 +27,13 @@ export const submitLead = async (leadData) => {
     localStorage.setItem('tunikabond_leads', JSON.stringify(existing.slice(0, 50)));
   } catch (e) {
     console.warn('Backup save error:', e);
+  }
+
+  // Push to Central Cloud Storage so Admin sees it across ANY device in real time
+  try {
+    await cloudPushLead(standardizedLead);
+  } catch (err) {
+    console.warn('Cloud lead push error:', err);
   }
 
   // Construct readable message

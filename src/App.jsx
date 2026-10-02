@@ -147,7 +147,19 @@ export function App() {
     };
     window.addEventListener('tunikabond_data_updated', handleUpdate);
     window.addEventListener('storage', handleUpdate);
+
+    // Refresh data when user focuses tab or every 20 seconds
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        loadDynamicData();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    const interval = setInterval(loadDynamicData, 20000);
+
     return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('tunikabond_data_updated', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };

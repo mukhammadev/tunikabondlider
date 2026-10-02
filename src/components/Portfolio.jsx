@@ -3,40 +3,49 @@ import { portfolio as defaultPortfolio } from '../data/portfolio';
 import { Compass, MapPin, Clock, Layers, Maximize2, X, CheckCircle2, ArrowRight, UserCheck } from 'lucide-react';
 
 export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
-  const [activeFilter, setActiveFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('naves');
   const [selectedImage, setSelectedImage] = useState(null);
 
   const portfolioToUse = items && items.length > 0 ? items : defaultPortfolio;
 
+  const getPortfolioCategory = (item) => {
+    const cat = String(item?.category || '').toLowerCase().trim();
+    if (cat.includes('naves')) return 'naves';
+    if (cat.includes('kozir')) return 'koziryok';
+    if (cat.includes('darvoza')) return 'darvozaxona';
+    if (cat.includes('fasad') || cat.includes('tunikabond') || cat.includes('alyukabond') || cat.includes('residential') || cat.includes('commercial')) return 'fasad';
+    if (cat.includes('cornice') || cat.includes('karniz') || cat.includes('shift')) return 'cornices';
+    return cat || 'naves';
+  };
+
   // Filter items matching structure category (naves, koziryok, darvozaxona, fasad, cornices)
   const filteredItems = activeFilter === 'all'
     ? portfolioToUse
-    : portfolioToUse.filter(item => {
-        if (item.category === activeFilter) return true;
-        // Backward compatibility: map residential/commercial to fasad
-        if (activeFilter === 'fasad' && (item.category === 'residential' || item.category === 'commercial')) {
-          return true;
-        }
-        return false;
-      });
+    : portfolioToUse.filter(item => getPortfolioCategory(item) === activeFilter);
 
   const filters = [
-    { id: 'all', label: t.portfolio?.all || "Barchasi" },
     { id: 'naves', label: t.portfolio?.naves || "Naveslar" },
     { id: 'koziryok', label: t.portfolio?.koziryok || "Koziryoklar" },
     { id: 'darvozaxona', label: t.portfolio?.darvozaxona || "Darvozaxonalar" },
     { id: 'fasad', label: t.portfolio?.fasad || "Fasadlar" },
-    { id: 'cornices', label: t.portfolio?.cornices || "Karniz va Shift" }
+    { id: 'cornices', label: t.portfolio?.cornices || "Karniz va Shift" },
+    { id: 'all', label: t.portfolio?.all || "Barchasi" }
   ];
 
+  const getCategoryCount = (fId) => {
+    if (fId === 'all') return portfolioToUse.length;
+    return portfolioToUse.filter(item => getPortfolioCategory(item) === fId).length;
+  };
+
   const getCategoryLabel = (cat) => {
-    switch (cat) {
+    const normalized = getPortfolioCategory({ category: cat });
+    switch (normalized) {
       case 'naves': return 'Naves';
       case 'koziryok': return 'Koziryok';
       case 'darvozaxona': return 'Darvozaxona';
       case 'fasad': return 'Fasad';
       case 'cornices': return 'Karniz';
-      default: return 'Fasad';
+      default: return 'Loyiha';
     }
   };
 
@@ -60,24 +69,46 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
 
         {/* Filter Pills (Naves, Koziryok, Darvozaxona, Fasad, Karniz) */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-14">
-          {filters.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setActiveFilter(f.id)}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                activeFilter === f.id
-                  ? 'bg-brand-red text-white shadow-glow-red font-bold scale-105'
-                  : 'bg-slate-100 dark:bg-brand-surface/80 text-slate-700 dark:text-slate-300 hover:text-brand-red hover:bg-slate-200 dark:hover:bg-brand-card border border-slate-200 dark:border-white/10'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+          {filters.map((f) => {
+            const count = getCategoryCount(f.id);
+            const isActive = activeFilter === f.id;
+            return (
+              <button
+                key={f.id}
+                onClick={() => setActiveFilter(f.id)}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                  isActive
+                    ? 'bg-brand-red text-white shadow-glow-red font-bold scale-105'
+                    : 'bg-slate-100 dark:bg-brand-surface/80 text-slate-700 dark:text-slate-300 hover:text-brand-red hover:bg-slate-200 dark:hover:bg-brand-card border border-slate-200 dark:border-white/10'
+                }`}
+              >
+                <span>{f.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Portfolio / Catalog Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredItems.map((item) => {
+          {filteredItems.length === 0 ? (
+            <div className="col-span-full py-16 text-center glass-card rounded-3xl p-8 border border-white/10 max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand-red/10 border border-brand-red/20 flex items-center justify-center text-brand-red">
+                <Compass className="w-8 h-8" />
+              </div>
+              <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">
+                Hozircha loyihalar mavjud emas
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Ushbu toifaga yaqin orada yangi namunali ishlar joylashtiriladi.
+              </p>
+            </div>
+          ) : (
+            filteredItems.map((item) => {
             const title = typeof item.title === 'object' ? (item.title[currentLang] || item.title.uz) : item.title;
             return (
               <div
@@ -177,7 +208,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
 
       </div>

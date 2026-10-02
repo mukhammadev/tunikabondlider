@@ -106,6 +106,9 @@ export const AdminDashboard = ({
     role: 'Admin'
   });
 
+  const [adminProductCat, setAdminProductCat] = useState('all');
+  const [adminPortfolioCat, setAdminPortfolioCat] = useState('all');
+
   // Calculator pricing form state
   const [calcForm, setCalcForm] = useState(() => {
     return calcSettings || DEFAULT_CALC_SETTINGS;
@@ -119,47 +122,57 @@ export const AdminDashboard = ({
   const [previewArea, setPreviewArea] = useState(100);
 
   // Load all initial data
-  const loadData = async () => {
-    setLoading(true);
-    const [st, ld, pr, pf, ad, tm, cSet, swt] = await Promise.all([
-      apiGetStats(),
-      apiGetLeads(),
-      apiGetProducts(),
-      apiGetPortfolio(),
-      apiGetAdmins(),
-      apiGetTeam(),
-      apiGetCalcSettings(),
-      apiGetSwatches()
-    ]);
-    setStats(st);
-    setLeads(ld);
-    setProductsList(pr);
-    setPortfolioList(pf);
-    setAdminsList(ad);
-    setTeamList(tm);
-    if (swt && Array.isArray(swt)) {
-      setSwatchesList(swt);
+  const loadData = async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    try {
+      const [st, ld, pr, pf, ad, tm, cSet, swt] = await Promise.all([
+        apiGetStats(),
+        apiGetLeads(),
+        apiGetProducts(),
+        apiGetPortfolio(),
+        apiGetAdmins(),
+        apiGetTeam(),
+        apiGetCalcSettings(),
+        apiGetSwatches()
+      ]);
+      setStats(st);
+      setLeads(ld);
+      setProductsList(pr);
+      setPortfolioList(pf);
+      setAdminsList(ad);
+      setTeamList(tm);
+      if (swt && Array.isArray(swt)) {
+        setSwatchesList(swt);
+      }
+      if (cSet && cSet.materialPrices) {
+        setCalcForm(cSet);
+        if (onCalcSettingsChanged) onCalcSettingsChanged(cSet);
+      }
+    } finally {
+      if (!isSilent) setLoading(false);
     }
-    if (cSet && cSet.materialPrices) {
-      setCalcForm(cSet);
-      if (onCalcSettingsChanged) onCalcSettingsChanged(cSet);
-    }
-    setLoading(false);
   };
 
   const notifyChange = () => {
     if (onDataChanged) onDataChanged();
-    loadData();
+    loadData(true);
   };
 
   useEffect(() => {
     loadData();
     const handleUpdate = () => {
-      loadData();
+      loadData(true);
     };
     window.addEventListener('tunikabond_data_updated', handleUpdate);
     window.addEventListener('storage', handleUpdate);
+
+    // Auto-poll cloud every 10 seconds for real-time lead reception from external visitors
+    const interval = setInterval(() => {
+      loadData(true);
+    }, 10000);
+
     return () => {
+      clearInterval(interval);
       window.removeEventListener('tunikabond_data_updated', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
@@ -957,27 +970,77 @@ export const AdminDashboard = ({
           {/* TAB 2: PRODUCTS CRUD */}
           {activeTab === 'products' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white">
                     Mahsulotlar Katalogi ({productsList.length})
                   </h2>
                   <p className="text-xs text-slate-400">
-                    Saytdagi mahsulotlarni tahrirlash, yangi qo'shish yoki o'chirish
+                    Saytdagi mahsulotlarni tahrirlash, yangi qo'shish yoki toifalar bo'yicha saralash
                   </p>
                 </div>
 
                 <button
                   onClick={handleOpenProductCreate}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Yangi mahsulot qo'shish</span>
                 </button>
               </div>
 
+              {/* Category Pills Filter */}
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  { id: 'all', label: 'Barchasi' },
+                  { id: 'tunikabond', label: 'Tunikabond' },
+                  { id: 'alyukabond', label: 'Alyukabond' },
+                  { id: 'cornice', label: 'Karnizlar' },
+                  { id: 'roofing', label: 'Profnastil & Tom' }
+                ].map((t) => {
+                  const getProdCat = (p) => {
+                    const c = String(p?.category || '').toLowerCase().trim();
+                    if (c.includes('tunikabond') || c.includes('tunika')) return 'tunikabond';
+                    if (c.includes('alyukabond') || c.includes('alyuka') || c.includes('alukabond') || c.includes('alucobond')) return 'alyukabond';
+                    if (c.includes('cornice') || c.includes('karniz')) return 'cornice';
+                    if (c.includes('roofing') || c.includes('profnastil') || c.includes('tom')) return 'roofing';
+                    return c || 'tunikabond';
+                  };
+                  const count = t.id === 'all'
+                    ? productsList.length
+                    : productsList.filter(p => getProdCat(p) === t.id).length;
+                  const isActive = adminProductCat === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setAdminProductCat(t.id)}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'bg-brand-red text-white shadow-glow-red font-black'
+                          : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                      }`}
+                    >
+                      <span>{t.label}</span>
+                      <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-white/20' : 'bg-white/10'}`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {productsList.map((prod) => (
+                {productsList
+                  .filter((prod) => {
+                    if (adminProductCat === 'all') return true;
+                    const c = String(prod?.category || '').toLowerCase().trim();
+                    if (adminProductCat === 'tunikabond') return c.includes('tunikabond') || c.includes('tunika');
+                    if (adminProductCat === 'alyukabond') return c.includes('alyukabond') || c.includes('alyuka') || c.includes('alukabond') || c.includes('alucobond');
+                    if (adminProductCat === 'cornice') return c.includes('cornice') || c.includes('karniz');
+                    if (adminProductCat === 'roofing') return c.includes('roofing') || c.includes('profnastil') || c.includes('tom');
+                    return c === adminProductCat;
+                  })
+                  .map((prod) => (
                   <div key={prod.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40">
                     <div>
                       <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
@@ -1031,27 +1094,80 @@ export const AdminDashboard = ({
           {/* TAB 3: PORTFOLIO CRUD */}
           {activeTab === 'portfolio' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white">
                     Portfolio / Obyektlar ({portfolioList.length})
                   </h2>
                   <p className="text-xs text-slate-400">
-                    Bajarilgan ishlar galereyasiga loyiha qo'shish va yangilash
+                    Bajarilgan ishlar galereyasiga loyiha qo'shish va toifalar bo'yicha ko'rish
                   </p>
                 </div>
 
                 <button
                   onClick={handleOpenPortfolioCreate}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all self-start sm:self-auto"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Yangi loyiha qo'shish</span>
                 </button>
               </div>
 
+              {/* Portfolio Category Filter */}
+              <div className="flex flex-wrap items-center gap-2">
+                {[
+                  { id: 'all', label: 'Barchasi' },
+                  { id: 'naves', label: 'Naveslar' },
+                  { id: 'koziryok', label: 'Koziryoklar' },
+                  { id: 'darvozaxona', label: 'Darvozaxonalar' },
+                  { id: 'fasad', label: 'Fasadlar' },
+                  { id: 'cornices', label: 'Karniz va Shift' }
+                ].map((f) => {
+                  const getPortCat = (item) => {
+                    const c = String(item?.category || '').toLowerCase().trim();
+                    if (c.includes('naves')) return 'naves';
+                    if (c.includes('kozir')) return 'koziryok';
+                    if (c.includes('darvoza')) return 'darvozaxona';
+                    if (c.includes('fasad') || c.includes('tunikabond') || c.includes('alyukabond') || c.includes('residential') || c.includes('commercial')) return 'fasad';
+                    if (c.includes('cornice') || c.includes('karniz') || c.includes('shift')) return 'cornices';
+                    return c || 'naves';
+                  };
+                  const count = f.id === 'all'
+                    ? portfolioList.length
+                    : portfolioList.filter(item => getPortCat(item) === f.id).length;
+                  const isActive = adminPortfolioCat === f.id;
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => setAdminPortfolioCat(f.id)}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'bg-brand-red text-white shadow-glow-red font-black'
+                          : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                      }`}
+                    >
+                      <span>{f.label}</span>
+                      <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-white/20' : 'bg-white/10'}`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {portfolioList.map((item) => (
+                {portfolioList
+                  .filter((item) => {
+                    if (adminPortfolioCat === 'all') return true;
+                    const c = String(item?.category || '').toLowerCase().trim();
+                    if (adminPortfolioCat === 'naves') return c.includes('naves');
+                    if (adminPortfolioCat === 'koziryok') return c.includes('kozir');
+                    if (adminPortfolioCat === 'darvozaxona') return c.includes('darvoza');
+                    if (adminPortfolioCat === 'fasad') return c.includes('fasad') || c.includes('tunikabond') || c.includes('alyukabond') || c.includes('residential') || c.includes('commercial');
+                    if (adminPortfolioCat === 'cornices') return c.includes('cornice') || c.includes('karniz') || c.includes('shift');
+                    return c === adminPortfolioCat;
+                  })
+                  .map((item) => (
                   <div key={item.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10">
                     <div>
                       <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">

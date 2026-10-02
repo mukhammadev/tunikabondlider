@@ -3,21 +3,31 @@ import { products as defaultProducts } from '../data/products';
 import { Layers, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export const Products = ({ currentLang, t, onSelectProduct, items }) => {
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('tunikabond');
 
   const productsToUse = items && items.length > 0 ? items : defaultProducts;
 
-  const filteredProducts = activeTab === 'all'
-    ? productsToUse
-    : productsToUse.filter(p => p.category === activeTab);
+  const getProductCategory = (p) => {
+    const cat = String(p?.category || '').toLowerCase().trim();
+    if (cat.includes('tunikabond') || cat.includes('tunika')) return 'tunikabond';
+    if (cat.includes('alyukabond') || cat.includes('alyuka') || cat.includes('alukabond') || cat.includes('alucobond')) return 'alyukabond';
+    if (cat.includes('cornice') || cat.includes('karniz')) return 'cornice';
+    if (cat.includes('roofing') || cat.includes('profnastil') || cat.includes('tom')) return 'roofing';
+    return cat || 'tunikabond';
+  };
+
+  const filteredProducts = productsToUse.filter(p => getProductCategory(p) === activeTab);
 
   const tabs = [
-    { id: 'all', label: t.products.all },
-    { id: 'tunikabond', label: t.products.tunikabond },
-    { id: 'alyukabond', label: t.products.alyukabond },
-    { id: 'cornice', label: t.products.cornice },
-    { id: 'roofing', label: t.products.roofing },
+    { id: 'tunikabond', label: t.products?.tunikabond || "Tunikabond" },
+    { id: 'alyukabond', label: t.products?.alyukabond || "Alyukabond" },
+    { id: 'cornice', label: t.products?.cornice || "Karnizlar" },
+    { id: 'roofing', label: t.products?.roofing || "Profnastil & Tom" },
   ];
+
+  const getCategoryCount = (catId) => {
+    return productsToUse.filter(p => getProductCategory(p) === catId).length;
+  };
 
   return (
     <section id="products" className="py-24 relative overflow-hidden bg-brand-surface/30">
@@ -39,24 +49,46 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
 
         {/* Category Tabs */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm ${
-                activeTab === tab.id
-                  ? 'bg-brand-red text-white border-2 border-brand-red shadow-glow-red font-extrabold'
-                  : 'bg-white dark:bg-[#13192b] text-slate-800 dark:text-slate-100 hover:text-brand-red hover:border-brand-red/50 border-2 border-slate-200 dark:border-white/15'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {tabs.map((tab) => {
+            const count = getCategoryCount(tab.id);
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm flex items-center gap-2 ${
+                  isActive
+                    ? 'bg-brand-red text-white border-2 border-brand-red shadow-glow-red font-extrabold scale-105'
+                    : 'bg-white dark:bg-[#13192b] text-slate-800 dark:text-slate-100 hover:text-brand-red hover:border-brand-red/50 border-2 border-slate-200 dark:border-white/15'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Product Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product) => {
+          {filteredProducts.length === 0 ? (
+            <div className="col-span-full py-16 text-center glass-card rounded-3xl p-8 border border-white/10 max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand-red/10 border border-brand-red/20 flex items-center justify-center text-brand-red">
+                <Layers className="w-8 h-8" />
+              </div>
+              <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">
+                Hozircha mahsulotlar mavjud emas
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Ushbu toifaga yaqin orada yangi modellar qo'shiladi.
+              </p>
+            </div>
+          ) : (
+            filteredProducts.map((product) => {
             const name = typeof product.name === 'object' ? (product.name[currentLang] || product.name.uz) : product.name;
             const desc = typeof product.shortDesc === 'object' ? (product.shortDesc[currentLang] || product.shortDesc.uz) : product.shortDesc;
 
@@ -137,7 +169,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
 
               </div>
             );
-          })}
+          }))}
         </div>
 
       </div>
