@@ -143,14 +143,14 @@ export const Footer = ({ t, onNavigate }) => {
               
               {/* Direct Telegram Admin */}
               <a
-                href="https://t.me/Muhammadazez"
+                href="https://t.me/Mukhammad_azez"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-between p-2.5 rounded-xl bg-[#0088cc]/10 hover:bg-[#0088cc]/20 border border-[#29b6f6]/30 text-slate-900 dark:text-white transition-all text-xs font-semibold"
               >
                 <div className="flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-[#29b6f6]" />
-                  <span>Admin: @Muhammadazez</span>
+                  <span>Admin: @Mukhammad_azez</span>
                 </div>
                 <span className="text-[10px] bg-[#0088cc] px-2 py-0.5 rounded text-white font-bold">Yozish</span>
               </a>
@@ -163,7 +163,7 @@ export const Footer = ({ t, onNavigate }) => {
                 className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-200/60 hover:bg-brand-red/10 dark:bg-white/5 dark:hover:bg-brand-red/15 border border-slate-300 dark:border-white/10 hover:border-brand-red/40 text-slate-700 dark:text-slate-200 transition-all text-xs font-semibold"
               >
                 <Send className="w-4 h-4 text-brand-red" />
-                <span>Kanal: @tunikabondLiderkanali</span>
+                <span>Rasmiy Kanal: @tunikabondLiderkanali</span>
               </a>
 
               {/* Instagram */}

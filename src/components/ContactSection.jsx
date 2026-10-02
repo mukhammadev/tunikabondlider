@@ -178,7 +178,7 @@ export const ContactSection = ({ t }) => {
                     rel="noopener noreferrer"
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-800 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold shadow-sm"
                   >
-                    <span>Telegram Kanal</span>
+                    <span>Rasmiy Kanal</span>
                   </a>
                   <a
                     href="https://www.instagram.com/tunikabond_lider"

@@ -49,12 +49,58 @@ export default async function handler(req, res) {
         ],
         [
           { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+          { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+        ],
+        [
           { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
         ]
       ]
     };
 
-    const targets = [ADMIN_ID, OWNER_ID, CHANNEL_ID, "@tunikabondlider_uz"];
+    // 1. Send confirmation message directly to user if submitted via Telegram Mini App
+    const userChatId = data.telegramUserId || data.chatId || data.userId;
+    if (userChatId) {
+      const userConfirmHtml = 
+        `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
+        `📋 <b>Ariza ma'lumotlari:</b>\n` +
+        `👤 <b>Mijoz:</b> ${name || "Hurmatli mijoz"}\n` +
+        `📞 <b>Telefon:</b> <code>${phone}</code>\n` +
+        (service ? `🛠 <b>Xizmat / Mahsulot:</b> ${service}\n` : '') +
+        (calcData ? `📊 <b>Kalkulyator Hisobi:</b> ${calcData.area || '-'} m² (${calcData.cost || '-'})\n` : '') +
+        (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
+        `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
+        `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
+
+      const userMarkup = {
+        inline_keyboard: [
+          [
+            { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+            { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+          ],
+          [
+            { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
+          ]
+        ]
+      };
+
+      try {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: userChatId,
+            text: userConfirmHtml,
+            parse_mode: 'HTML',
+            reply_markup: userMarkup
+          })
+        });
+      } catch (e) {
+        console.warn("User confirmation send error:", e);
+      }
+    }
+
+    // 2. Dispatch to Admin, Owner, and Channels
+    const targets = [ADMIN_ID, OWNER_ID, CHANNEL_ID, "@tunikabondlider_uz", "@tunikabondLiderkanali"];
     for (const target of targets) {
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {

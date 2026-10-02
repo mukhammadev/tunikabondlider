@@ -80,7 +80,7 @@ export default async function handler(req, res) {
           },
           {
             text: "📢 Rasmiy Kanal",
-            url: "https://t.me/tunikabondlider_uz"
+            url: "https://t.me/tunikabondLiderkanali"
           }
         ],
         [
@@ -100,48 +100,210 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
-  // 2. User sends contact or message
-  const contactPhone = message.contact?.phone_number || '';
-  if (contactPhone || (text && !text.startsWith('/'))) {
-    // Acknowledge to user
-    const replyHtml = 
-      `Rahmat, <b>${escapeHtml(firstName)}</b>! ✅\n\n` +
-      `Xabaringiz qabul qilindi. Menejerimiz tez orada siz bilan bog‘lanadi.\n\n` +
-      `Katalog va xizmatlar bilan tanishish uchun quyidagi ilovadan foydalanishingiz mumkin:`;
+  // Helper buttons for user confirmation responses
+  const userConfirmMarkup = {
+    inline_keyboard: [
+      [
+        {
+          text: "🚀 Ilovani ochish (Katalog & Narxlar)",
+          web_app: { url: "https://tunikabondlider.vercel.app" }
+        }
+      ],
+      [
+        {
+          text: "🌐 Rasmiy sayt",
+          url: "https://tunikabondlider.vercel.app"
+        },
+        {
+          text: "📢 Rasmiy Kanal",
+          url: "https://t.me/tunikabondLiderkanali"
+        }
+      ],
+      [
+        {
+          text: "👨‍💼 Admin: @Mukhammad_azez",
+          url: "https://t.me/Mukhammad_azez"
+        }
+      ]
+    ]
+  };
 
-    const appMarkup = {
+  // 2. User submits via Telegram WebApp Data (Mini App sendData)
+  const webAppDataRaw = message.web_app_data?.data;
+  if (webAppDataRaw) {
+    let lead = {};
+    try {
+      lead = JSON.parse(webAppDataRaw);
+    } catch {
+      lead = { message: webAppDataRaw };
+    }
+
+    const leadName = lead.name || firstName;
+    const leadPhone = lead.phone || '';
+    const leadService = lead.service || lead.product || 'Tunikabond xizmatlari';
+    const leadCalc = lead.calcData;
+    const leadMsg = lead.message || '';
+    const cleanPhone = String(leadPhone).replace(/\D/g, '');
+    const callUrl = `https://tunikabondlider.vercel.app/call.html?tel=${cleanPhone || '998995333303'}`;
+    const tgUrl = `https://t.me/+${cleanPhone}`;
+
+    // A) Send confirmation to user with application details + "Siz bilan tez orada bog'lanamiz!"
+    const userConfirmHtml = 
+      `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
+      `📋 <b>Ariza ma'lumotlari:</b>\n` +
+      `👤 <b>Mijoz:</b> ${escapeHtml(leadName)}\n` +
+      (leadPhone ? `📞 <b>Telefon:</b> <code>${escapeHtml(leadPhone)}</code>\n` : '') +
+      `🛠 <b>Xizmat / Mahsulot:</b> ${escapeHtml(leadService)}\n` +
+      (leadCalc ? `📊 <b>Kalkulyator hisobi:</b> ${escapeHtml(String(leadCalc.area || '-'))} m² (${escapeHtml(String(leadCalc.cost || '-'))})\n` : '') +
+      (leadMsg ? `💬 <b>Qo'shimcha izoh:</b> ${escapeHtml(leadMsg)}\n` : '') +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
+      `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
+
+    await sendMessage(chatId, userConfirmHtml, userConfirmMarkup);
+
+    // B) Forward lead to Admin, Owner, and Channels
+    const leadNotification = 
+      `🔥 <b>YANGI ARIZA (Mini App orqali)</b> 🔥\n\n` +
+      `👤 <b>Mijoz:</b> ${escapeHtml(leadName)}\n` +
+      `📞 <b>Telefon:</b> <code>${escapeHtml(leadPhone || '-')}</code>\n` +
+      `🛠 <b>Xizmat:</b> ${escapeHtml(leadService)}\n` +
+      (leadCalc ? `📊 <b>Kalkulyator:</b> ${escapeHtml(String(leadCalc.area || '-'))} m² (${escapeHtml(String(leadCalc.cost || '-'))})\n` : '') +
+      (leadMsg ? `💬 <b>Izoh:</b> ${escapeHtml(leadMsg)}\n` : '') +
+      `🆔 <b>Telegram ID:</b> <code>${chatId}</code> ${username ? `(${username})` : ''}\n` +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
+      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
+
+    const channelMarkup = {
       inline_keyboard: [
         [
-          {
-            text: "🚀 Ilovani ochish (Katalog & Narxlar)",
-            web_app: { url: "https://tunikabondlider.vercel.app" }
-          }
+          { text: "📞 Telefon qilish", url: callUrl },
+          ...(cleanPhone ? [{ text: "💬 Telegramdan yozish", url: tgUrl }] : [])
+        ],
+        [
+          { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+          { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+        ],
+        [
+          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
         ]
       ]
     };
-    await sendMessage(chatId, replyHtml, appMarkup);
 
-    // Forward lead to admin & channel
+    await sendMessage(ADMIN_ID, leadNotification, channelMarkup);
+    if (OWNER_ID !== ADMIN_ID) await sendMessage(OWNER_ID, leadNotification, channelMarkup);
+    await sendMessage(CHANNEL_ID, leadNotification, channelMarkup);
+    await sendMessage("@tunikabondLiderkanali", leadNotification, channelMarkup);
+
+    return res.status(200).json({ ok: true });
+  }
+
+  // 3. User shares contact via Telegram contact button
+  const contactPhone = message.contact?.phone_number || '';
+  if (contactPhone) {
+    const contactName = [message.contact?.first_name, message.contact?.last_name].filter(Boolean).join(' ') || firstName;
+    const formattedPhone = contactPhone.startsWith('+') ? contactPhone : `+${contactPhone}`;
+    const cleanPhone = formattedPhone.replace(/\D/g, '');
+    const callUrl = `https://tunikabondlider.vercel.app/call.html?tel=${cleanPhone}`;
+    const tgUrl = `https://t.me/+${cleanPhone}`;
+
+    // A) Send confirmation to user with their details + "Siz bilan tez orada bog'lanamiz!"
+    const userConfirmHtml = 
+      `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
+      `📋 <b>Ariza ma'lumotlari:</b>\n` +
+      `👤 <b>Mijoz:</b> ${escapeHtml(contactName)}\n` +
+      `📞 <b>Telefon:</b> <code>${escapeHtml(formattedPhone)}</code>\n` +
+      `🛠 <b>Xizmat:</b> Bepul konsultatsiya va o‘lchash\n` +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
+      `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
+
+    await sendMessage(chatId, userConfirmHtml, userConfirmMarkup);
+
+    // B) Forward to Admin, Owner, Channel
     const adminNotification = 
-      `💬 <b>YANGI MUROJAAT (Telegram Bot)</b>\n\n` +
-      `👤 <b>Foydalanuvchi:</b> ${escapeHtml(firstName)} ${username}\n` +
-      (contactPhone ? `📞 <b>Telefon:</b> <code>${contactPhone}</code>\n` : '') +
+      `🔥 <b>YANGI ARIZA (Kontakt ulashildi)</b> 🔥\n\n` +
+      `👤 <b>Mijoz:</b> ${escapeHtml(contactName)} ${username ? `(${username})` : ''}\n` +
+      `📞 <b>Telefon:</b> <code>${formattedPhone}</code>\n` +
       `🆔 <b>Chat ID:</b> <code>${chatId}</code>\n` +
-      `💬 <b>Xabar:</b> ${escapeHtml(text || 'Kontakt ulashildi')}\n` +
-      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}`;
+      `📍 <b>Manba:</b> Telegram Bot Kontakt\n` +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
+      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
 
     const adminMarkup = {
       inline_keyboard: [
         [
-          { text: "💬 Foydalanuvchiga yozish", url: username ? `https://t.me/${username.replace('@', '')}` : `tg://user?id=${chatId}` }
+          { text: "📞 Telefon qilish", url: callUrl },
+          { text: "💬 Telegramdan yozish", url: tgUrl }
+        ],
+        [
+          { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+          { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+        ],
+        [
+          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
         ]
       ]
     };
+
     await sendMessage(ADMIN_ID, adminNotification, adminMarkup);
-    if (OWNER_ID !== ADMIN_ID) {
-      await sendMessage(OWNER_ID, adminNotification, adminMarkup);
-    }
-    await sendMessage(CHANNEL_ID, adminNotification);
+    if (OWNER_ID !== ADMIN_ID) await sendMessage(OWNER_ID, adminNotification, adminMarkup);
+    await sendMessage(CHANNEL_ID, adminNotification, adminMarkup);
+    await sendMessage("@tunikabondLiderkanali", adminNotification, adminMarkup);
+
+    return res.status(200).json({ ok: true });
+  }
+
+  // 4. User sends a text message or phone number
+  if (text && !text.startsWith('/')) {
+    const phoneMatch = text.match(/(?:\+?998[\s-]?)?[0-9]{2}[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}|[0-9]{9,12}/);
+    const extractedPhone = phoneMatch ? phoneMatch[0] : '';
+    const cleanPhone = extractedPhone ? extractedPhone.replace(/\D/g, '') : '';
+    const callUrl = cleanPhone ? `https://tunikabondlider.vercel.app/call.html?tel=${cleanPhone}` : '';
+    const tgUrl = cleanPhone ? `https://t.me/+${cleanPhone}` : '';
+
+    // A) Send confirmation to user with application details + "Siz bilan tez orada bog'lanamiz!"
+    const userConfirmHtml = 
+      `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
+      `📋 <b>Ariza ma'lumotlari:</b>\n` +
+      `👤 <b>Mijoz:</b> ${escapeHtml(firstName)} ${username ? `(${escapeHtml(username)})` : ''}\n` +
+      (extractedPhone ? `📞 <b>Telefon:</b> <code>${escapeHtml(extractedPhone)}</code>\n` : '') +
+      `💬 <b>Murojaat mazmuni:</b> ${escapeHtml(text)}\n` +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
+      `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
+
+    await sendMessage(chatId, userConfirmHtml, userConfirmMarkup);
+
+    // B) Forward lead to Admin, Owner, Channel
+    const adminNotification = 
+      `💬 <b>YANGI MUROJAAT (Telegram Bot)</b>\n\n` +
+      `👤 <b>Foydalanuvchi:</b> ${escapeHtml(firstName)} ${username ? `(${username})` : ''}\n` +
+      (extractedPhone ? `📞 <b>Telefon:</b> <code>${extractedPhone}</code>\n` : '') +
+      `🆔 <b>Chat ID:</b> <code>${chatId}</code>\n` +
+      `💬 <b>Xabar:</b> ${escapeHtml(text)}\n` +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
+      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
+
+    const adminMarkup = {
+      inline_keyboard: [
+        [
+          ...(callUrl ? [{ text: "📞 Telefon qilish", url: callUrl }] : []),
+          { text: "💬 Foydalanuvchiga yozish", url: username ? `https://t.me/${username.replace('@', '')}` : `tg://user?id=${chatId}` }
+        ],
+        [
+          { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+          { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+        ],
+        [
+          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
+        ]
+      ]
+    };
+
+    await sendMessage(ADMIN_ID, adminNotification, adminMarkup);
+    if (OWNER_ID !== ADMIN_ID) await sendMessage(OWNER_ID, adminNotification, adminMarkup);
+    await sendMessage(CHANNEL_ID, adminNotification, adminMarkup);
+    await sendMessage("@tunikabondLiderkanali", adminNotification, adminMarkup);
+
+    return res.status(200).json({ ok: true });
   }
 
   return res.status(200).json({ ok: true });

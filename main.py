@@ -756,6 +756,7 @@ def send_telegram_notification(lead_data):
             {"text": "🚀 Ilovani ochish (Mini App)", "web_app": {"url": "https://tunikabondlider.vercel.app"}}
         ] if is_private else [
             {"text": "🌐 Rasmiy sayt", "url": "https://tunikabondlider.vercel.app"},
+            {"text": "📢 Rasmiy Kanal", "url": "https://t.me/tunikabondLiderkanali"},
             {"text": "👨‍💼 Admin: @Mukhammad_azez", "url": "https://t.me/Mukhammad_azez"}
         ]
         reply_markup = {

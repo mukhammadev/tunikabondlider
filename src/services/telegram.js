@@ -11,6 +11,7 @@ export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
   botUsername: "tunikabondlider_rasmiy_bot",
   adminUsername: "Mukhammad_azez",
+  channelLink: "https://t.me/tunikabondLiderkanali",
   recipients: [
     {
       id: "1003939636",
@@ -27,6 +28,12 @@ export const DEFAULT_TELEGRAM_CONFIG = {
     {
       id: "@tunikabondlider_uz",
       label: "Rasmiy Kanal (@tunikabondlider_uz)",
+      type: "channel",
+      enabled: true
+    },
+    {
+      id: "@tunikabondLiderkanali",
+      label: "Asosiy Kanal (@tunikabondLiderkanali)",
       type: "channel",
       enabled: true
     }
@@ -327,8 +334,11 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
             ]
           : [
               { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
-              { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
-            ]
+              { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+            ],
+        [
+          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
+        ]
       ]
     };
 
@@ -418,6 +428,43 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
   const results = await Promise.allSettled(dispatchPromises);
   const anySuccess = results.some(r => r.status === 'fulfilled' && r.value?.ok);
 
+  // If lead came from a Telegram user (Mini App), send them direct confirmation with application details
+  if (leadData.telegramUserId) {
+    const userConfirmHtml = 
+      `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
+      `📋 <b>Ariza ma'lumotlari:</b>\n` +
+      `👤 <b>Mijoz:</b> ${leadData.name || 'Hurmatli mijoz'}\n` +
+      `📞 <b>Telefon:</b> <code>${leadData.phone || '-'}</code>\n` +
+      (leadData.service ? `🛠 <b>Xizmat / Mahsulot:</b> ${leadData.service}\n` : '') +
+      (leadData.calcData ? `📊 <b>Kalkulyator Hisobi:</b> ${leadData.calcData.area || '-'} m² (${leadData.calcData.cost || '-'})\n` : '') +
+      (leadData.message ? `💬 <b>Qo'shimcha izoh:</b> ${leadData.message}\n` : '') +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
+      `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
+
+    const userMarkup = {
+      inline_keyboard: [
+        [
+          { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+          { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
+        ],
+        [
+          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
+        ]
+      ]
+    };
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: leadData.telegramUserId,
+        text: userConfirmHtml,
+        parse_mode: 'HTML',
+        reply_markup: userMarkup
+      })
+    }).catch(e => console.warn('User direct confirmation error:', e));
+  }
+
   return {
     success: anySuccess,
     results: results.map((r, i) => ({
@@ -433,11 +480,19 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
  * Validates, formats, logs to localStorage, and immediately dispatches to Telegram bot/channel.
  */
 export const submitLead = async (leadData) => {
+  const tgUser = (typeof window !== 'undefined' && window.Telegram?.WebApp?.initDataUnsafe?.user) || null;
+  const telegramUserId = leadData.telegramUserId || tgUser?.id || null;
+  const telegramUsername = leadData.telegramUsername || tgUser?.username || null;
+  const telegramFirstName = leadData.telegramFirstName || tgUser?.first_name || null;
+
   const now = new Date().toISOString();
   const standardizedLead = {
     id: leadData.id || `lead-${Date.now()}`,
     timestamp: leadData.timestamp || now,
     ...leadData,
+    telegramUserId,
+    telegramUsername,
+    telegramFirstName,
     status: (leadData.status && ['new', 'in_progress', 'completed', 'cancelled'].includes(leadData.status))
       ? leadData.status
       : 'new',
@@ -468,7 +523,7 @@ export const submitLead = async (leadData) => {
 
   // 4. Forward to local backend API if available
   try {
-    fetch('/api/leads/', {
+    fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(standardizedLead)
