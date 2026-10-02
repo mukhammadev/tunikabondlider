@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mijozga qo'ng'iroq qilish — Tunikabond Lider</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0b0d10;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: #14171d;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 36px 24px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+    .icon {
+      width: 68px;
+      height: 68px;
+      background: rgba(220, 38, 38, 0.15);
+      border: 1px solid rgba(220, 38, 38, 0.35);
+      color: #ef4444;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      font-size: 30px;
+    }
+    h1 { font-size: 20px; font-weight: 800; margin-bottom: 6px; color: #fff; }
+    p { font-size: 13px; color: #94a3b8; margin-bottom: 20px; }
+    .phone {
+      font-family: monospace;
+      font-size: 22px;
+      font-weight: 900;
+      color: #38bdf8;
+      background: rgba(255,255,255,0.06);
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      display: inline-block;
+      letter-spacing: 1px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .btn-call {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.35);
+    }
+    .btn-call:active { transform: scale(0.98); }
+    .btn-tg {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .btn-back {
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">📞</div>
+    <h1>Mijozga qo'ng'iroq</h1>
+    <p>Telefon terish oynasi ochilmoqda...</p>
+    <div class="phone" id="phoneDisplay">...</div>
+
+    <a href="#" class="btn btn-call" id="callBtn">📞 Qo'ng'iroq qilish</a>
+    <a href="#" class="btn btn-tg" id="tgBtn">💬 Telegramdan yozish</a>
+    <a href="/" class="btn btn-back">⬅️ Saytni ochish</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const rawTel = params.get('tel') || '';
+    const cleanTel = rawTel.replace(/\D/g, '');
+    const formattedTel = rawTel.startsWith('+') ? rawTel : ('+' + rawTel);
+
+    if (rawTel) {
+      document.getElementById('phoneDisplay').textContent = formattedTel;
+      document.getElementById('callBtn').href = 'tel:' + formattedTel;
+      document.getElementById('tgBtn').href = 'https://t.me/+' + cleanTel;
+      
+      // Auto-open phone dialer
+      setTimeout(() => {
+        window.location.href = 'tel:' + formattedTel;
+      }, 200);
+    } else {
+      document.getElementById('phoneDisplay').textContent = "Raqam ko'rsatilmadi";
+    }
+  </script>
+</body>
+</html>

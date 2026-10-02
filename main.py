@@ -30,7 +30,7 @@ CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003209002534,1003939636")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6481310196,-1003209002534,1003939636")
 
 ACTIVE_TOKENS = {}  # token -> admin_info
 
@@ -744,21 +744,30 @@ def send_telegram_notification(lead_data):
     if not chat_ids:
         return False
 
-    reply_markup = {
-        "inline_keyboard": [
-            [
-                {"text": "💬 Mijozga yozish", "url": f"https://t.me/+{clean_phone}"} if clean_phone else {"text": "👨‍💼 Mas'ul", "url": "https://t.me/Mukhammad_azez"},
-                {"text": "👨‍💼 Admin: @Mukhammad_azez", "url": "https://t.me/Mukhammad_azez"}
-            ],
-            [
-                {"text": "🌐 Saytga o'tish", "url": "https://tunikabondlider.uz"}
-            ]
-        ]
-    }
+    call_url = f"https://tunikabondlider.vercel.app/call.html?tel={clean_phone or '998995333303'}"
+    tg_url = f"https://t.me/+{clean_phone}"
 
     any_success = False
     for chat_id in chat_ids:
         sent = False
+        is_private = not chat_id.startswith("-")
+        row2 = [
+            {"text": "🚀 Ilovani ochish (Mini App)", "web_app": {"url": "https://tunikabondlider.vercel.app"}}
+        ] if is_private else [
+            {"text": "🌐 Saytni ochish", "url": "https://tunikabondlider.vercel.app"},
+            {"text": "👨‍💼 Admin: @mukhammadew", "url": "https://t.me/mukhammadew"}
+        ]
+        reply_markup = {
+            "inline_keyboard": [
+                [
+                    {"text": "📞 Telefon qilish", "url": call_url},
+                    {"text": "💬 Telegramdan yozish", "url": tg_url}
+                ] if clean_phone else [
+                    {"text": "📞 Qo'ng'iroq", "url": call_url}
+                ],
+                row2
+            ]
+        }
         # Try sending with Photo if local file exists
         if photo_url and photo_url.startswith("/uploads/"):
             fname = photo_url.replace("/uploads/", "")

@@ -10,8 +10,14 @@ export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config';
 export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4",
   botUsername: "tunikabondlider_bot",
-  adminUsername: "Mukhammad_azez",
+  adminUsername: "mukhammadew",
   recipients: [
+    {
+      id: "6481310196",
+      label: "Bosh Menejer Bot Lichkasi (@mukhammadew)",
+      type: "user",
+      enabled: true
+    },
     {
       id: "-1003209002534",
       label: "Telegram Kanal (Tunikabond Lider)",
@@ -20,7 +26,7 @@ export const DEFAULT_TELEGRAM_CONFIG = {
     },
     {
       id: "1003939636",
-      label: "Alohida Arizalar Akkounti (@Mukhammad_azez)",
+      label: "Menejer Muhammadaziz (@Mukhammad_azez)",
       type: "user",
       enabled: true
     }
@@ -144,11 +150,14 @@ export const testTelegramRecipient = async (botToken, chatId) => {
     `Ushbu chatga saytdan tushgan barcha arizalar to'g'ridan-to'g'ri yetkaziladi.\n\n` +
     `⏰ <b>Sinov vaqti:</b> ${now}`;
 
+  const isPrivate = !String(chatId).trim().startsWith('-');
   const replyMarkup = {
     inline_keyboard: [
+      isPrivate
+        ? [{ text: "🚀 Ilovani ochish (Mini App)", web_app: { url: "https://tunikabondlider.vercel.app" } }]
+        : [{ text: "🌐 Saytni ochish", url: "https://tunikabondlider.vercel.app" }],
       [
-        { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" },
-        { text: "🌐 Saytga o'tish", url: "https://tunikabondlider.uz" }
+        { text: "👨‍💼 Admin: @mukhammadew", url: "https://t.me/mukhammadew" }
       ]
     ]
   };
@@ -193,21 +202,29 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
 
   const htmlText = formatLeadHtml(leadData);
   const cleanPhone = (leadData.phone || '').replace(/\D/g, '');
-
-  const replyMarkup = {
-    inline_keyboard: [
-      [
-        ...(cleanPhone ? [{ text: "💬 Mijozga yozish", url: `https://t.me/+${cleanPhone}` }] : []),
-        { text: "👨‍💼 Mas'ul: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
-      ],
-      [
-        { text: "🌐 Tunikabond Lider Sayti", url: "https://tunikabondlider.uz" }
-      ]
-    ]
-  };
+  const callUrl = `https://tunikabondlider.vercel.app/call.html?tel=${cleanPhone || '998995333303'}`;
+  const tgUrl = `https://t.me/+${cleanPhone}`;
 
   const dispatchPromises = activeRecipients.map(async (recipient) => {
     const chatId = String(recipient.id).trim();
+    const isPrivate = recipient.type === 'user' || !chatId.startsWith('-');
+
+    const replyMarkup = {
+      inline_keyboard: [
+        [
+          { text: "📞 Telefon qilish", url: callUrl },
+          ...(cleanPhone ? [{ text: "💬 Telegramdan yozish", url: tgUrl }] : [])
+        ],
+        isPrivate
+          ? [
+              { text: "🚀 Ilovani ochish (Mini App)", web_app: { url: "https://tunikabondlider.vercel.app" } }
+            ]
+          : [
+              { text: "🌐 Saytni ochish", url: "https://tunikabondlider.vercel.app" },
+              { text: "👨‍💼 Admin: @mukhammadew", url: "https://t.me/mukhammadew" }
+            ]
+      ]
+    };
 
     // 1. If photo attached and is a valid web URL, try sendPhoto first
     if (leadData.photoUrl && leadData.photoUrl.startsWith('http')) {
