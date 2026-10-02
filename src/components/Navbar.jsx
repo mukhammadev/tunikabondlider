@@ -61,17 +61,17 @@ export const Navbar = ({
             <button
               type="button"
               onClick={() => handleLinkClick('home')}
-              className="flex items-center gap-2 group shrink-0 text-left cursor-pointer"
+              className="flex items-center gap-2.5 group shrink-0 text-left cursor-pointer"
             >
-              <div className={`w-8 h-8 rounded-lg border border-brand-red/50 p-1 flex items-center justify-center group-hover:border-brand-red transition-all ${isLight ? 'bg-black/5' : 'bg-white/8'}`}>
-                <img src="/favi.svg" alt="Logo" className="w-full h-full object-contain" />
+              <div className="w-9 h-9 rounded-xl overflow-hidden border border-brand-red/40 p-0.5 flex items-center justify-center group-hover:border-brand-red transition-all bg-white shadow-sm shrink-0">
+                <img src="/brand-logo.jpg" alt="TL Tunikabond Lider" className="w-full h-full object-contain" />
               </div>
               <div className="leading-none">
                 <span className={`block font-display font-extrabold text-sm tracking-wide whitespace-nowrap group-hover:text-brand-red transition-colors ${isLight ? 'text-slate-900' : 'text-white'}`}>
                   TUNIKABOND <span className="text-brand-red">LIDER</span>
                 </span>
-                <span className={`hidden xl:block text-[9px] uppercase tracking-[0.15em] font-medium mt-0.5 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-                  Fasad &amp; Tom
+                <span className={`hidden xl:block text-[9px] uppercase tracking-[0.12em] font-medium mt-0.5 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
+                  Ibragimov &amp; Partners
                 </span>
               </div>
             </button>
