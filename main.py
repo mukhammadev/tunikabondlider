@@ -719,7 +719,7 @@ def send_telegram_notification(lead_data):
     text += f"👤 <b>Mijoz:</b> {name}\n"
     text += f"📞 <b>Telefon:</b> <code>{html.escape(phone)}</code>\n"
     text += f"🛠 <b>Xizmat/Mahsulot:</b> {service}\n"
-    text += f"👨‍💼 <b>Mas'ul Admin:</b> @Mukhammad_azez\n"
+    text += f"👨‍💼 <b>Mas'ul Admin:</b> @mukhammadew\n"
 
     if calc:
         text += f"\n📊 <b>Kalkulyator Hisobi:</b>\n"

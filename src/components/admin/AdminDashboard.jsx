@@ -1651,7 +1651,7 @@ export const AdminDashboard = ({
                   <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
                     <span className="flex items-center gap-1.5">
                       <UserCheck className="w-4 h-4 text-emerald-400" />
-                      Mas'ul admin: <strong className="text-white">@Mukhammad_azez</strong>
+                      Mas'ul admin: <strong className="text-white">@mukhammadew</strong>
                     </span>
                     <span className="text-slate-500 font-mono text-[11px]">
                       Format: HTML (Xatosiz yetkazish kafolatlangan)
@@ -1818,7 +1818,7 @@ export const AdminDashboard = ({
                     <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">2</div>
                     <h4 className="font-bold text-white">Chat ID ni aniqlash</h4>
                     <p className="text-slate-400">
-                      O'zingizning Telegram raqamli ID raqamingizni bilish uchun Telegramda <a href="https://t.me/userinfobot" target="_blank" rel="noreferrer" className="text-sky-400 underline font-bold">@userinfobot</a> ga kirsangiz, u sizga raqamli IDingizni beradi (masalan: <code>1003939636</code>).
+                      O'zingizning Telegram raqamli ID raqamingizni bilish uchun Telegramda <a href="https://t.me/userinfobot" target="_blank" rel="noreferrer" className="text-sky-400 underline font-bold">@userinfobot</a> ga kirsangiz, u sizga raqamli IDingizni beradi (masalan: <code>6481310196</code>).
                     </p>
                   </div>
 
@@ -2858,7 +2858,7 @@ export const AdminDashboard = ({
                   required
                   value={newRecipientForm.id}
                   onChange={(e) => setNewRecipientForm({ ...newRecipientForm, id: e.target.value })}
-                  placeholder="Masalan: 1003939636 yoki -1004415750690"
+                  placeholder="Masalan: 6481310196 yoki -1004415750690"
                   className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">
