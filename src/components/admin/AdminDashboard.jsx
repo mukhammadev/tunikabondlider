@@ -1598,7 +1598,7 @@ export const AdminDashboard = ({
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Rasmiy Bot</span>
-                      <span className="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">@tunikabondlider_bot</span>
+                      <span className="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">@tunikabondlider_rasmiy_bot</span>
                     </div>
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
@@ -1615,7 +1615,7 @@ export const AdminDashboard = ({
                   </div>
 
                   <a
-                    href="https://t.me/tunikabondlider_bot"
+                    href="https://t.me/tunikabondlider_rasmiy_bot"
                     target="_blank"
                     rel="noreferrer"
                     className="mt-4 w-full py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 border border-sky-500/30 transition-colors"
@@ -1643,7 +1643,7 @@ export const AdminDashboard = ({
                       type="text"
                       value={telegramConfig.botToken || ''}
                       onChange={(e) => setTelegramConfig({ ...telegramConfig, botToken: e.target.value.trim() })}
-                      placeholder="Masalan: 8160493029:AAHA..."
+                      placeholder="Masalan: 8697018482:AAFw..."
                       className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-xs sm:text-sm focus:outline-none focus:border-brand-red transition-colors"
                     />
                   </div>
@@ -1744,12 +1744,12 @@ export const AdminDashboard = ({
                                     </span>
                                     {testStatus.error?.includes("bot can't initiate conversation") && (
                                       <a
-                                        href="https://t.me/tunikabondlider_bot"
+                                        href="https://t.me/tunikabondlider_rasmiy_bot"
                                         target="_blank"
                                         rel="noreferrer"
                                         className="text-sky-400 underline font-bold text-[11px]"
                                       >
-                                        Iltimos, @tunikabondlider_bot ga kirib bir marta Start bosing &rarr;
+                                        Iltimos, @tunikabondlider_rasmiy_bot ga kirib bir marta Start bosing &rarr;
                                       </a>
                                     )}
                                   </div>
@@ -1810,7 +1810,7 @@ export const AdminDashboard = ({
                     <div className="w-7 h-7 rounded-lg bg-brand-red/20 text-brand-red flex items-center justify-center font-bold">1</div>
                     <h4 className="font-bold text-white">Shaxsiy akkauntga ulash</h4>
                     <p className="text-slate-400">
-                      Telegram qoidasiga ko'ra, bot shaxsga birinchi bo'lib yoza olmaydi. Shuning uchun menejer avval <a href="https://t.me/tunikabondlider_bot" target="_blank" rel="noreferrer" className="text-sky-400 underline font-bold">@tunikabondlider_bot</a> ga kirib <strong>Start</strong> tugmasini bosishi shart.
+                      Telegram qoidasiga ko'ra, bot shaxsga birinchi bo'lib yoza olmaydi. Shuning uchun menejer avval <a href="https://t.me/tunikabondlider_rasmiy_bot" target="_blank" rel="noreferrer" className="text-sky-400 underline font-bold">@tunikabondlider_rasmiy_bot</a> ga kirib <strong>Start</strong> tugmasini bosishi shart.
                     </p>
                   </div>
 
@@ -1826,7 +1826,7 @@ export const AdminDashboard = ({
                     <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">3</div>
                     <h4 className="font-bold text-white">Guruhga ulash</h4>
                     <p className="text-slate-400">
-                      Telegramda yangi guruh ochib, unga <strong className="text-white">@tunikabondlider_bot</strong> ni va barcha ustalarni qo'shing. Botga admin bering va guruh ID sini (odatda -100 bilan boshlanadi) ro'yxatga qo'shing.
+                      Telegramda yangi guruh ochib, unga <strong className="text-white">@tunikabondlider_rasmiy_bot</strong> ni va barcha ustalarni qo'shing. Botga admin bering va guruh ID sini (odatda -100 bilan boshlanadi) ro'yxatga qo'shing.
                     </p>
                   </div>
                 </div>

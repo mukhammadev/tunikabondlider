@@ -5,11 +5,11 @@ import { cloudPushLead } from './api.js';
  * Sends leads to Telegram channel, dedicated personal account, and any configured recipients.
  */
 
-export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v3';
+export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v4';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
-  botToken: "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4",
-  botUsername: "tunikabondlider_bot",
+  botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
+  botUsername: "tunikabondlider_rasmiy_bot",
   adminUsername: "mukhammadew",
   recipients: [
     {
