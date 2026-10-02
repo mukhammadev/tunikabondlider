@@ -89,18 +89,18 @@ export const ContactSection = ({ t }) => {
                       Telegram Admin & Menejer
                     </span>
                     <a 
-                      href="https://t.me/Muhammadazez" 
+                      href="https://t.me/Mukhammad_azez" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="font-display font-black text-base text-slate-900 dark:text-white hover:text-brand-red transition-colors flex items-center gap-1.5"
                     >
-                      <span>@Muhammadazez</span>
+                      <span>@Mukhammad_azez</span>
                     </a>
                   </div>
                 </div>
 
                 <a
-                  href="https://t.me/Muhammadazez"
+                  href="https://t.me/Mukhammad_azez"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3.5 py-1.5 rounded-xl bg-[#0088cc] hover:bg-[#0077b5] text-white text-xs font-bold transition-all shadow-sm"

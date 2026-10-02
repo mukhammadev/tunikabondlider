@@ -177,7 +177,7 @@ export default async function handler(req, res) {
       inline_keyboard: [
         [
           { text: "📞 Telefon qilish", url: callUrl },
-          ...(cleanPhone ? [{ text: "💬 Telegramdan yozish", url: tgUrl }] : [])
+          { text: "💬 Telegramdan yozish", url: "https://t.me/Mukhammad_azez" }
         ],
         [
           { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
@@ -232,7 +232,7 @@ export default async function handler(req, res) {
       inline_keyboard: [
         [
           { text: "📞 Telefon qilish", url: callUrl },
-          { text: "💬 Telegramdan yozish", url: tgUrl }
+          { text: "💬 Telegramdan yozish", url: "https://t.me/Mukhammad_azez" }
         ],
         [
           { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },

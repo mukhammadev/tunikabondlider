@@ -6,11 +6,11 @@ export const QuickActions = () => {
     <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3.5">
       {/* Telegram Button - WIGGLING & BOUNCING JUST LIKE PHONE */}
       <a
-        href="https://t.me/Muhammadazez"
+        href="https://t.me/Mukhammad_azez"
         target="_blank"
         rel="noopener noreferrer"
         className="group relative w-14 h-14 rounded-full bg-gradient-to-tr from-[#0088cc] to-[#29b6f6] text-white flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all shadow-[#0088cc]/50 animate-bounce"
-        aria-label="Telegram orqali bog'lanish: @Muhammadazez"
+        aria-label="Telegram orqali bog'lanish: @Mukhammad_azez"
       >
         <Send className="w-6 h-6 ml-[-2px] mt-[1px] group-hover:rotate-12 transition-transform" />
         

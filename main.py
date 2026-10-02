@@ -763,9 +763,7 @@ def send_telegram_notification(lead_data):
             "inline_keyboard": [
                 [
                     {"text": "📞 Telefon qilish", "url": call_url},
-                    {"text": "💬 Telegramdan yozish", "url": tg_url}
-                ] if clean_phone else [
-                    {"text": "📞 Qo'ng'iroq", "url": call_url}
+                    {"text": "💬 Telegramdan yozish", "url": "https://t.me/Mukhammad_azez"}
                 ],
                 row2
             ]
