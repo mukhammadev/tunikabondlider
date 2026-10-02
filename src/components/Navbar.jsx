@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Menu, X, Calculator, Layers, Info, HelpCircle, Lock, Shield, Sun, Moon, Home, Compass } from 'lucide-react';
+import { Phone, Menu, X, Layers, Info, HelpCircle, Lock, Shield, Sun, Moon, Home, Compass } from 'lucide-react';
 
 export const Navbar = ({ 
   currentLang, 
@@ -24,7 +24,6 @@ export const Navbar = ({
 
   const navLinks = [
     { id: 'home',       label: t.nav.home || "Bosh sahifa",       icon: Home },
-    { id: 'calculator', label: t.nav.calculator || "Kalkulyator", icon: Calculator },
     { id: 'products',   label: t.nav.products || "Katalog",       icon: Layers },
     { id: 'portfolio',  label: t.nav.portfolio || "Loyihalar",    icon: Compass },
     { id: 'about',      label: t.nav.about || "Biz haqimizda",    icon: Info },

@@ -62,15 +62,6 @@ export const Footer = ({ t, onNavigate }) => {
               <li>
                 <button
                   type="button"
-                  onClick={() => handleNav('calculator')}
-                  className="hover:text-brand-red transition-colors text-left cursor-pointer"
-                >
-                  {t.nav.calculator}
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
                   onClick={() => handleNav('products')}
                   className="hover:text-brand-red transition-colors text-left cursor-pointer"
                 >

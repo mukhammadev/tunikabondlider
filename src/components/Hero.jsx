@@ -33,18 +33,8 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleCalcClick = (e) => {
-    e.preventDefault();
-    if (onNavigate) {
-      onNavigate('calculator');
-    } else {
-      const el = document.getElementById('calculator');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const handleCatalogClick = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (onNavigate) {
       onNavigate('products');
     } else {
@@ -65,7 +55,6 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
         <div className="text-center max-w-4xl mx-auto">
           
 
-
           {/* Main Headline */}
           <h1 className="font-display font-extrabold text-3xl sm:text-5xl md:text-6xl text-slate-900 dark:text-white tracking-tight leading-[1.15] mb-6">
             {t.hero.titleStart}{' '}
@@ -84,24 +73,24 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <button
               type="button"
-              onClick={handleCalcClick}
+              onClick={handleCatalogClick}
               className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-bold text-base shadow-glow-red hover:shadow-glow-red-lg hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               {/* Metallic specular light sweep */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
-              <span>{t.hero.ctaCalculate}</span>
+              <span>{t.hero.ctaCatalog || "Mahsulotlar Katalogi"}</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
 
             <button
               type="button"
-              onClick={handleCatalogClick}
+              onClick={() => onOpenLeadModal ? onOpenLeadModal("Bepul o'lchash va konsultatsiya") : handleCatalogClick()}
               className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white dark:bg-[#13192b] hover:bg-slate-50 dark:hover:bg-[#19223a] border-2 border-slate-300 dark:border-white/20 hover:border-brand-red dark:hover:border-brand-red text-slate-900 dark:text-white font-extrabold text-base shadow-lg shadow-black/5 dark:shadow-black/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <div className="w-7 h-7 rounded-lg bg-brand-red/15 dark:bg-brand-red/25 text-brand-red flex items-center justify-center shrink-0 group-hover:bg-brand-red group-hover:text-white transition-colors">
                 <Building2 className="w-4 h-4" />
               </div>
-              <span>{t.hero.ctaCatalog}</span>
+              <span>Bepul O'lchash & Konsultatsiya</span>
             </button>
           </div>
 

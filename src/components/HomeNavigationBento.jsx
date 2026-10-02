@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Calculator, 
   Layers, 
   Sparkles, 
   ArrowRight, 
@@ -16,39 +15,27 @@ import {
 export const HomeNavigationBento = ({ t, onNavigate }) => {
   const cards = [
     {
-      id: 'calculator',
-      title: "Interaktiv Kalkulyator",
-      subtitle: "Bino hajmini kiriting va fasad yoki tom narxini, kerakli material miqdorini 1 daqiqada onlayn hisoblang.",
-      badge: "Onlayn hisoblagich",
+      id: 'products',
+      title: "Tunikabond & Alyukabond Katalogi",
+      subtitle: "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, 30+ ranglar va karniz turlari.",
+      badge: "To'g'ridan-to'g'ri ishlab chiqaruvchi",
       badgeColor: "bg-brand-red/10 text-brand-red border-brand-red/30",
-      icon: Calculator,
-      ctaText: "Narxni hisoblash",
+      icon: Layers,
+      ctaText: "Katalogni ko'rish",
       gradient: "from-brand-red/20 via-transparent to-transparent",
       accentBorder: "group-hover:border-brand-red/50",
       featured: true,
     },
     {
-      id: 'products',
-      title: "Mahsulotlar & 30+ Ranglar",
-      subtitle: "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari hamda karniz turlari.",
-      badge: "Sifatli materiallar",
-      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/30",
-      icon: Layers,
-      ctaText: "Katalogni ko'rish",
-      gradient: "from-blue-500/15 via-transparent to-transparent",
-      accentBorder: "group-hover:border-blue-500/50",
-      featured: false,
-    },
-    {
       id: 'portfolio',
       title: "2000+ Bajarilgan Loyihalar",
-      subtitle: "Bajarilgan obyektlar fotogalereyasi va tajribali professional ustalar jamoasi.",
+      subtitle: "Naveslar, fasadlar, darvozaxonalar va karnizlar bo'yicha tayyor obyektlar fotogalereyasi.",
       badge: "Tayyor ishlar",
-      badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
+      badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/30",
       icon: Compass,
       ctaText: "Galereyani ko'rish",
-      gradient: "from-emerald-500/15 via-transparent to-transparent",
-      accentBorder: "group-hover:border-emerald-500/50",
+      gradient: "from-blue-500/15 via-transparent to-transparent",
+      accentBorder: "group-hover:border-blue-500/50",
       featured: false,
     },
     {
@@ -65,7 +52,7 @@ export const HomeNavigationBento = ({ t, onNavigate }) => {
     },
     {
       id: 'contact',
-      title: "24/7 Aloqa & Ustaxona Manzili",
+      title: "24/7 Aloqa & Bepul O'lchash",
       subtitle: "Siz uchun to'xtovsiz xizmatdamiz! Bepul o'lchovga buyurtma bering yoki ustaxonamiz xaritasini ko'ring.",
       badge: "To'xtovsiz xizmat",
       badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
@@ -96,17 +83,16 @@ export const HomeNavigationBento = ({ t, onNavigate }) => {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {cards.map((card, index) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+          {cards.map((card) => {
             const Icon = card.icon;
-            const isWide = card.featured && (index === 0 || index === cards.length - 1);
             return (
               <div
                 key={card.id}
                 onClick={() => onNavigate(card.id)}
                 className={`group relative rounded-2xl p-6 sm:p-7 border-2 border-slate-200 dark:border-white/15 bg-white dark:bg-[#0f1423] shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden flex flex-col justify-between ${
                   card.accentBorder
-                } ${isWide ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                }`}
               >
                 {/* Background glow gradient */}
                 <div 

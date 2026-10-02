@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { translations } from './data/translations';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { Calculator } from './components/Calculator';
 import { Products } from './components/Products';
 import { ColorSwatches } from './components/ColorSwatches';
 import { Portfolio } from './components/Portfolio';
@@ -21,9 +20,9 @@ import { HomeNavigationBento } from './components/HomeNavigationBento';
 import { PageBanner } from './components/PageBanner';
 import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetCalcSettings, DEFAULT_CALC_SETTINGS, apiGetSwatches } from './services/api';
+import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetSwatches } from './services/api';
 
-const VALID_PAGES = ['home', 'calculator', 'products', 'portfolio', 'about', 'contact'];
+const VALID_PAGES = ['home', 'products', 'portfolio', 'about', 'contact'];
 
 export function App() {
   const getPageFromHash = () => {
@@ -90,12 +89,11 @@ export function App() {
   // Splash Brand Intro animation on site load & refresh
   const [showBrandIntro, setShowBrandIntro] = useState(true);
 
-  // Dynamic products, portfolio, team, swatches & calculator state from CMS
+  // Dynamic products, portfolio, team & swatches state from CMS
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
   const [teamList, setTeamList] = useState([]);
   const [swatchesList, setSwatchesList] = useState([]);
-  const [calcSettings, setCalcSettings] = useState(DEFAULT_CALC_SETTINGS);
 
   // Modals state
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -120,13 +118,12 @@ export function App() {
     document.documentElement.lang = currentLang;
   }, [currentLang]);
 
-  // Fetch dynamic products, portfolio, team members, swatches and calculator pricing
+  // Fetch dynamic products, portfolio, team members, and swatches
   const loadDynamicData = async () => {
-    const [prods, ports, teams, cSettings, swt] = await Promise.all([
+    const [prods, ports, teams, swt] = await Promise.all([
       apiGetProducts(),
       apiGetPortfolio(),
       apiGetTeam(),
-      apiGetCalcSettings(),
       apiGetSwatches()
     ]);
     setProductsList(prods);
@@ -134,9 +131,6 @@ export function App() {
     setTeamList(teams);
     if (swt && Array.isArray(swt) && swt.length > 0) {
       setSwatchesList(swt);
-    }
-    if (cSettings && cSettings.materialPrices) {
-      setCalcSettings(cSettings);
     }
   };
 
@@ -191,14 +185,6 @@ export function App() {
     setLeadModalOpen(true);
   };
 
-  const handleOpenCalcModal = (calcData) => {
-    setLeadModalData({
-      service: `Kalkulyator buyurtmasi (${calcData.buildingType}, ${calcData.area} m²)`,
-      calcData: calcData,
-      source: "Kalkulyator hisoblagich"
-    });
-    setLeadModalOpen(true);
-  };
 
   const handleOpenSwatchModal = (swatchName) => {
     setLeadModalData({
@@ -282,39 +268,7 @@ export function App() {
           </div>
         )}
 
-        {/* ═══ 2. KALKULYATOR PAGE ═══ */}
-        {currentPage === 'calculator' && (
-          <div className="animate-fadeIn">
-            <PageBanner
-              title="Fasad va Tom Narxini Hisoblang"
-              subtitle="Bino parametrlari va kerakli materialni tanlang. Tizim taxminiy xarajat va muddatni bir zumda hisoblab beradi."
-              badge="Interaktiv hisoblagich"
-              breadcrumb="Kalkulyator"
-              onBackToHome={() => navigateToPage('home')}
-            />
-            <Calculator
-              t={t}
-              onOpenLeadModalWithCalc={handleOpenCalcModal}
-              calcSettings={calcSettings}
-            />
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-20 text-center">
-              <div className="p-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/40 shadow-sm">
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                  Hisoblagich natijalari taxminiy xarakterga ega. Mutaxassisimiz obyektga borib bepul aniq o'lchov olganidan so'ng, smeta va shartnoma tuziladi.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => handleOpenLeadModal("Bepul usta o'lchovi va smeta")}
-                  className="mt-4 px-6 py-2.5 rounded-xl bg-brand-red text-white text-xs sm:text-sm font-bold shadow-glow-red hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                >
-                  Bepul mutaxassis chaqirish
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ═══ 3. MAHSULOTLAR VA KATALOG PAGE ═══ */}
+        {/* ═══ 2. MAHSULOTLAR VA KATALOG PAGE ═══ */}
         {currentPage === 'products' && (
           <div className="animate-fadeIn">
             <PageBanner
@@ -456,8 +410,6 @@ export function App() {
           onLogout={handleLogout}
           onClose={() => setAdminDashboardOpen(false)}
           onDataChanged={loadDynamicData}
-          calcSettings={calcSettings}
-          onCalcSettingsChanged={(newSettings) => setCalcSettings(newSettings)}
           swatchesList={swatchesList}
         />
       )}
