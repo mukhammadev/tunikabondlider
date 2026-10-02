@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/((?!api/|assets/|favicon|call.html|brand-logo|og-image).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
