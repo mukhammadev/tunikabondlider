@@ -841,10 +841,21 @@ export const AdminDashboard = ({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="text-xs text-slate-300">
                     Yangi arizalar: <strong className="text-brand-red font-bold">{leads.filter(l => l.status === 'new' || !l.status).length} ta</strong>
                   </span>
+
+                  <button
+                    type="button"
+                    onClick={() => loadData(false)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold shadow-sm transition-all cursor-pointer"
+                    title="Telegram va bulutdan arizalarni qayta yuklash"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Telegramdan Yangilash</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleExportCsv}
@@ -877,10 +888,11 @@ export const AdminDashboard = ({
                         
                         {/* Customer Info */}
                         <div className="space-y-1">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2.5 flex-wrap">
                             <span className="font-display font-bold text-lg text-white">
                               {lead.name || "Noma'lum mijoz"}
                             </span>
+                            
                             <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
                               lead.status === 'in_progress' 
                                 ? 'bg-amber-500 text-black' 
@@ -898,12 +910,26 @@ export const AdminDashboard = ({
                                 ? 'Bekor qilindi' 
                                 : 'Yangi'}
                             </span>
+
+                            {lead.source && (
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                                lead.source.includes('Telegram')
+                                  ? 'bg-sky-500/20 text-sky-400 border-sky-500/30'
+                                  : 'bg-white/10 text-slate-300 border-white/10'
+                              }`}>
+                                <Send className="w-2.5 h-2.5" />
+                                <span>{lead.source}</span>
+                              </span>
+                            )}
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300">
-                            <span className="font-bold text-white">📞 {lead.phone}</span>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
+                            <span className="font-bold text-white flex items-center gap-1">
+                              <span>📞</span>
+                              <span>{lead.phone}</span>
+                            </span>
                             <span>🛠 {lead.service}</span>
-                            <span className="text-slate-500">⏰ {lead.timestamp ? new Date(lead.timestamp).toLocaleString('uz-UZ') : ''}</span>
+                            <span className="text-slate-400">⏰ {lead.timestamp ? (lead.timestamp.includes('T') ? new Date(lead.timestamp).toLocaleString('uz-UZ') : lead.timestamp) : ''}</span>
                           </div>
 
                           {lead.calcData && (
@@ -939,13 +965,31 @@ export const AdminDashboard = ({
                         <div className="flex items-center gap-2 flex-wrap">
                           
                           {/* Direct Phone Dial */}
+                          {lead.phone && !lead.phone.startsWith('@') && (
+                            <a
+                              href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                              title="Telefon qilish"
+                            >
+                              <Phone className="w-3.5 h-3.5" />
+                              <span>Qo'ng'iroq</span>
+                            </a>
+                          )}
+
+                          {/* Telegram Direct Chat */}
                           <a
-                            href={`tel:${lead.phone}`}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                            title="Telefon qilish"
+                            href={
+                              lead.phone && lead.phone.startsWith('@')
+                                ? `https://t.me/${lead.phone.replace('@', '')}`
+                                : `https://t.me/+${(lead.phone || '').replace(/\D/g, '')}`
+                            }
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                            title="Telegram orqali yozish"
                           >
-                            <Phone className="w-3.5 h-3.5" />
-                            <span>Qo'ng'iroq</span>
+                            <Send className="w-3.5 h-3.5" />
+                            <span>Telegram</span>
                           </a>
 
                           {/* Status Dropdown */}

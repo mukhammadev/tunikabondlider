@@ -317,8 +317,13 @@ export const cloudSaveCatalogData = async (partialData) => {
 // --- LEADS API ---
 export const apiGetLeads = async () => {
   let backendLeads = [];
+
+  // 1. Fetch from serverless API /api/leads or /api/leads/
   try {
-    const res = await apiFetch('/api/leads/');
+    let res = await fetch('/api/leads');
+    if (!res.ok) {
+      res = await apiFetch('/api/leads/');
+    }
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -327,13 +332,35 @@ export const apiGetLeads = async () => {
     }
   } catch {}
 
-  let cloudLeads = [];
+  // 2. Direct client-side fetch from Telegram Bot getUpdates (works on any client without server)
+  let telegramBotLeads = [];
   try {
-    const cloudRes = await fetch(CLOUD_LEADS_URL);
-    if (cloudRes.ok) {
-      const json = await cloudRes.json();
-      if (json?.data?.leads && Array.isArray(json.data.leads)) {
-        cloudLeads = json.data.leads;
+    const BOT_TOKEN = "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
+    const uRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?limit=50`);
+    if (uRes.ok) {
+      const uJson = await uRes.json();
+      if (uJson.ok && Array.isArray(uJson.result)) {
+        uJson.result.forEach(u => {
+          const m = u.message;
+          if (m && m.from && !m.from.is_bot) {
+            const fromName = `${m.from.first_name || ''} ${m.from.last_name || ''}`.trim() || m.from.username || 'Telegram Mijoz';
+            const text = (m.text || '').trim();
+            const contactPhone = m.contact?.phone_number || '';
+            const phoneMatch = text.match(/\+?998\s*\d{2}\s*\d{3}\s*\d{2}\s*\d{2}|\b\d{9}\b/);
+            const phone = contactPhone || (phoneMatch ? phoneMatch[0] : (m.from.username ? `@${m.from.username}` : `ID: ${m.from.id}`));
+
+            telegramBotLeads.push({
+              id: `tg-direct-${m.message_id}-${m.date}`,
+              name: fromName,
+              phone: phone,
+              service: "Telegram Bot Murojaati",
+              message: text !== '/start' ? text : "Botga /start bosdi",
+              source: m.from.username ? `Telegram Bot (@${m.from.username})` : `Telegram Bot (${m.from.id})`,
+              timestamp: new Date(m.date * 1000).toISOString(),
+              status: "new"
+            });
+          }
+        });
       }
     }
   } catch {}
@@ -343,12 +370,28 @@ export const apiGetLeads = async () => {
     localLeads = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
   } catch {}
 
+  // Local statuses map so admin status changes are preserved
+  const localStatusMap = new Map();
+  localLeads.forEach(l => {
+    if (l && l.id && l.status) {
+      localStatusMap.set(String(l.id), l.status);
+      if (l.phone) {
+        localStatusMap.set(String(l.phone), l.status);
+      }
+    }
+  });
+
   const map = new Map();
-  [...cloudLeads, ...backendLeads, ...localLeads].forEach(l => {
+  [...backendLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
     if (l && (l.id || l.phone)) {
       const key = String(l.id || `${l.phone}_${l.timestamp || l.date}`);
       if (!map.has(key)) {
-        map.set(key, l);
+        // Restore local status if admin already updated it
+        const savedStatus = localStatusMap.get(String(l.id)) || (l.phone && localStatusMap.get(String(l.phone)));
+        map.set(key, {
+          ...l,
+          status: savedStatus || l.status || 'new'
+        });
       }
     }
   });
@@ -361,7 +404,7 @@ export const apiGetLeads = async () => {
     }
     return {
       ...l,
-      id: l.id || `lead-local-${index}-${Date.now()}`,
+      id: l.id || `lead-${index}-${Date.now()}`,
       status: status,
       timestamp: l.timestamp || l.date || new Date().toISOString()
     };
