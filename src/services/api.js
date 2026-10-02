@@ -3,10 +3,10 @@
  * Falls back gracefully to localStorage or static data if backend is offline.
  */
 
-import { products as initialProducts } from '../data/products';
-import { portfolio as initialPortfolio } from '../data/portfolio';
-import { initialTeam } from '../data/team';
-import { swatches as initialSwatches } from '../data/swatches';
+import { products as initialProducts } from '../data/products.js';
+import { portfolio as initialPortfolio } from '../data/portfolio.js';
+import { initialTeam } from '../data/team.js';
+import { swatches as initialSwatches } from '../data/swatches.js';
 
 const TOKEN_KEY = 'tl_admin_token';
 const USER_KEY = 'tl_admin_user';

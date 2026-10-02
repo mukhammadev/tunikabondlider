@@ -5,7 +5,7 @@ import { cloudPushLead } from './api.js';
  * Sends leads to Telegram channel, dedicated personal account, and any configured recipients.
  */
 
-export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v6_clean';
+export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v7_guaranteed';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
@@ -19,7 +19,7 @@ export const DEFAULT_TELEGRAM_CONFIG = {
       enabled: true
     },
     {
-      id: "-1004415750690",
+      id: "@tunikabondlider_uz",
       label: "Rasmiy Kanal (@tunikabondlider_uz)",
       type: "channel",
       enabled: true
@@ -38,7 +38,8 @@ export const getTelegramConfig = () => {
       'tunikabond_telegram_config_v2',
       'tunikabond_telegram_config_v3',
       'tunikabond_telegram_config_v4',
-      'tunikabond_telegram_config_v5'
+      'tunikabond_telegram_config_v5',
+      'tunikabond_telegram_config_v6_clean'
     ].forEach(k => localStorage.removeItem(k));
   } catch {}
 
@@ -277,10 +278,10 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
     });
   }
 
-  // ALWAYS guarantee Tunikabond Lider Channel (-1004415750690) is in the dispatch list!
+  // ALWAYS guarantee Tunikabond Lider Channel (@tunikabondlider_uz) is in the dispatch list!
   if (!activeRecipients.some(r => String(r.id).trim() === "-1004415750690" || String(r.id).trim() === "@tunikabondlider_uz")) {
     activeRecipients.push({
-      id: "-1004415750690",
+      id: "@tunikabondlider_uz",
       label: "Rasmiy Kanal (@tunikabondlider_uz)",
       type: "channel",
       enabled: true
@@ -293,8 +294,9 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
   const tgUrl = `https://t.me/+${cleanPhone}`;
 
   const dispatchPromises = activeRecipients.map(async (recipient) => {
-    const chatId = String(recipient.id).trim();
-    const isPrivate = recipient.type === 'user' || !chatId.startsWith('-');
+    let chatId = String(recipient.id).trim();
+    const isChannel = recipient.type === 'channel' || chatId.startsWith('-') || chatId.startsWith('@');
+    const isPrivate = !isChannel;
 
     const replyMarkup = {
       inline_keyboard: [
@@ -311,6 +313,20 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
               { text: "👨‍💼 Admin: @mukhammadew", url: "https://t.me/mukhammadew" }
             ]
       ]
+    };
+
+    // Helper to send text message to Telegram
+    const sendMsg = async (targetId, markup) => {
+      return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: targetId,
+          text: htmlText,
+          parse_mode: 'HTML',
+          reply_markup: markup
+        })
+      });
     };
 
     // 1. If photo attached and is a valid web URL, try sendPhoto first
@@ -336,49 +352,46 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
       }
     }
 
-    // 2. Standard HTML text message with fallback
+    // 2. Standard HTML text message
     try {
-      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: htmlText,
-          parse_mode: 'HTML',
-          reply_markup: replyMarkup
-        })
-      });
-      const json = await res.json();
+      let res = await sendMsg(chatId, replyMarkup);
+      let json = await res.json();
       if (json.ok) {
         return { chatId, recipient, ok: true };
       }
 
-      // Retry with fallback simple markup if web_app button rejected
+      // If channel username failed, fallback to numerical channel ID
+      if (chatId === '@tunikabondlider_uz') {
+        res = await sendMsg('-1004415750690', replyMarkup);
+        json = await res.json();
+        if (json.ok) {
+          return { chatId: '-1004415750690', recipient, ok: true };
+        }
+      } else if (chatId === '-1004415750690') {
+        res = await sendMsg('@tunikabondlider_uz', replyMarkup);
+        json = await res.json();
+        if (json.ok) {
+          return { chatId: '@tunikabondlider_uz', recipient, ok: true };
+        }
+      }
+
+      // Retry with simplified fallback markup if any button issue
       const fallbackMarkup = {
         inline_keyboard: [
           [
-            { text: "📞 Telefon qilish", url: callUrl },
-            ...(cleanPhone ? [{ text: "💬 Telegramdan yozish", url: tgUrl }] : [])
+            { text: "📞 Qo‘ng‘iroq qilish", url: callUrl }
           ],
           [
-            { text: "🌐 Saytga o'tish", url: "https://tunikabondlider.vercel.app" }
+            { text: "🌐 Saytni ochish", url: "https://tunikabondlider.vercel.app" }
           ]
         ]
       };
-      const res2 = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: htmlText,
-          parse_mode: 'HTML',
-          reply_markup: fallbackMarkup
-        })
-      });
+      const res2 = await sendMsg(chatId, fallbackMarkup);
       const json2 = await res2.json();
       if (json2.ok) {
         return { chatId, recipient, ok: true };
       }
+
       throw new Error(json2.description || json.description || 'Telegram xatosi');
     } catch (err) {
       throw err;
@@ -400,7 +413,7 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
 
 /**
  * Lead handling service
- * Validates, formats, logs to localStorage & cloud, and safely dispatches to Telegram bot/channel/account.
+ * Validates, formats, logs to localStorage, and immediately dispatches to Telegram bot/channel.
  */
 export const submitLead = async (leadData) => {
   const now = new Date().toISOString();
@@ -414,7 +427,7 @@ export const submitLead = async (leadData) => {
     date: now
   };
 
-  // 1. Store in browser backup storage so lead is never lost
+  // 1. Store in browser backup storage immediately so lead is never lost
   try {
     const existing = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
     existing.unshift(standardizedLead);
@@ -423,14 +436,7 @@ export const submitLead = async (leadData) => {
     console.warn('Backup save error:', e);
   }
 
-  // 2. Push to Central Cloud Storage so Admin sees it across ANY device in real time
-  try {
-    await cloudPushLead(standardizedLead);
-  } catch (err) {
-    console.warn('Cloud lead push error:', err);
-  }
-
-  // 3. DIRECT TELEGRAM DISPATCH (to Channel, Dedicated Account, and Groups)
+  // 2. IMMEDIATE TELEGRAM DISPATCH FIRST (Never blocked by external services)
   let telegramResult = null;
   try {
     telegramResult = await dispatchToTelegram(standardizedLead);
@@ -438,13 +444,18 @@ export const submitLead = async (leadData) => {
     console.error('Direct Telegram dispatch error:', err);
   }
 
-  // 4. Also forward to local backend API if available
+  // 3. Push to Cloud Storage asynchronously in background (do not block user)
   try {
-    await fetch('/api/leads/', {
+    cloudPushLead(standardizedLead).catch(() => {});
+  } catch {}
+
+  // 4. Forward to local backend API if available
+  try {
+    fetch('/api/leads/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(standardizedLead)
-    });
+    }).catch(() => {});
   } catch {}
 
   // 5. Notify local UI components of new data
