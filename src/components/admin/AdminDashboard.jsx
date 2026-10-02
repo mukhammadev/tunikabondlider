@@ -8,12 +8,18 @@ import {
   apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch,
   apiExportAllData, apiImportData
 } from '../../services/api';
+import {
+  getTelegramConfig,
+  saveTelegramConfig,
+  testTelegramRecipient,
+  DEFAULT_TELEGRAM_CONFIG
+} from '../../services/telegram';
 import { 
   LayoutDashboard, Inbox, Package, Briefcase, Users, LogOut, 
   Plus, Trash2, Edit3, CheckCircle2, Clock, Phone, Send, X, 
   ExternalLink, Search, RefreshCw, Shield, AlertCircle,
   Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck,
-  Palette
+  Palette, Bot, MessageSquare, Check, Save, Radio
 } from 'lucide-react';
 
 export const AdminDashboard = ({ 
@@ -24,7 +30,7 @@ export const AdminDashboard = ({
   isStandaloneApp = false,
   swatchesList: propSwatchesList
 }) => {
-  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | swatches | admins
+  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | swatches | telegram | admins
   const [stats, setStats] = useState(null);
   const [leads, setLeads] = useState([]);
   const [productsList, setProductsList] = useState([]);
@@ -162,6 +168,93 @@ export const AdminDashboard = ({
       setSwatchesList(propSwatchesList);
     }
   }, [propSwatchesList]);
+
+  // Telegram Bot Settings state
+  const [telegramConfig, setTelegramConfig] = useState(() => getTelegramConfig());
+  const [telegramSaving, setTelegramSaving] = useState(false);
+  const [telegramSuccess, setTelegramSuccess] = useState(false);
+  const [telegramTesting, setTelegramTesting] = useState(false);
+  const [testResults, setTestResults] = useState({});
+  const [newRecipientModalOpen, setNewRecipientModalOpen] = useState(false);
+  const [newRecipientForm, setNewRecipientForm] = useState({
+    id: '',
+    label: '',
+    type: 'user'
+  });
+
+  // --- TELEGRAM ACTIONS ---
+  const handleSaveTelegram = (e) => {
+    if (e) e.preventDefault();
+    setTelegramSaving(true);
+    const ok = saveTelegramConfig(telegramConfig);
+    setTelegramSaving(false);
+    if (ok) {
+      setTelegramSuccess(true);
+      setTimeout(() => setTelegramSuccess(false), 3000);
+    }
+  };
+
+  const handleTestAllTelegram = async () => {
+    setTelegramTesting(true);
+    const results = {};
+    for (const r of telegramConfig.recipients) {
+      if (!r.enabled) continue;
+      const res = await testTelegramRecipient(telegramConfig.botToken, r.id);
+      results[r.id] = res;
+    }
+    setTestResults(results);
+    setTelegramTesting(false);
+  };
+
+  const handleTestSingleTelegram = async (chatId) => {
+    setTestResults(prev => ({ ...prev, [chatId]: { loading: true } }));
+    const res = await testTelegramRecipient(telegramConfig.botToken, chatId);
+    setTestResults(prev => ({ ...prev, [chatId]: res }));
+  };
+
+  const handleToggleRecipient = (index) => {
+    const nextRecipients = [...telegramConfig.recipients];
+    nextRecipients[index] = {
+      ...nextRecipients[index],
+      enabled: !nextRecipients[index].enabled
+    };
+    const updated = { ...telegramConfig, recipients: nextRecipients };
+    setTelegramConfig(updated);
+    saveTelegramConfig(updated);
+  };
+
+  const handleDeleteRecipient = (index) => {
+    if (window.confirm("Ushbu qabul qiluvchini o'chirmoqchimisiz?")) {
+      const nextRecipients = telegramConfig.recipients.filter((_, i) => i !== index);
+      const updated = { ...telegramConfig, recipients: nextRecipients };
+      setTelegramConfig(updated);
+      saveTelegramConfig(updated);
+    }
+  };
+
+  const handleAddRecipient = (e) => {
+    e.preventDefault();
+    if (!newRecipientForm.id.trim()) {
+      alert("Iltimos, Chat ID yoki Foydalanuvchi ID raqamini kiriting");
+      return;
+    }
+    const updated = {
+      ...telegramConfig,
+      recipients: [
+        ...telegramConfig.recipients,
+        {
+          id: newRecipientForm.id.trim(),
+          label: newRecipientForm.label.trim() || `Qabul qiluvchi (${newRecipientForm.id.trim()})`,
+          type: newRecipientForm.type || 'user',
+          enabled: true
+        }
+      ]
+    };
+    setTelegramConfig(updated);
+    saveTelegramConfig(updated);
+    setNewRecipientForm({ id: '', label: '', type: 'user' });
+    setNewRecipientModalOpen(false);
+  };
 
   // --- LEADS ACTIONS ---
   const handleLeadStatusChange = async (leadId, newStatus) => {
@@ -684,6 +777,21 @@ export const AdminDashboard = ({
             </button>
 
             <button
+              onClick={() => setActiveTab('telegram')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'telegram' 
+                  ? 'bg-brand-red text-white shadow-glow-red' 
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Send className="w-4 h-4 text-sky-400" />
+                <span>Telegram Bot & Arizalar</span>
+              </div>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('admins')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                 activeTab === 'admins' 
@@ -699,10 +807,21 @@ export const AdminDashboard = ({
             </button>
           </nav>
 
-          <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-slate-400">
-            <span className="block font-bold text-white mb-1">Telegram Bot:</span>
-            <span>Arizalar avtomatik tarzda Telegram va serverga tushadi.</span>
-          </div>
+          <button
+            onClick={() => setActiveTab('telegram')}
+            className="p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 text-left transition-colors group cursor-pointer block w-full"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <Send className="w-3.5 h-3.5 text-sky-400" />
+                Telegram Bot
+              </span>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded">Faol</span>
+            </div>
+            <p className="text-[11px] text-slate-400 group-hover:text-slate-200">
+              Kanal va shaxsiy akkaunt sozlamalari &rarr;
+            </p>
+          </button>
         </aside>
 
         {/* Content Area */}
@@ -1421,6 +1540,300 @@ export const AdminDashboard = ({
             </div>
           )}
 
+          {/* TAB: TELEGRAM BOT & ARIZALAR */}
+          {activeTab === 'telegram' && (
+            <div className="space-y-6 animate-fadeIn max-w-5xl mx-auto">
+              
+              {/* Top Header Card */}
+              <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-br from-brand-surface/90 via-brand-surface/60 to-brand-dark/90">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/20 shrink-0">
+                      <Send className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Telegram Bot & Arizalar</h2>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                          Avtomatik tarqatish faol
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                        Saytdan kelgan har bir yangi ariza darhol Telegram kanalga, botga va shaxsiy menejer akkauntiga yuboriladi.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={handleTestAllTelegram}
+                      disabled={telegramTesting}
+                      className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-bold flex items-center gap-2 border border-white/15 transition-all active:scale-95 disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-4 h-4 text-sky-400 ${telegramTesting ? 'animate-spin' : ''}`} />
+                      <span>{telegramTesting ? "Sinov xabari yuborilmoqda..." : "Barchasiga sinov xabari"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveTelegram}
+                      disabled={telegramSaving}
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover hover:scale-105 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 transition-all"
+                    >
+                      {telegramSuccess ? <Check className="w-4 h-4 text-white" /> : <Save className="w-4 h-4 text-white" />}
+                      <span>{telegramSuccess ? "Saqlandi!" : "Saqlash"}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bot Info & Token Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* Bot Profile Card */}
+                <div className="glass-panel p-5 rounded-2xl border border-white/10 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Rasmiy Bot</span>
+                      <span className="text-[10px] bg-sky-500/20 text-sky-400 px-2 py-0.5 rounded font-mono font-bold">@tunikabondlider_bot</span>
+                    </div>
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+                        <Bot className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-white text-sm">Tunikabond Lider Bot</div>
+                        <div className="text-xs text-slate-400">Telegram integratsiya boti</div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-300">
+                      Ushbu bot barcha arizalarni mijoz telefon raqami va ma'lumotlari bilan kanalga va akkauntingizga yetkazadi.
+                    </p>
+                  </div>
+
+                  <a
+                    href="https://t.me/tunikabondlider_bot"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 w-full py-2 px-3 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 border border-sky-500/30 transition-colors"
+                  >
+                    <span>Botni Telegramda ochish</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+
+                {/* Bot Token Configuration */}
+                <div className="glass-panel p-5 rounded-2xl border border-white/10 md:col-span-2 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Telegram Bot Token (HTTP API)
+                      </label>
+                      <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" /> Ulanish o'rnatilgan
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mb-3">
+                      BotFather orqali olingan token. Odatda o'zgartirish talab etilmaydi.
+                    </p>
+                    <input
+                      type="text"
+                      value={telegramConfig.botToken || ''}
+                      onChange={(e) => setTelegramConfig({ ...telegramConfig, botToken: e.target.value.trim() })}
+                      placeholder="Masalan: 8160493029:AAHA..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-xs sm:text-sm focus:outline-none focus:border-brand-red transition-colors"
+                    />
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                    <span className="flex items-center gap-1.5">
+                      <UserCheck className="w-4 h-4 text-emerald-400" />
+                      Mas'ul admin: <strong className="text-white">@Mukhammad_azez</strong>
+                    </span>
+                    <span className="text-slate-500 font-mono text-[11px]">
+                      Format: HTML (Xatosiz yetkazish kafolatlangan)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recipients List Card */}
+              <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-bold text-white text-base flex items-center gap-2">
+                      <Radio className="w-5 h-5 text-brand-red" />
+                      <span>Arizalar yetkaziladigan manzillar (Kanal va Shaxsiy Akkountlar)</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Saytdan kelgan har bir ariza bir vaqtning o'zida quyidagi faol joylarga parallel yuboriladi:
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewRecipientModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 border border-white/15 transition-colors self-start sm:self-auto"
+                  >
+                    <Plus className="w-4 h-4 text-brand-red" />
+                    <span>Qabul qiluvchi qo'shish</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {telegramConfig.recipients.map((rec, idx) => {
+                    const testStatus = testResults[rec.id];
+                    return (
+                      <div
+                        key={rec.id + '-' + idx}
+                        className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                          rec.enabled 
+                            ? 'bg-brand-dark/70 border-white/15' 
+                            : 'bg-white/5 border-white/5 opacity-60'
+                        }`}
+                      >
+                        <div className="flex items-start sm:items-center gap-3.5">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                            rec.type === 'channel'
+                              ? 'bg-sky-500/20 text-sky-400'
+                              : rec.type === 'group'
+                              ? 'bg-purple-500/20 text-purple-400'
+                              : 'bg-emerald-500/20 text-emerald-400'
+                          }`}>
+                            {rec.type === 'channel' ? (
+                              <Radio className="w-5 h-5" />
+                            ) : rec.type === 'group' ? (
+                              <Users className="w-5 h-5" />
+                            ) : (
+                              <UserCheck className="w-5 h-5" />
+                            )}
+                          </div>
+
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-white text-sm">{rec.label}</span>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-slate-300">
+                                ID: {rec.id}
+                              </span>
+                              <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-brand-red/20 text-brand-red border border-brand-red/30">
+                                {rec.type === 'channel' ? "Kanal" : rec.type === 'group' ? "Guruh" : "Shaxsiy Akkount"}
+                              </span>
+                            </div>
+
+                            {/* Test status notice */}
+                            {testStatus && (
+                              <div className="mt-1.5 text-xs">
+                                {testStatus.loading ? (
+                                  <span className="text-amber-300 flex items-center gap-1 font-semibold">
+                                    <RefreshCw className="w-3 h-3 animate-spin" /> Sinov xabari yuborilmoqda...
+                                  </span>
+                                ) : testStatus.ok ? (
+                                  <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Sinov xabari muvaffaqiyatli yetkazildi!
+                                  </span>
+                                ) : (
+                                  <div className="text-amber-400 flex flex-col gap-0.5">
+                                    <span className="flex items-center gap-1 font-semibold">
+                                      <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                                      {testStatus.error?.includes("bot can't initiate conversation")
+                                        ? "Foydalanuvchi botga hali Start bosmagan!"
+                                        : `Telegram xatosi: ${testStatus.error}`}
+                                    </span>
+                                    {testStatus.error?.includes("bot can't initiate conversation") && (
+                                      <a
+                                        href="https://t.me/tunikabondlider_bot"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-sky-400 underline font-bold text-[11px]"
+                                      >
+                                        Iltimos, @tunikabondlider_bot ga kirib bir marta Start bosing &rarr;
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end sm:self-center">
+                          <button
+                            type="button"
+                            onClick={() => handleTestSingleTelegram(rec.id)}
+                            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors flex items-center gap-1"
+                          >
+                            <Send className="w-3 h-3 text-sky-400" />
+                            <span>Sinash</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleToggleRecipient(idx)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                              rec.enabled
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-slate-700/50 text-slate-400'
+                            }`}
+                          >
+                            {rec.enabled ? 'Faol' : 'O\'chiq'}
+                          </button>
+
+                          {idx >= 2 && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteRecipient(idx)}
+                              className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors"
+                              title="O'chirish"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Quick Instructions & Help Card */}
+              <div className="glass-panel p-6 rounded-3xl border border-white/10 bg-brand-surface/40 space-y-4">
+                <h3 className="font-bold text-white text-base flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                  <span>Qanday qilib yangi shaxsiy akkaunt yoki guruh qo'shiladi?</span>
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-300">
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                    <div className="w-7 h-7 rounded-lg bg-brand-red/20 text-brand-red flex items-center justify-center font-bold">1</div>
+                    <h4 className="font-bold text-white">Shaxsiy akkauntga ulash</h4>
+                    <p className="text-slate-400">
+                      Telegram qoidasiga ko'ra, bot shaxsga birinchi bo'lib yoza olmaydi. Shuning uchun menejer avval <a href="https://t.me/tunikabondlider_bot" target="_blank" rel="noreferrer" className="text-sky-400 underline font-bold">@tunikabondlider_bot</a> ga kirib <strong>Start</strong> tugmasini bosishi shart.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                    <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">2</div>
+                    <h4 className="font-bold text-white">Chat ID ni aniqlash</h4>
+                    <p className="text-slate-400">
+                      O'zingizning Telegram raqamli ID raqamingizni bilish uchun Telegramda <a href="https://t.me/userinfobot" target="_blank" rel="noreferrer" className="text-sky-400 underline font-bold">@userinfobot</a> ga kirsangiz, u sizga raqamli IDingizni beradi (masalan: <code>1003939636</code>).
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">3</div>
+                    <h4 className="font-bold text-white">Guruhga ulash</h4>
+                    <p className="text-slate-400">
+                      Telegramda yangi guruh ochib, unga <strong className="text-white">@tunikabondlider_bot</strong> ni va barcha ustalarni qo'shing. Botga admin bering va guruh ID sini (odatda -100 bilan boshlanadi) ro'yxatga qo'shing.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          )}
+
         </main>
 
         {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet screens only) */}
@@ -1480,6 +1893,16 @@ export const AdminDashboard = ({
           >
             <Palette className="w-5 h-5" />
             <span className="text-[10px] truncate w-full text-center">Ranglar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('telegram')}
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
+              activeTab === 'telegram' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Send className="w-5 h-5 text-sky-400" />
+            <span className="text-[10px] truncate w-full text-center">Telegram</span>
           </button>
 
           <button
@@ -2386,6 +2809,92 @@ export const AdminDashboard = ({
               >
                 {editingSwatch ? "O'zgarishlarni saqlash" : "Rangni katalogga qo'shish"}
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- TELEGRAM NEW RECIPIENT MODAL --- */}
+      {newRecipientModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn">
+          <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative">
+            <button
+              onClick={() => setNewRecipientModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="font-bold text-xl text-white mb-1 flex items-center gap-2">
+              <Plus className="w-5 h-5 text-brand-red" />
+              <span>Yangi Qabul Qiluvchi Qo'shish</span>
+            </h3>
+            <p className="text-xs text-slate-400 mb-6">
+              Arizalar kelib tushishi kerak bo'lgan yangi kanal, shaxsiy akkaunt yoki guruh chat ID sini kiriting.
+            </p>
+
+            <form onSubmit={handleAddRecipient} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                  Nomi / Mas'ul shaxs
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newRecipientForm.label}
+                  onChange={(e) => setNewRecipientForm({ ...newRecipientForm, label: e.target.value })}
+                  placeholder="Masalan: Usta Alisher yoki Arizalar Guruhi"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                  Telegram Chat ID / User ID
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newRecipientForm.id}
+                  onChange={(e) => setNewRecipientForm({ ...newRecipientForm, id: e.target.value })}
+                  placeholder="Masalan: 1003939636 yoki -1003209002534"
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
+                />
+                <span className="text-[11px] text-slate-400 mt-1 block">
+                  Kanal/guruhlar IDsi odatda -100 bilan boshlanadi. Shaxsiy ID esa musbat son bo'ladi.
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+                  Turi
+                </label>
+                <select
+                  value={newRecipientForm.type}
+                  onChange={(e) => setNewRecipientForm({ ...newRecipientForm, type: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white text-sm focus:outline-none focus:border-brand-red"
+                >
+                  <option value="user">Shaxsiy Akkount (User ID)</option>
+                  <option value="channel">Telegram Kanal (-100...)</option>
+                  <option value="group">Telegram Guruh (-...)</option>
+                </select>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setNewRecipientModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 text-xs font-bold transition-colors"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red transition-all"
+                >
+                  Qo'shish
+                </button>
+              </div>
             </form>
           </div>
         </div>

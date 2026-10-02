@@ -2,6 +2,7 @@ import os
 import json
 import logging
 import hashlib
+import html
 import secrets
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
@@ -29,7 +30,7 @@ CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003209002534")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1003209002534,1003939636")
 
 ACTIVE_TOKENS = {}  # token -> admin_info
 
@@ -705,66 +706,94 @@ def serve_uploads(filename):
 
 
 def send_telegram_notification(lead_data):
-    name = lead_data.get("name", "Noma'lum mijoz")
-    phone = lead_data.get("phone", "-")
-    service = lead_data.get("service") or lead_data.get("product") or "-"
-    source = lead_data.get("source", "Veb-sayt")
-    message = lead_data.get("message", "")
+    name = html.escape(str(lead_data.get("name") or "Noma'lum mijoz"))
+    phone = str(lead_data.get("phone") or "-")
+    clean_phone = "".join(filter(str.isdigit, phone))
+    service = html.escape(str(lead_data.get("service") or lead_data.get("product") or "-"))
+    source = html.escape(str(lead_data.get("source") or "Veb-sayt"))
+    message = html.escape(str(lead_data.get("message") or ""))
     calc = lead_data.get("calcData")
     photo_url = lead_data.get("photoUrl", "")
 
-    text = f"🔥 *YANGI BUYURTMA: Tunikabond Lider* 🔥\n\n"
-    text += f"👤 *Mijoz:* {name}\n"
-    text += f"📞 *Telefon:* `{phone}`\n"
-    text += f"🛠 *Xizmat/Mahsulot:* {service}\n"
-    text += f"👨‍💼 *Mas'ul Admin:* @Muhammadazez\n"
+    text = f"🔥 <b>YANGI ARIZA: Tunikabond Lider</b> 🔥\n\n"
+    text += f"👤 <b>Mijoz:</b> {name}\n"
+    text += f"📞 <b>Telefon:</b> <code>{html.escape(phone)}</code>\n"
+    text += f"🛠 <b>Xizmat/Mahsulot:</b> {service}\n"
+    text += f"👨‍💼 <b>Mas'ul Admin:</b> @Mukhammad_azez\n"
 
     if calc:
-        text += f"\n📊 *Kalkulyator Hisobi:*\n"
-        text += f" • Bino turi: {calc.get('buildingType', '-')}\n"
-        text += f" • Maydoni: {calc.get('area', '-')} m²\n"
-        text += f" • Material: {calc.get('material', '-')}\n"
-        text += f" • Taxminiy summa: {calc.get('cost', '-')}\n"
+        text += f"\n📊 <b>Kalkulyator Hisobi:</b>\n"
+        text += f" • Bino turi: {html.escape(str(calc.get('buildingType', '-')))}\n"
+        text += f" • Maydoni: {html.escape(str(calc.get('area', '-')))} m²\n"
+        text += f" • Material: {html.escape(str(calc.get('material', '-')))}\n"
+        text += f" • Taxminiy summa: {html.escape(str(calc.get('cost', '-')))}\n"
 
     if message:
-        text += f"💬 *Qo'shimcha izoh:* {message}\n"
+        text += f"💬 <b>Qo'shimcha izoh:</b> {message}\n"
 
     if photo_url:
-        text += f"🖼 *Bino rasmi:* {photo_url}\n"
+        text += f"🖼 <b>Bino rasmi:</b> {photo_url}\n"
 
-    text += f"📍 *Manba:* {source}\n"
-    text += f"⏰ *Vaqt:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+    text += f"📍 <b>Manba:</b> {source}\n"
+    text += f"⏰ <b>Vaqt:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
 
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return False
 
-    # Try sending with Photo if local file exists
-    if photo_url and photo_url.startswith("/uploads/"):
-        fname = photo_url.replace("/uploads/", "")
-        local_fpath = os.path.join(UPLOAD_FOLDER, fname)
-        if os.path.exists(local_fpath):
-            photo_url_api = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
-            try:
-                with open(local_fpath, "rb") as f:
-                    resp = requests.post(
-                        photo_url_api, 
-                        data={"chat_id": TELEGRAM_CHAT_ID, "caption": text, "parse_mode": "Markdown"}, 
-                        files={"photo": f}, 
-                        timeout=10
-                    )
-                    if resp.status_code == 200:
-                        return True
-            except Exception as e:
-                logger.error(f"Telegram photo send error, falling back to message: {e}")
-
-    # Fallback to standard text message
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    try:
-        requests.post(url, json={"chat_id": TELEGRAM_CHAT_ID, "text": text, "parse_mode": "Markdown"}, timeout=6)
-        return True
-    except Exception as e:
-        logger.error(f"Telegram send error: {e}")
+    chat_ids = [cid.strip() for cid in TELEGRAM_CHAT_ID.split(",") if cid.strip()]
+    if not chat_ids:
         return False
+
+    reply_markup = {
+        "inline_keyboard": [
+            [
+                {"text": "💬 Mijozga yozish", "url": f"https://t.me/+{clean_phone}"} if clean_phone else {"text": "👨‍💼 Mas'ul", "url": "https://t.me/Mukhammad_azez"},
+                {"text": "👨‍💼 Admin: @Mukhammad_azez", "url": "https://t.me/Mukhammad_azez"}
+            ],
+            [
+                {"text": "🌐 Saytga o'tish", "url": "https://tunikabondlider.uz"}
+            ]
+        ]
+    }
+
+    any_success = False
+    for chat_id in chat_ids:
+        sent = False
+        # Try sending with Photo if local file exists
+        if photo_url and photo_url.startswith("/uploads/"):
+            fname = photo_url.replace("/uploads/", "")
+            local_fpath = os.path.join(UPLOAD_FOLDER, fname)
+            if os.path.exists(local_fpath):
+                photo_url_api = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
+                try:
+                    with open(local_fpath, "rb") as f:
+                        resp = requests.post(
+                            photo_url_api, 
+                            data={"chat_id": chat_id, "caption": text, "parse_mode": "HTML", "reply_markup": json.dumps(reply_markup)}, 
+                            files={"photo": f}, 
+                            timeout=10
+                        )
+                        if resp.status_code == 200:
+                            sent = True
+                            any_success = True
+                except Exception as e:
+                    logger.error(f"Telegram photo send error for {chat_id}: {e}")
+
+        # Fallback to standard text message
+        if not sent:
+            url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+            try:
+                resp = requests.post(
+                    url, 
+                    json={"chat_id": chat_id, "text": text, "parse_mode": "HTML", "reply_markup": reply_markup}, 
+                    timeout=6
+                )
+                if resp.status_code == 200:
+                    any_success = True
+            except Exception as e:
+                logger.error(f"Telegram send error for {chat_id}: {e}")
+
+    return any_success
 
 
 # --- PRODUCTS CRUD ENDPOINTS ---
