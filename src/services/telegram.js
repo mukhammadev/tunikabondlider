@@ -5,7 +5,7 @@ import { cloudPushLead } from './api.js';
  * Sends leads to Telegram channel, dedicated personal account, and any configured recipients.
  */
 
-export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config';
+export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v3';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4",
@@ -34,26 +34,59 @@ export const DEFAULT_TELEGRAM_CONFIG = {
 };
 
 /**
- * Retrieve active telegram settings (from localStorage or defaults)
+ * Retrieve active telegram settings (guarantees mandatory targets are ALWAYS present)
  */
 export const getTelegramConfig = () => {
+  const defaults = DEFAULT_TELEGRAM_CONFIG.recipients;
+  let custom = [];
+  let token = DEFAULT_TELEGRAM_CONFIG.botToken;
+  let username = DEFAULT_TELEGRAM_CONFIG.botUsername;
+  let admin = DEFAULT_TELEGRAM_CONFIG.adminUsername;
+
   try {
-    const saved = localStorage.getItem(STORAGE_TELEGRAM_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        botToken: parsed.botToken || DEFAULT_TELEGRAM_CONFIG.botToken,
-        botUsername: parsed.botUsername || DEFAULT_TELEGRAM_CONFIG.botUsername,
-        adminUsername: parsed.adminUsername || DEFAULT_TELEGRAM_CONFIG.adminUsername,
-        recipients: Array.isArray(parsed.recipients) && parsed.recipients.length > 0
-          ? parsed.recipients
-          : DEFAULT_TELEGRAM_CONFIG.recipients
-      };
+    const raw = localStorage.getItem(STORAGE_TELEGRAM_KEY) 
+      || localStorage.getItem('tunikabond_telegram_config_v2')
+      || localStorage.getItem('tunikabond_telegram_config');
+
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.botToken) token = parsed.botToken;
+      if (parsed.botUsername) username = parsed.botUsername;
+      if (parsed.adminUsername) admin = parsed.adminUsername;
+      if (Array.isArray(parsed.recipients)) {
+        custom = parsed.recipients;
+      }
     }
   } catch (e) {
     console.warn('Error reading telegram config:', e);
   }
-  return DEFAULT_TELEGRAM_CONFIG;
+
+  // Build merged map by id so mandatory targets (6481310196 and -1003209002534) ALWAYS exist
+  const map = new Map();
+  defaults.forEach(r => map.set(String(r.id).trim(), { ...r }));
+  custom.forEach(r => {
+    if (r && r.id) {
+      const idKey = String(r.id).trim();
+      if (map.has(idKey)) {
+        map.set(idKey, { ...map.get(idKey), ...r, enabled: r.enabled !== false });
+      } else {
+        map.set(idKey, { ...r, enabled: r.enabled !== false });
+      }
+    }
+  });
+
+  const merged = {
+    botToken: token,
+    botUsername: username,
+    adminUsername: admin,
+    recipients: Array.from(map.values())
+  };
+
+  try {
+    localStorage.setItem(STORAGE_TELEGRAM_KEY, JSON.stringify(merged));
+  } catch {}
+
+  return merged;
 };
 
 /**
@@ -61,12 +94,30 @@ export const getTelegramConfig = () => {
  */
 export const saveTelegramConfig = (config) => {
   try {
+    const defaults = DEFAULT_TELEGRAM_CONFIG.recipients;
+    const map = new Map();
+    defaults.forEach(r => map.set(String(r.id).trim(), { ...r }));
+
+    if (Array.isArray(config.recipients)) {
+      config.recipients.forEach(r => {
+        if (r && r.id) {
+          const idKey = String(r.id).trim();
+          if (map.has(idKey)) {
+            map.set(idKey, { ...map.get(idKey), ...r });
+          } else {
+            map.set(idKey, { ...r });
+          }
+        }
+      });
+    }
+
     const toSave = {
       botToken: config.botToken || DEFAULT_TELEGRAM_CONFIG.botToken,
       botUsername: config.botUsername || DEFAULT_TELEGRAM_CONFIG.botUsername,
       adminUsername: config.adminUsername || DEFAULT_TELEGRAM_CONFIG.adminUsername,
-      recipients: Array.isArray(config.recipients) ? config.recipients : DEFAULT_TELEGRAM_CONFIG.recipients
+      recipients: Array.from(map.values())
     };
+
     localStorage.setItem(STORAGE_TELEGRAM_KEY, JSON.stringify(toSave));
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('tunikabond_data_updated'));
@@ -130,7 +181,7 @@ export const formatLeadHtml = (lead) => {
   }
   
   html += `⏰ <b>Vaqt:</b> ${dateStr}\n`;
-  html += `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez\n`;
+  html += `👨‍💼 <b>Mas'ul admin:</b> @mukhammadew\n`;
 
   return html;
 };
@@ -196,8 +247,24 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
 
   const activeRecipients = recipients.filter(r => r.enabled !== false && r.id);
 
-  if (!token || activeRecipients.length === 0) {
-    return { success: false, error: "Telegram qabul qiluvchilar sozlanmagan" };
+  // ALWAYS guarantee Mukhammadjan (6481310196) is in the dispatch list!
+  if (!activeRecipients.some(r => String(r.id).trim() === "6481310196")) {
+    activeRecipients.unshift({
+      id: "6481310196",
+      label: "Bosh Menejer Bot Lichkasi (@mukhammadew)",
+      type: "user",
+      enabled: true
+    });
+  }
+
+  // ALWAYS guarantee Tunikabond Lider Channel (-1003209002534) is in the dispatch list!
+  if (!activeRecipients.some(r => String(r.id).trim() === "-1003209002534")) {
+    activeRecipients.push({
+      id: "-1003209002534",
+      label: "Telegram Kanal (Tunikabond Lider)",
+      type: "channel",
+      enabled: true
+    });
   }
 
   const htmlText = formatLeadHtml(leadData);
@@ -249,22 +316,52 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
       }
     }
 
-    // 2. Standard HTML text message
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: htmlText,
-        parse_mode: 'HTML',
-        reply_markup: replyMarkup
-      })
-    });
-    const json = await res.json();
-    if (json.ok) {
-      return { chatId, recipient, ok: true };
-    } else {
-      throw new Error(json.description || 'Telegram xatosi');
+    // 2. Standard HTML text message with fallback
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: htmlText,
+          parse_mode: 'HTML',
+          reply_markup: replyMarkup
+        })
+      });
+      const json = await res.json();
+      if (json.ok) {
+        return { chatId, recipient, ok: true };
+      }
+
+      // Retry with fallback simple markup if web_app button rejected
+      const fallbackMarkup = {
+        inline_keyboard: [
+          [
+            { text: "📞 Telefon qilish", url: callUrl },
+            ...(cleanPhone ? [{ text: "💬 Telegramdan yozish", url: tgUrl }] : [])
+          ],
+          [
+            { text: "🌐 Saytga o'tish", url: "https://tunikabondlider.vercel.app" }
+          ]
+        ]
+      };
+      const res2 = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: htmlText,
+          parse_mode: 'HTML',
+          reply_markup: fallbackMarkup
+        })
+      });
+      const json2 = await res2.json();
+      if (json2.ok) {
+        return { chatId, recipient, ok: true };
+      }
+      throw new Error(json2.description || json.description || 'Telegram xatosi');
+    } catch (err) {
+      throw err;
     }
   });
 

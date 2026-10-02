@@ -133,6 +133,7 @@ export const AdminDashboard = ({
       if (swt && Array.isArray(swt)) {
         setSwatchesList(swt);
       }
+      setTelegramConfig(getTelegramConfig());
     } finally {
       if (!isSilent) setLoading(false);
     }
