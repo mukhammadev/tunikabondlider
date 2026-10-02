@@ -5,7 +5,7 @@ import { cloudPushLead } from './api.js';
  * Sends leads to Telegram channel, dedicated personal account, and any configured recipients.
  */
 
-export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v5';
+export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v6_clean';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
@@ -14,29 +14,34 @@ export const DEFAULT_TELEGRAM_CONFIG = {
   recipients: [
     {
       id: "6481310196",
-      label: "Bosh Menejer Bot Lichkasi (@mukhammadew)",
+      label: "Bosh Menejer Lichkasi (@mukhammadew)",
       type: "user",
       enabled: true
     },
     {
       id: "-1004415750690",
-      label: "Telegram Kanal (@tunikabondlider_uz)",
+      label: "Rasmiy Kanal (@tunikabondlider_uz)",
       type: "channel",
-      enabled: true
-    },
-    {
-      id: "1003939636",
-      label: "Menejer Muhammadaziz (@Mukhammad_azez)",
-      type: "user",
       enabled: true
     }
   ]
 };
 
 /**
- * Retrieve active telegram settings (guarantees mandatory targets are ALWAYS present)
+ * Retrieve active telegram settings (guarantees ONLY official targets are present)
  */
 export const getTelegramConfig = () => {
+  // Purge ALL legacy storage keys so old channels or tokens NEVER survive:
+  try {
+    [
+      'tunikabond_telegram_config',
+      'tunikabond_telegram_config_v2',
+      'tunikabond_telegram_config_v3',
+      'tunikabond_telegram_config_v4',
+      'tunikabond_telegram_config_v5'
+    ].forEach(k => localStorage.removeItem(k));
+  } catch {}
+
   const defaults = DEFAULT_TELEGRAM_CONFIG.recipients;
   let custom = [];
   let token = DEFAULT_TELEGRAM_CONFIG.botToken;
@@ -44,14 +49,15 @@ export const getTelegramConfig = () => {
   let admin = DEFAULT_TELEGRAM_CONFIG.adminUsername;
 
   try {
-    const raw = localStorage.getItem(STORAGE_TELEGRAM_KEY) 
-      || localStorage.getItem('tunikabond_telegram_config_v2')
-      || localStorage.getItem('tunikabond_telegram_config');
-
+    const raw = localStorage.getItem(STORAGE_TELEGRAM_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed.botToken) token = parsed.botToken;
-      if (parsed.botUsername) username = parsed.botUsername;
+      if (parsed.botToken && !parsed.botToken.startsWith('8160493029')) {
+        token = parsed.botToken;
+      }
+      if (parsed.botUsername && !parsed.botUsername.includes('tunikabondlider_bot')) {
+        username = parsed.botUsername;
+      }
       if (parsed.adminUsername) admin = parsed.adminUsername;
       if (Array.isArray(parsed.recipients)) {
         custom = parsed.recipients;
@@ -61,11 +67,16 @@ export const getTelegramConfig = () => {
     console.warn('Error reading telegram config:', e);
   }
 
-  // Build merged map by id so mandatory targets (6481310196 and -1004415750690) ALWAYS exist
+  // Blacklist old channel and disconnected targets completely
+  const isBlacklisted = (id) => {
+    const s = String(id || '').trim();
+    return s === "-1003209002534" || s.includes("1003209002534") || s === "1003939636";
+  };
+
   const map = new Map();
   defaults.forEach(r => map.set(String(r.id).trim(), { ...r }));
   custom.forEach(r => {
-    if (r && r.id) {
+    if (r && r.id && !isBlacklisted(r.id)) {
       const idKey = String(r.id).trim();
       if (map.has(idKey)) {
         map.set(idKey, { ...map.get(idKey), ...r, enabled: r.enabled !== false });
@@ -240,28 +251,37 @@ export const testTelegramRecipient = async (botToken, chatId) => {
  */
 export const dispatchToTelegram = async (leadData, customConfig = null) => {
   const config = customConfig || getTelegramConfig();
-  const token = config.botToken || DEFAULT_TELEGRAM_CONFIG.botToken;
+  const rawToken = config.botToken || DEFAULT_TELEGRAM_CONFIG.botToken;
+  const token = (rawToken && !rawToken.startsWith("8160493029")) 
+    ? rawToken 
+    : DEFAULT_TELEGRAM_CONFIG.botToken;
+
   const recipients = (config.recipients && config.recipients.length > 0)
     ? config.recipients
     : DEFAULT_TELEGRAM_CONFIG.recipients;
 
-  const activeRecipients = recipients.filter(r => r.enabled !== false && r.id);
+  let activeRecipients = recipients.filter(r => {
+    if (r.enabled === false || !r.id) return false;
+    const sId = String(r.id).trim();
+    if (sId === "-1003209002534" || sId.includes("1003209002534") || sId === "1003939636") return false;
+    return true;
+  });
 
   // ALWAYS guarantee Mukhammadjan (6481310196) is in the dispatch list!
   if (!activeRecipients.some(r => String(r.id).trim() === "6481310196")) {
     activeRecipients.unshift({
       id: "6481310196",
-      label: "Bosh Menejer Bot Lichkasi (@mukhammadew)",
+      label: "Bosh Menejer Lichkasi (@mukhammadew)",
       type: "user",
       enabled: true
     });
   }
 
   // ALWAYS guarantee Tunikabond Lider Channel (-1004415750690) is in the dispatch list!
-  if (!activeRecipients.some(r => String(r.id).trim() === "-1004415750690")) {
+  if (!activeRecipients.some(r => String(r.id).trim() === "-1004415750690" || String(r.id).trim() === "@tunikabondlider_uz")) {
     activeRecipients.push({
       id: "-1004415750690",
-      label: "Telegram Kanal (@tunikabondlider_uz)",
+      label: "Rasmiy Kanal (@tunikabondlider_uz)",
       type: "channel",
       enabled: true
     });

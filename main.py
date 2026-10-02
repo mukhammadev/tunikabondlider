@@ -30,7 +30,7 @@ CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6481310196,-1004415750690,1003939636")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6481310196,-1004415750690")
 
 ACTIVE_TOKENS = {}  # token -> admin_info
 
@@ -740,7 +740,8 @@ def send_telegram_notification(lead_data):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return False
 
-    chat_ids = [cid.strip() for cid in TELEGRAM_CHAT_ID.split(",") if cid.strip()]
+    raw_chat_ids = [cid.strip() for cid in TELEGRAM_CHAT_ID.split(",") if cid.strip()]
+    chat_ids = [cid for cid in raw_chat_ids if cid not in ["-1003209002534", "1003939636"]]
     if not chat_ids:
         return False
 
