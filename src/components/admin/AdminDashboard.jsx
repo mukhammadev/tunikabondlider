@@ -2858,7 +2858,7 @@ export const AdminDashboard = ({
                   required
                   value={newRecipientForm.id}
                   onChange={(e) => setNewRecipientForm({ ...newRecipientForm, id: e.target.value })}
-                  placeholder="Masalan: 1003939636 yoki -1003209002534"
+                  placeholder="Masalan: 1003939636 yoki -1004415750690"
                   className="w-full px-4 py-2.5 rounded-xl bg-brand-dark/90 border border-white/15 text-white font-mono text-sm focus:outline-none focus:border-brand-red"
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">

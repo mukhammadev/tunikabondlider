@@ -5,7 +5,7 @@ import { cloudPushLead } from './api.js';
  * Sends leads to Telegram channel, dedicated personal account, and any configured recipients.
  */
 
-export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v4';
+export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v5';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
@@ -19,8 +19,8 @@ export const DEFAULT_TELEGRAM_CONFIG = {
       enabled: true
     },
     {
-      id: "-1003209002534",
-      label: "Telegram Kanal (Tunikabond Lider)",
+      id: "-1004415750690",
+      label: "Telegram Kanal (@tunikabondlider_uz)",
       type: "channel",
       enabled: true
     },
@@ -61,7 +61,7 @@ export const getTelegramConfig = () => {
     console.warn('Error reading telegram config:', e);
   }
 
-  // Build merged map by id so mandatory targets (6481310196 and -1003209002534) ALWAYS exist
+  // Build merged map by id so mandatory targets (6481310196 and -1004415750690) ALWAYS exist
   const map = new Map();
   defaults.forEach(r => map.set(String(r.id).trim(), { ...r }));
   custom.forEach(r => {
@@ -257,11 +257,11 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
     });
   }
 
-  // ALWAYS guarantee Tunikabond Lider Channel (-1003209002534) is in the dispatch list!
-  if (!activeRecipients.some(r => String(r.id).trim() === "-1003209002534")) {
+  // ALWAYS guarantee Tunikabond Lider Channel (-1004415750690) is in the dispatch list!
+  if (!activeRecipients.some(r => String(r.id).trim() === "-1004415750690")) {
     activeRecipients.push({
-      id: "-1003209002534",
-      label: "Telegram Kanal (Tunikabond Lider)",
+      id: "-1004415750690",
+      label: "Telegram Kanal (@tunikabondlider_uz)",
       type: "channel",
       enabled: true
     });
