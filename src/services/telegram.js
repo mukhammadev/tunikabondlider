@@ -5,13 +5,19 @@ import { cloudPushLead } from './api.js';
  * Sends leads to Telegram channel, dedicated personal account, and any configured recipients.
  */
 
-export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v7_guaranteed';
+export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v8_azez';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
   botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
   botUsername: "tunikabondlider_rasmiy_bot",
-  adminUsername: "mukhammadew",
+  adminUsername: "Mukhammad_azez",
   recipients: [
+    {
+      id: "1003939636",
+      label: "Mas'ul Admin (@Mukhammad_azez)",
+      type: "user",
+      enabled: true
+    },
     {
       id: "6481310196",
       label: "Bosh Menejer Lichkasi (@mukhammadew)",
@@ -39,7 +45,8 @@ export const getTelegramConfig = () => {
       'tunikabond_telegram_config_v3',
       'tunikabond_telegram_config_v4',
       'tunikabond_telegram_config_v5',
-      'tunikabond_telegram_config_v6_clean'
+      'tunikabond_telegram_config_v6_clean',
+      'tunikabond_telegram_config_v7_guaranteed'
     ].forEach(k => localStorage.removeItem(k));
   } catch {}
 
@@ -68,10 +75,10 @@ export const getTelegramConfig = () => {
     console.warn('Error reading telegram config:', e);
   }
 
-  // Blacklist old channel and disconnected targets completely
+  // Blacklist old channel completely
   const isBlacklisted = (id) => {
     const s = String(id || '').trim();
-    return s === "-1003209002534" || s.includes("1003209002534") || s === "1003939636";
+    return s === "-1003209002534" || s.includes("1003209002534");
   };
 
   const map = new Map();
@@ -193,7 +200,7 @@ export const formatLeadHtml = (lead) => {
   }
   
   html += `⏰ <b>Vaqt:</b> ${dateStr}\n`;
-  html += `👨‍💼 <b>Mas'ul admin:</b> @mukhammadew\n`;
+  html += `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez\n`;
 
   return html;
 };
@@ -264,9 +271,19 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
   let activeRecipients = recipients.filter(r => {
     if (r.enabled === false || !r.id) return false;
     const sId = String(r.id).trim();
-    if (sId === "-1003209002534" || sId.includes("1003209002534") || sId === "1003939636") return false;
+    if (sId === "-1003209002534" || sId.includes("1003209002534")) return false;
     return true;
   });
+
+  // ALWAYS guarantee Mas'ul Admin Muhammadaziz (1003939636) is in the dispatch list!
+  if (!activeRecipients.some(r => String(r.id).trim() === "1003939636")) {
+    activeRecipients.unshift({
+      id: "1003939636",
+      label: "Mas'ul Admin (@Mukhammad_azez)",
+      type: "user",
+      enabled: true
+    });
+  }
 
   // ALWAYS guarantee Mukhammadjan (6481310196) is in the dispatch list!
   if (!activeRecipients.some(r => String(r.id).trim() === "6481310196")) {
@@ -309,8 +326,8 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
               { text: "🚀 Ilovani ochish (Mini App)", web_app: { url: "https://tunikabondlider.vercel.app" } }
             ]
           : [
-              { text: "🌐 Saytni ochish", url: "https://tunikabondlider.vercel.app" },
-              { text: "👨‍💼 Admin: @mukhammadew", url: "https://t.me/mukhammadew" }
+              { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+              { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
             ]
       ]
     };

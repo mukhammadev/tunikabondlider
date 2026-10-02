@@ -1695,7 +1695,7 @@ export const AdminDashboard = ({
                   <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
                     <span className="flex items-center gap-1.5">
                       <UserCheck className="w-4 h-4 text-emerald-400" />
-                      Mas'ul admin: <strong className="text-white">@mukhammadew</strong>
+                      Mas'ul admin: <strong className="text-white">@{telegramConfig.adminUsername || 'Mukhammad_azez'}</strong>
                     </span>
                     <span className="text-slate-500 font-mono text-[11px]">
                       Format: HTML (Xatosiz yetkazish kafolatlangan)

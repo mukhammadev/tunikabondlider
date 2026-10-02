@@ -19,7 +19,8 @@ export default async function handler(req, res) {
   }
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
-  const ADMIN_ID = process.env.TELEGRAM_ADMIN_ID || "6481310196";
+  const ADMIN_ID = process.env.TELEGRAM_ADMIN_ID || "1003939636"; // @Mukhammad_azez
+  const OWNER_ID = "6481310196"; // @mukhammadew
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
 
   const update = req.body || {};
@@ -74,8 +75,8 @@ export default async function handler(req, res) {
         ],
         [
           {
-            text: "📞 Qo‘ng‘iroq qilish",
-            url: "https://tunikabondlider.vercel.app/call.html?tel=998995333303"
+            text: "🌐 Rasmiy sayt",
+            url: "https://tunikabondlider.vercel.app"
           },
           {
             text: "📢 Rasmiy Kanal",
@@ -84,8 +85,12 @@ export default async function handler(req, res) {
         ],
         [
           {
-            text: "👨‍💼 Bosh Menejer bilan aloqa",
-            url: "https://t.me/mukhammadew"
+            text: "📞 Qo‘ng‘iroq qilish",
+            url: "https://tunikabondlider.vercel.app/call.html?tel=998995333303"
+          },
+          {
+            text: "👨‍💼 Admin: @Mukhammad_azez",
+            url: "https://t.me/Mukhammad_azez"
           }
         ]
       ]
@@ -133,6 +138,9 @@ export default async function handler(req, res) {
       ]
     };
     await sendMessage(ADMIN_ID, adminNotification, adminMarkup);
+    if (OWNER_ID !== ADMIN_ID) {
+      await sendMessage(OWNER_ID, adminNotification, adminMarkup);
+    }
     await sendMessage(CHANNEL_ID, adminNotification);
   }
 

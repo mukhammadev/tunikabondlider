@@ -15,7 +15,8 @@ export default async function handler(req, res) {
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
-  const ADMIN_ID = process.env.TELEGRAM_ADMIN_ID || "6481310196";
+  const ADMIN_ID = process.env.TELEGRAM_ADMIN_ID || "1003939636"; // @Mukhammad_azez
+  const OWNER_ID = "6481310196"; // @mukhammadew
 
   // POST: Receive new lead and dispatch to Telegram
   if (req.method === 'POST') {
@@ -38,7 +39,7 @@ export default async function handler(req, res) {
       (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
       `📍 <b>Manba:</b> ${source || "Veb-sayt"}\n` +
       `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
-      `👨‍💼 <b>Mas'ul admin:</b> @mukhammadew`;
+      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
 
     const channelMarkup = {
       inline_keyboard: [
@@ -47,13 +48,13 @@ export default async function handler(req, res) {
           ...(cleanPhone ? [{ text: "💬 Telegramdan yozish", url: tgUrl }] : [])
         ],
         [
-          { text: "🌐 Saytni ochish", url: "https://tunikabondlider.vercel.app" },
-          { text: "👨‍💼 Admin: @mukhammadew", url: "https://t.me/mukhammadew" }
+          { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
+          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
         ]
       ]
     };
 
-    const targets = [ADMIN_ID, CHANNEL_ID, "@tunikabondlider_uz"];
+    const targets = [ADMIN_ID, OWNER_ID, CHANNEL_ID, "@tunikabondlider_uz"];
     for (const target of targets) {
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {

@@ -30,7 +30,7 @@ CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "6481310196,-1004415750690")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "1003939636,6481310196,-1004415750690")
 
 ACTIVE_TOKENS = {}  # token -> admin_info
 
@@ -719,7 +719,7 @@ def send_telegram_notification(lead_data):
     text += f"👤 <b>Mijoz:</b> {name}\n"
     text += f"📞 <b>Telefon:</b> <code>{html.escape(phone)}</code>\n"
     text += f"🛠 <b>Xizmat/Mahsulot:</b> {service}\n"
-    text += f"👨‍💼 <b>Mas'ul Admin:</b> @mukhammadew\n"
+    text += f"👨‍💼 <b>Mas'ul Admin:</b> @Mukhammad_azez\n"
 
     if calc:
         text += f"\n📊 <b>Kalkulyator Hisobi:</b>\n"
@@ -741,7 +741,7 @@ def send_telegram_notification(lead_data):
         return False
 
     raw_chat_ids = [cid.strip() for cid in TELEGRAM_CHAT_ID.split(",") if cid.strip()]
-    chat_ids = [cid for cid in raw_chat_ids if cid not in ["-1003209002534", "1003939636"]]
+    chat_ids = [cid for cid in raw_chat_ids if cid not in ["-1003209002534"]]
     if not chat_ids:
         return False
 
@@ -755,8 +755,8 @@ def send_telegram_notification(lead_data):
         row2 = [
             {"text": "🚀 Ilovani ochish (Mini App)", "web_app": {"url": "https://tunikabondlider.vercel.app"}}
         ] if is_private else [
-            {"text": "🌐 Saytni ochish", "url": "https://tunikabondlider.vercel.app"},
-            {"text": "👨‍💼 Admin: @mukhammadew", "url": "https://t.me/mukhammadew"}
+            {"text": "🌐 Rasmiy sayt", "url": "https://tunikabondlider.vercel.app"},
+            {"text": "👨‍💼 Admin: @Mukhammad_azez", "url": "https://t.me/Mukhammad_azez"}
         ]
         reply_markup = {
             "inline_keyboard": [
