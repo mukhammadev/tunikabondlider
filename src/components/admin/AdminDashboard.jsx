@@ -6,7 +6,8 @@ import {
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
   apiGetAdmins, apiRegister, apiUploadFile,
   apiGetCalcSettings, apiUpdateCalcSettings, DEFAULT_CALC_SETTINGS,
-  apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch
+  apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch,
+  apiExportAllData, apiImportData
 } from '../../services/api';
 import { 
   LayoutDashboard, Inbox, Package, Briefcase, Users, LogOut, 
@@ -146,8 +147,22 @@ export const AdminDashboard = ({
     setLoading(false);
   };
 
+  const notifyChange = () => {
+    if (onDataChanged) onDataChanged();
+    loadData();
+  };
+
   useEffect(() => {
     loadData();
+    const handleUpdate = () => {
+      loadData();
+    };
+    window.addEventListener('tunikabond_data_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('tunikabond_data_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   useEffect(() => {
@@ -192,6 +207,7 @@ export const AdminDashboard = ({
       const res = await apiUpdateCalcSettings(calcForm);
       if (res.success) {
         if (onCalcSettingsChanged) onCalcSettingsChanged(res.settings);
+        if (onDataChanged) onDataChanged();
         setCalcSuccessMsg(true);
         setTimeout(() => setCalcSuccessMsg(false), 3500);
       } else {
@@ -213,6 +229,7 @@ export const AdminDashboard = ({
         if (res.success) {
           setCalcForm(DEFAULT_CALC_SETTINGS);
           if (onCalcSettingsChanged) onCalcSettingsChanged(DEFAULT_CALC_SETTINGS);
+          if (onDataChanged) onDataChanged();
           setCalcSuccessMsg(true);
           setTimeout(() => setCalcSuccessMsg(false), 3500);
         }
@@ -228,12 +245,14 @@ export const AdminDashboard = ({
   const handleLeadStatusChange = async (leadId, newStatus) => {
     await apiUpdateLead(leadId, { status: newStatus });
     setLeads(leads.map(l => String(l.id) === String(leadId) ? { ...l, status: newStatus } : l));
+    if (onDataChanged) onDataChanged();
   };
 
   const handleDeleteLead = async (leadId) => {
     if (window.confirm("Haqiqatan ham ushbu arizani o'chirmoqchimisiz?")) {
       await apiDeleteLead(leadId);
       setLeads(leads.filter(l => String(l.id) !== String(leadId)));
+      if (onDataChanged) onDataChanged();
     }
   };
 
@@ -326,14 +345,14 @@ export const AdminDashboard = ({
       }
     }
     setProductModalOpen(false);
-    if (onDataChanged) onDataChanged();
+    notifyChange();
   };
 
   const handleDeleteProduct = async (prodId) => {
     if (window.confirm("Ushbu mahsulotni o'chirmoqchimisiz?")) {
       await apiDeleteProduct(prodId);
       setProductsList(productsList.filter(p => p.id !== prodId));
-      if (onDataChanged) onDataChanged();
+      notifyChange();
     }
   };
 
@@ -400,14 +419,14 @@ export const AdminDashboard = ({
       }
     }
     setPortfolioModalOpen(false);
-    if (onDataChanged) onDataChanged();
+    notifyChange();
   };
 
   const handleDeletePortfolio = async (itemId) => {
     if (window.confirm("Ushbu loyihani o'chirmoqchimisiz?")) {
       await apiDeletePortfolio(itemId);
       setPortfolioList(portfolioList.filter(p => p.id !== itemId));
-      if (onDataChanged) onDataChanged();
+      notifyChange();
     }
   };
 
@@ -475,14 +494,14 @@ export const AdminDashboard = ({
       }
     }
     setTeamModalOpen(false);
-    if (onDataChanged) onDataChanged();
+    notifyChange();
   };
 
   const handleDeleteTeamMember = async (memberId) => {
     if (window.confirm("Haqiqatan ham ushbu ustani o'chirmoqchimisiz?")) {
       await apiDeleteTeamMember(memberId);
       setTeamList(teamList.filter(m => m.id !== memberId));
-      if (onDataChanged) onDataChanged();
+      notifyChange();
     }
   };
 
@@ -494,6 +513,7 @@ export const AdminDashboard = ({
       setAdminsList([...adminsList, res.user]);
       setAdminModalOpen(false);
       setAdminForm({ username: '', fullName: '', password: '', role: 'Admin' });
+      notifyChange();
       alert("Yangi admin muvaffaqiyatli qo'shildi!");
     } else {
       alert(res.error || "Xatolik yuz berdi");
@@ -582,14 +602,14 @@ export const AdminDashboard = ({
       }
     }
     setSwatchModalOpen(false);
-    if (onDataChanged) onDataChanged();
+    notifyChange();
   };
 
   const handleDeleteSwatch = async (swatchId) => {
     if (window.confirm("Haqiqatan ham ushbu rang namunasini o'chirmoqchimisiz?")) {
       await apiDeleteSwatch(swatchId);
       setSwatchesList(swatchesList.filter(s => s.id !== swatchId));
-      if (onDataChanged) onDataChanged();
+      notifyChange();
     }
   };
 
@@ -597,28 +617,30 @@ export const AdminDashboard = ({
     <div className="dark fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn">
       
       {/* Top Navbar */}
-      <div className="bg-brand-surface border-b border-white/10 px-6 py-4 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-red to-brand-redHover flex items-center justify-center shadow-glow-red text-white font-black text-xl">
+      <div className="bg-brand-surface border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-4 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-brand-red to-brand-redHover flex items-center justify-center shadow-glow-red text-white font-black text-sm sm:text-xl shrink-0">
             TL
           </div>
-          <div>
-            <h1 className="font-display font-black text-lg sm:text-xl text-white flex items-center gap-2">
-              <span>Tunikabond Lider Boshqaruv Paneli</span>
-              <span className="text-[10px] bg-brand-red text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                CMS v2.0
+          <div className="min-w-0">
+            <h1 className="font-display font-black text-sm sm:text-xl text-white flex items-center gap-1.5 sm:gap-2 truncate">
+              <span className="truncate hidden sm:inline">Tunikabond Lider Boshqaruv Paneli</span>
+              <span className="truncate sm:hidden">TL Admin Paneli</span>
+              <span className="text-[9px] sm:text-[10px] bg-brand-red text-white px-1.5 sm:px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shrink-0">
+                v2.0
               </span>
             </h1>
-            <p className="text-xs text-slate-400">
-              Admin: <strong className="text-white">{currentUser?.fullName || currentUser?.username}</strong> ({currentUser?.role || 'Admin'})
+            <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+              Admin: <strong className="text-white">{currentUser?.fullName || currentUser?.username}</strong>
+              <span className="hidden sm:inline"> ({currentUser?.role || 'Admin'})</span>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <button
             onClick={loadData}
-            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
+            className="p-1.5 sm:p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
             title="Yangilash"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -646,10 +668,10 @@ export const AdminDashboard = ({
 
           <button
             onClick={onLogout}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-red/20 hover:bg-brand-red text-brand-red hover:text-white text-xs font-bold transition-all border border-brand-red/40"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-brand-red/20 hover:bg-brand-red text-brand-red hover:text-white text-xs font-bold transition-all border border-brand-red/40"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Chiqish</span>
+            <span className="hidden sm:inline">Chiqish</span>
           </button>
         </div>
       </div>
@@ -779,7 +801,7 @@ export const AdminDashboard = ({
         </aside>
 
         {/* Content Area */}
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto bg-brand-dark/50 pb-24 md:pb-6">
+        <main className="flex-1 p-3 sm:p-6 overflow-y-auto bg-brand-dark/50 pb-28 md:pb-6">
           
           {/* TAB 1: LEADS (Arizalar) */}
           {activeTab === 'leads' && (
@@ -1336,6 +1358,58 @@ export const AdminDashboard = ({
                   </div>
                 ))}
               </div>
+
+              {/* Data Backup & Restore */}
+              <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <Download className="w-5 h-5 text-brand-red" />
+                  <div>
+                    <h3 className="font-bold text-white text-sm">Ma'lumotlar zaxirasi (Backup & Restore)</h3>
+                    <p className="text-xs text-slate-400">
+                      Saytdagi barcha arizalar, mahsulotlar, obyektlar, ustalar, ranglar va narxlarni JSON fayl qilib saqlang yoki boshqa telefonga o'tkazing.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={apiExportAllData}
+                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-2 border border-white/10 transition-colors"
+                  >
+                    <Download className="w-4 h-4 text-emerald-400" />
+                    <span>Zaxira nusxani yuklab olish (.json)</span>
+                  </button>
+
+                  <label className="cursor-pointer px-4 py-2 rounded-xl bg-brand-red/20 hover:bg-brand-red/30 border border-brand-red/40 text-xs font-bold text-white flex items-center gap-2 transition-colors">
+                    <Upload className="w-4 h-4 text-brand-red" />
+                    <span>Zaxiradan tiklash (Import)</span>
+                    <input
+                      type="file"
+                      accept=".json"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          try {
+                            const text = await file.text();
+                            const res = await apiImportData(text);
+                            if (res.success) {
+                              notifyChange();
+                              alert("Barcha ma'lumotlar muvaffaqiyatli tiklandi!");
+                            } else {
+                              alert("Xatolik: " + (res.error || "Fayl formati noto'g'ri"));
+                            }
+                          } catch (err) {
+                            alert("Faylni o'qishda xatolik yuz berdi");
+                          }
+                          e.target.value = '';
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1810,10 +1884,10 @@ export const AdminDashboard = ({
         </main>
 
         {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet screens only) */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-1 py-1.5 flex items-center justify-around shadow-2xl safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-1 py-1.5 flex items-center justify-between shadow-2xl safe-area-bottom overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('leads')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all relative ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all relative ${
               activeTab === 'leads' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -1825,67 +1899,67 @@ export const AdminDashboard = ({
                 </span>
               )}
             </div>
-            <span className="text-[10px]">Arizalar</span>
+            <span className="text-[10px] truncate w-full text-center">Arizalar</span>
           </button>
 
           <button
             onClick={() => setActiveTab('products')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
               activeTab === 'products' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Package className="w-5 h-5" />
-            <span className="text-[10px]">Mahsulot</span>
+            <span className="text-[10px] truncate w-full text-center">Mahsulot</span>
           </button>
 
           <button
             onClick={() => setActiveTab('portfolio')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
               activeTab === 'portfolio' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Briefcase className="w-5 h-5" />
-            <span className="text-[10px]">Obyekt</span>
+            <span className="text-[10px] truncate w-full text-center">Obyekt</span>
           </button>
 
           <button
             onClick={() => setActiveTab('team')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
               activeTab === 'team' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Hammer className="w-5 h-5" />
-            <span className="text-[10px]">Ustalar</span>
+            <span className="text-[10px] truncate w-full text-center">Ustalar</span>
           </button>
 
           <button
             onClick={() => setActiveTab('swatches')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
               activeTab === 'swatches' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Palette className="w-5 h-5" />
-            <span className="text-[10px]">Ranglar</span>
+            <span className="text-[10px] truncate w-full text-center">Ranglar</span>
           </button>
 
           <button
             onClick={() => setActiveTab('calculator')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
               activeTab === 'calculator' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             <CalculatorIcon className="w-5 h-5" />
-            <span className="text-[10px]">Kalkulyator</span>
+            <span className="text-[10px] truncate w-full text-center">Narxlar</span>
           </button>
 
           <button
             onClick={() => setActiveTab('admins')}
-            className={`flex flex-col items-center gap-1 py-1 px-1.5 rounded-xl transition-all ${
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
               activeTab === 'admins' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Users className="w-5 h-5" />
-            <span className="text-[10px]">Adminlar</span>
+            <span className="text-[10px] truncate w-full text-center">Admin</span>
           </button>
         </div>
       </div>

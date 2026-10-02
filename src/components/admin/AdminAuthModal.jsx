@@ -19,8 +19,11 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     setSuccessMsg('');
     setLoading(true);
 
+    const cleanUser = (username || '').trim();
+    const cleanPass = (password || '').trim();
+
     if (isRegisterTab) {
-      const res = await apiRegister(username, password, fullName);
+      const res = await apiRegister(cleanUser, cleanPass, fullName.trim());
       setLoading(false);
       if (res.success) {
         setSuccessMsg("Yangi admin muvaffaqiyatli ro'yxatdan o'tdi! Endi kirishingiz mumkin.");
@@ -29,7 +32,7 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
         setError(res.error || "Ro'yxatdan o'tishda xatolik");
       }
     } else {
-      const res = await apiLogin(username, password);
+      const res = await apiLogin(cleanUser, cleanPass);
       setLoading(false);
       if (res.success) {
         onLoginSuccess(res.user);
@@ -137,6 +140,9 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
               <input
                 type="text"
                 required
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
                 placeholder="Muhammadazez yoki admin"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}

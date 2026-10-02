@@ -142,6 +142,15 @@ export function App() {
 
   useEffect(() => {
     loadDynamicData();
+    const handleUpdate = () => {
+      loadDynamicData();
+    };
+    window.addEventListener('tunikabond_data_updated', handleUpdate);
+    window.addEventListener('storage', handleUpdate);
+    return () => {
+      window.removeEventListener('tunikabond_data_updated', handleUpdate);
+      window.removeEventListener('storage', handleUpdate);
+    };
   }, []);
 
   // Admin handlers

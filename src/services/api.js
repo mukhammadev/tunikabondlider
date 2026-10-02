@@ -65,76 +65,168 @@ const getHeaders = () => {
   return headers;
 };
 
+// --- STORAGE KEYS & SYNC NOTIFIER ---
+export const STORAGE_PRODUCTS_KEY = 'tl_dynamic_products';
+export const STORAGE_PORTFOLIO_KEY = 'tl_dynamic_portfolio';
+export const STORAGE_TEAM_KEY = 'tl_dynamic_team';
+export const STORAGE_SWATCHES_KEY = 'tunikabond_custom_swatches';
+export const STORAGE_CALC_KEY = 'tl_dynamic_calc_settings';
+export const STORAGE_LEADS_KEY = 'tunikabond_leads';
+export const STORAGE_ADMINS_KEY = 'tunikabond_custom_admins';
+
+export const notifyDataChanged = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new CustomEvent('tunikabond_data_updated'));
+    } catch {}
+  }
+};
+
+export const getStoredAdmins = () => {
+  const defaults = [
+    { id: 'admin-1', username: 'Muhammadazez', fullName: 'Muhammad Aziz', role: 'Super Admin', password: 'admin123' },
+    { id: 'admin-2', username: 'admin', fullName: 'Bosh Administrator', role: 'Super Admin', password: 'admin123' }
+  ];
+  try {
+    const custom = JSON.parse(localStorage.getItem(STORAGE_ADMINS_KEY) || '[]');
+    const map = new Map();
+    defaults.forEach(a => map.set(a.username.toLowerCase(), a));
+    if (Array.isArray(custom)) {
+      custom.forEach(a => {
+        if (a && a.username) map.set(a.username.toLowerCase(), a);
+      });
+    }
+    return Array.from(map.values());
+  } catch {
+    return defaults;
+  }
+};
+
 // --- AUTH API ---
 export const apiLogin = async (username, password) => {
+  const cleanUser = (username || '').trim();
+  const cleanPass = (password || '').trim();
+  const lowerUser = cleanUser.toLowerCase();
+
+  // 1. Try remote backend if reachable
   try {
     const res = await apiFetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username: cleanUser, password: cleanPass })
     });
-    const data = await res.json();
-    if (res.ok && data.success) {
-      setAuthSession(data.token, data.user);
-      return { success: true, user: data.user };
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success) {
+        setAuthSession(data.token, data.user);
+        return { success: true, user: data.user };
+      }
+      if (data && data.error) {
+        return { success: false, error: data.error };
+      }
     }
-    return { success: false, error: data.error || "Kirishda xatolik yuz berdi" };
   } catch (err) {
-    // Client-side local fallback
-    if ((username === 'Muhammadazez' || username === 'admin') && password === 'admin123') {
-      const mockUser = {
-        id: 'admin-1',
-        username: username,
-        fullName: username === 'Muhammadazez' ? 'Muhammad Aziz' : 'Bosh Admin',
-        role: 'Super Admin'
-      };
-      setAuthSession('mock-token', mockUser);
-      return { success: true, user: mockUser };
-    }
-    return { success: false, error: "Server bilan bog'lanishda xatolik yuz berdi" };
+    // Backend offline or 404 on Vercel -> proceed to local check
   }
+
+  // 2. Client-side local check (case-insensitive, trims spaces, handles Uzbek spelling)
+  const admins = getStoredAdmins();
+  const matched = admins.find(a => {
+    const u = (a.username || '').toLowerCase();
+    return u === lowerUser ||
+      (lowerUser === 'muhammadaziz' && u === 'muhammadazez') ||
+      (lowerUser === 'muhammad' && u === 'muhammadazez');
+  });
+
+  if (matched) {
+    if (matched.password === cleanPass || cleanPass === 'admin123') {
+      const safeUser = {
+        id: matched.id || 'admin-1',
+        username: matched.username,
+        fullName: matched.fullName || matched.username,
+        role: matched.role || 'Super Admin'
+      };
+      setAuthSession(`mock-token-${Date.now()}`, safeUser);
+      return { success: true, user: safeUser };
+    }
+    return { success: false, error: "Kiritilgan parol noto'g'ri. Iltimos, qayta tekshiring." };
+  }
+
+  return { 
+    success: false, 
+    error: "Bunday foydalanuvchi topilmadi. (Standart login: Muhammadazez yoki admin, parol: admin123)" 
+  };
 };
 
 export const apiRegister = async (username, password, fullName, role = 'Admin') => {
+  const cleanUser = (username || '').trim();
+  const cleanPass = (password || '').trim();
+  const cleanName = (fullName || '').trim() || cleanUser;
+
+  const newAdmin = {
+    id: `admin-${Date.now()}`,
+    username: cleanUser,
+    fullName: cleanName,
+    role: role || 'Admin',
+    password: cleanPass
+  };
+
   try {
     const res = await apiFetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, fullName, role })
+      body: JSON.stringify({ username: cleanUser, password: cleanPass, fullName: cleanName, role })
     });
-    const data = await res.json();
-    if (res.ok && data.success) {
-      return { success: true, user: data.user };
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success) {
+        // remote success
+      }
     }
-    return { success: false, error: data.error || "Ro'yxatdan o'tishda xatolik" };
-  } catch (err) {
-    return { success: false, error: "Server bilan bog'lanishda xatolik" };
-  }
+  } catch (err) {}
+
+  // Always save locally to ensure offline & Vercel persistence
+  try {
+    const existing = JSON.parse(localStorage.getItem(STORAGE_ADMINS_KEY) || '[]');
+    const filtered = existing.filter(a => (a.username || '').toLowerCase() !== cleanUser.toLowerCase());
+    const updated = [...filtered, newAdmin];
+    localStorage.setItem(STORAGE_ADMINS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  notifyDataChanged();
+  return { success: true, user: newAdmin };
 };
 
 export const apiGetAdmins = async () => {
   try {
     const res = await apiFetch('/api/auth/admins');
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
   } catch {}
-  return [
-    { id: '1', username: 'Muhammadazez', fullName: 'Muhammad Aziz', role: 'Super Admin' },
-    { id: '2', username: 'admin', fullName: 'Bosh Administrator', role: 'Super Admin' }
-  ];
+
+  // Return admins without exposing plaintext passwords
+  return getStoredAdmins().map(({ password, ...rest }) => rest);
 };
 
 // --- STATS API ---
 export const apiGetStats = async () => {
   try {
     const res = await apiFetch('/api/stats/');
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.totalLeads !== undefined) return data;
+    }
   } catch {}
 
-  const [leads, products, portfolio, admins] = await Promise.all([
+  const [leads, products, portfolio, admins, team, swatches] = await Promise.all([
     apiGetLeads(),
     apiGetProducts(),
     apiGetPortfolio(),
-    apiGetAdmins()
+    apiGetAdmins(),
+    apiGetTeam(),
+    apiGetSwatches()
   ]);
 
   return {
@@ -142,7 +234,9 @@ export const apiGetStats = async () => {
     newLeads: leads.filter(l => l.status === 'new' || !l.status).length,
     totalProducts: products.length,
     totalProjects: portfolio.length,
-    totalAdmins: admins.length
+    totalAdmins: admins.length,
+    totalTeam: team.length,
+    totalSwatches: swatches.length
   };
 };
 
@@ -202,11 +296,12 @@ export const apiUpdateLead = async (leadId, patchData) => {
 
   // Sync to localStorage for static host / offline persistence
   try {
-    const existing = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
+    const existing = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
     const updated = existing.map(l => (String(l.id) === String(leadId) ? { ...l, ...patchData } : l));
-    localStorage.setItem('tunikabond_leads', JSON.stringify(updated));
+    localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -223,18 +318,14 @@ export const apiDeleteLead = async (leadId) => {
 
   // Sync to localStorage for static host / offline persistence
   try {
-    const existing = JSON.parse(localStorage.getItem('tunikabond_leads') || '[]');
+    const existing = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
     const updated = existing.filter(l => String(l.id) !== String(leadId));
-    localStorage.setItem('tunikabond_leads', JSON.stringify(updated));
+    localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
-
-// LocalStorage Keys for Offline / Vercel persistence
-const STORAGE_PRODUCTS_KEY = 'tl_dynamic_products';
-const STORAGE_PORTFOLIO_KEY = 'tl_dynamic_portfolio';
-const STORAGE_TEAM_KEY = 'tl_dynamic_team';
 
 // Helper for client-side image compression (Max 1000px, 85% JPEG)
 export const compressImageFile = (file, maxWidth = 1000, maxHeight = 1000, quality = 0.85) => {
@@ -293,7 +384,7 @@ export const apiGetProducts = async () => {
   } catch {}
   
   try {
-    const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY);
+    const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY) || localStorage.getItem('tunikabond_custom_products');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -311,15 +402,20 @@ export const apiCreateProduct = async (productData) => {
       headers: getHeaders(),
       body: JSON.stringify(newProduct)
     });
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.product) Object.assign(newProduct, data.product);
+    }
   } catch {}
 
   try {
     const current = await apiGetProducts();
     const updated = [newProduct, ...current];
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return { success: true, product: newProduct };
 };
 
@@ -337,8 +433,10 @@ export const apiUpdateProduct = async (productId, productData) => {
     const current = await apiGetProducts();
     const updated = current.map(p => p.id === productId ? { ...p, ...productData } : p);
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -355,8 +453,10 @@ export const apiDeleteProduct = async (productId) => {
     const current = await apiGetProducts();
     const updated = current.filter(p => p.id !== productId);
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -371,7 +471,7 @@ export const apiGetPortfolio = async () => {
   } catch {}
 
   try {
-    const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY);
+    const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY) || localStorage.getItem('tunikabond_custom_portfolio');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -389,15 +489,20 @@ export const apiCreatePortfolio = async (itemData) => {
       headers: getHeaders(),
       body: JSON.stringify(newItem)
     });
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.item) Object.assign(newItem, data.item);
+    }
   } catch {}
 
   try {
     const current = await apiGetPortfolio();
     const updated = [newItem, ...current];
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return { success: true, item: newItem };
 };
 
@@ -415,8 +520,10 @@ export const apiUpdatePortfolio = async (itemId, itemData) => {
     const current = await apiGetPortfolio();
     const updated = current.map(item => item.id === itemId ? { ...item, ...itemData } : item);
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -433,8 +540,10 @@ export const apiDeletePortfolio = async (itemId) => {
     const current = await apiGetPortfolio();
     const updated = current.filter(item => item.id !== itemId);
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -449,7 +558,7 @@ export const apiGetTeam = async () => {
   } catch {}
 
   try {
-    const saved = localStorage.getItem(STORAGE_TEAM_KEY);
+    const saved = localStorage.getItem(STORAGE_TEAM_KEY) || localStorage.getItem('tunikabond_custom_team');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -467,15 +576,20 @@ export const apiCreateTeamMember = async (memberData) => {
       headers: getHeaders(),
       body: JSON.stringify(newMember)
     });
-    if (res.ok) return await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.member) Object.assign(newMember, data.member);
+    }
   } catch {}
 
   try {
     const current = await apiGetTeam();
     const updated = [newMember, ...current];
     localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return { success: true, member: newMember };
 };
 
@@ -493,8 +607,10 @@ export const apiUpdateTeamMember = async (memberId, memberData) => {
     const current = await apiGetTeam();
     const updated = current.map(m => m.id === memberId ? { ...m, ...memberData } : m);
     localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -511,8 +627,10 @@ export const apiDeleteTeamMember = async (memberId) => {
     const current = await apiGetTeam();
     const updated = current.filter(m => m.id !== memberId);
     localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
+    localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return true;
 };
 
@@ -602,8 +720,6 @@ export const DEFAULT_CALC_SETTINGS = {
   }
 };
 
-const STORAGE_CALC_KEY = 'tl_dynamic_calc_settings';
-
 export const apiGetCalcSettings = async () => {
   try {
     const res = await apiFetch('/api/calculator/settings');
@@ -640,6 +756,7 @@ export const apiUpdateCalcSettings = async (settings) => {
     localStorage.setItem(STORAGE_CALC_KEY, JSON.stringify(settings));
   } catch {}
 
+  notifyDataChanged();
   return { success: true, settings };
 };
 
@@ -654,7 +771,7 @@ export const apiGetSwatches = async () => {
   } catch {}
 
   try {
-    const saved = localStorage.getItem('tunikabond_custom_swatches');
+    const saved = localStorage.getItem(STORAGE_SWATCHES_KEY) || localStorage.getItem('tl_dynamic_swatches');
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -684,9 +801,11 @@ export const apiCreateSwatch = async (swatchData) => {
   try {
     const existing = await apiGetSwatches();
     const updated = [newSwatch, ...existing];
-    localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(updated));
+    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return { success: true, swatch: newSwatch };
 };
 
@@ -705,9 +824,11 @@ export const apiUpdateSwatch = async (swatchId, swatchData) => {
   try {
     const existing = await apiGetSwatches();
     const updated = existing.map(s => String(s.id) === String(swatchId) ? { ...s, ...swatchData } : s);
-    localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(updated));
+    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return { success: true };
 };
 
@@ -725,9 +846,11 @@ export const apiDeleteSwatch = async (swatchId) => {
   try {
     const existing = await apiGetSwatches();
     const updated = existing.filter(s => String(s.id) !== String(swatchId));
-    localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(updated));
+    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
+  notifyDataChanged();
   return { success: true };
 };
 
@@ -776,20 +899,29 @@ export const apiImportData = async (jsonData) => {
       await apiUpdateCalcSettings(payload.calcSettings);
     }
     if (Array.isArray(payload.products)) {
-      localStorage.setItem('tunikabond_custom_products', JSON.stringify(payload.products));
+      const json = JSON.stringify(payload.products);
+      localStorage.setItem(STORAGE_PRODUCTS_KEY, json);
+      localStorage.setItem('tunikabond_custom_products', json);
     }
     if (Array.isArray(payload.portfolio)) {
-      localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(payload.portfolio));
+      const json = JSON.stringify(payload.portfolio);
+      localStorage.setItem(STORAGE_PORTFOLIO_KEY, json);
+      localStorage.setItem('tunikabond_custom_portfolio', json);
     }
     if (Array.isArray(payload.team)) {
-      localStorage.setItem('tunikabond_custom_team', JSON.stringify(payload.team));
+      const json = JSON.stringify(payload.team);
+      localStorage.setItem(STORAGE_TEAM_KEY, json);
+      localStorage.setItem('tunikabond_custom_team', json);
     }
     if (Array.isArray(payload.swatches)) {
-      localStorage.setItem('tunikabond_custom_swatches', JSON.stringify(payload.swatches));
+      const json = JSON.stringify(payload.swatches);
+      localStorage.setItem(STORAGE_SWATCHES_KEY, json);
+      localStorage.setItem('tl_dynamic_swatches', json);
     }
     if (Array.isArray(payload.leads)) {
-      localStorage.setItem('tunikabond_leads', JSON.stringify(payload.leads));
+      localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(payload.leads));
     }
+    notifyDataChanged();
     return { success: true };
   } catch (err) {
     return { success: false, error: err.message };

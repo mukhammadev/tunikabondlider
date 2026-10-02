@@ -57,8 +57,14 @@ export const submitLead = async (leadData) => {
   }
 
   // 2. Direct Telegram webhook fallback
-  const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-  const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+  const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN || "8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4";
+  const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID || "-1003209002534";
+
+  if (typeof window !== 'undefined') {
+    try {
+      window.dispatchEvent(new CustomEvent('tunikabond_data_updated'));
+    } catch {}
+  }
 
   if (BOT_TOKEN && CHAT_ID) {
     try {

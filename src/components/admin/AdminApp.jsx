@@ -66,7 +66,9 @@ export const AdminApp = () => {
     setLoading(true);
 
     try {
-      const res = await apiLogin(username, password);
+      const cleanUser = (username || '').trim();
+      const cleanPass = (password || '').trim();
+      const res = await apiLogin(cleanUser, cleanPass);
       setLoading(false);
       if (res.success) {
         setCurrentUser(res.user);
@@ -179,6 +181,9 @@ export const AdminApp = () => {
                 <input
                   type="text"
                   required
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Loginni kiriting"
