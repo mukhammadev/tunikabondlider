@@ -30,7 +30,7 @@ CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "1003939636,6481310196,-1004415750690")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1004415750690")
 
 ACTIVE_TOKENS = {}  # token -> admin_info
 
@@ -741,34 +741,14 @@ def send_telegram_notification(lead_data):
         return False
 
     raw_chat_ids = [cid.strip() for cid in TELEGRAM_CHAT_ID.split(",") if cid.strip()]
-    chat_ids = [cid for cid in raw_chat_ids if cid not in ["-1003209002534"]]
+    chat_ids = [cid for cid in raw_chat_ids if cid not in ["-1003209002534", "1003939636", "6481310196"]]
     if not chat_ids:
-        return False
-
-    call_url = f"https://tunikabondlider.vercel.app/call.html?tel={clean_phone or '998995333303'}"
-    tg_url = f"https://t.me/+{clean_phone}"
+        chat_ids = ["-1004415750690"]
 
     any_success = False
     for chat_id in chat_ids:
         sent = False
-        is_private = not chat_id.startswith("-")
-        row2 = [
-            {"text": "🚀 Ilovani ochish (Mini App)", "web_app": {"url": "https://tunikabondlider.vercel.app"}}
-        ] if is_private else [
-            {"text": "🌐 Rasmiy sayt", "url": "https://tunikabondlider.vercel.app"},
-            {"text": "📢 Rasmiy Kanal", "url": "https://t.me/tunikabondLiderkanali"},
-            {"text": "👨‍💼 Admin: @Mukhammad_azez", "url": "https://t.me/Mukhammad_azez"}
-        ]
-        reply_markup = {
-            "inline_keyboard": [
-                [
-                    {"text": "📞 Telefon qilish", "url": call_url},
-                    {"text": "💬 Telegramdan yozish", "url": "https://t.me/Mukhammad_azez"}
-                ],
-                row2
-            ]
-        }
-        # Try sending with Photo if local file exists
+        # Try sending with Photo if local file exists (clean, NO buttons for internal private channel)
         if photo_url and photo_url.startswith("/uploads/"):
             fname = photo_url.replace("/uploads/", "")
             local_fpath = os.path.join(UPLOAD_FOLDER, fname)
@@ -778,7 +758,7 @@ def send_telegram_notification(lead_data):
                     with open(local_fpath, "rb") as f:
                         resp = requests.post(
                             photo_url_api, 
-                            data={"chat_id": chat_id, "caption": text, "parse_mode": "HTML", "reply_markup": json.dumps(reply_markup)}, 
+                            data={"chat_id": chat_id, "caption": text, "parse_mode": "HTML"}, 
                             files={"photo": f}, 
                             timeout=10
                         )
@@ -788,13 +768,13 @@ def send_telegram_notification(lead_data):
                 except Exception as e:
                     logger.error(f"Telegram photo send error for {chat_id}: {e}")
 
-        # Fallback to standard text message
+        # Fallback to standard text message (clean, NO buttons for internal private channel)
         if not sent:
             url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
             try:
                 resp = requests.post(
                     url, 
-                    json={"chat_id": chat_id, "text": text, "parse_mode": "HTML", "reply_markup": reply_markup}, 
+                    json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}, 
                     timeout=6
                 )
                 if resp.status_code == 200:

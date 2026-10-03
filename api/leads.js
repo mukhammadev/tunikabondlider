@@ -1,12 +1,20 @@
 /**
  * Vercel Serverless Function: /api/leads
- * Real-time synchronization of leads from Telegram Channel (@tunikabondlider_uz)
- * and direct Telegram Bot updates (@tunikabondlider_rasmiy_bot)
+ * Real-time synchronization of leads for Admin Panel and Telegram Private Channel
+ * 
+ * Rules:
+ * 1. Leads from website go ONLY to the private channel (-1004415750690) and Admin Panel.
+ * 2. NO personal bot chat sends (ADMIN_ID, OWNER_ID are not spammed).
+ * 3. Channel messages have NO buttons (reply_markup is omitted for private internal channel).
+ * 4. User receives confirmation details if telegram user ID is provided.
  */
+
+// In-memory cache for warm lambda executions
+const inMemoryLeads = [];
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -15,10 +23,9 @@ export default async function handler(req, res) {
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
-  const ADMIN_ID = process.env.TELEGRAM_ADMIN_ID || "1003939636"; // @Mukhammad_azez
-  const OWNER_ID = "6481310196"; // @mukhammadew
+  const CLOUD_LEADS_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a0fc19c245604c";
 
-  // POST: Receive new lead and dispatch to Telegram
+  // POST: Receive new lead and dispatch to Telegram Private Channel and Admin Panel
   if (req.method === 'POST') {
     const data = req.body || {};
     const { name, phone, service, message, source, calcData } = data;
@@ -27,35 +34,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Telefon raqami kiritilishi shart" });
     }
 
-    const cleanPhone = String(phone).replace(/\D/g, '');
-    const callUrl = `https://tunikabondlider.vercel.app/call.html?tel=${cleanPhone || '998995333303'}`;
-    const tgUrl = `https://t.me/+${cleanPhone}`;
-
-    const text = `🔥 <b>YANGI ARIZA — TUNIKABOND LIDER</b> 🔥\n\n` +
-      `👤 <b>Mijoz:</b> ${name || "Noma'lum"}\n` +
-      `📞 <b>Telefon:</b> <code>${phone}</code>\n` +
-      (service ? `🛠 <b>Xizmat / Mahsulot:</b> ${service}\n` : '') +
-      (calcData ? `\n📊 <b>Kalkulyator Hisobi:</b>\n • Maydoni: ${calcData.area || '-'} m²\n • Narx: <b>${calcData.cost || '-'}</b>\n` : '') +
-      (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
-      `📍 <b>Manba:</b> ${source || "Veb-sayt"}\n` +
-      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
-      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
-
-    const channelMarkup = {
-      inline_keyboard: [
-        [
-          { text: "📞 Telefon qilish", url: callUrl },
-          { text: "💬 Telegramdan yozish", url: "https://t.me/Mukhammad_azez" }
-        ],
-        [
-          { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
-          { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
-        ],
-        [
-          { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
-        ]
-      ]
+    const leadRecord = {
+      id: data.id || `lead-${Date.now()}`,
+      name: name || "Noma'lum",
+      phone: String(phone).trim(),
+      service: service || data.product || "Tunikabond xizmatlari",
+      message: message || "",
+      source: source || "Veb-sayt",
+      calcData: calcData || null,
+      status: data.status || "new",
+      timestamp: data.timestamp || new Date().toISOString()
     };
+
+    // Cache in memory
+    const existingIdx = inMemoryLeads.findIndex(l => String(l.id) === String(leadRecord.id));
+    if (existingIdx >= 0) {
+      inMemoryLeads[existingIdx] = leadRecord;
+    } else {
+      inMemoryLeads.unshift(leadRecord);
+    }
 
     // 1. Send confirmation message directly to user if submitted via Telegram Mini App
     const userChatId = data.telegramUserId || data.chatId || data.userId;
@@ -71,18 +68,6 @@ export default async function handler(req, res) {
         `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
         `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
 
-      const userMarkup = {
-        inline_keyboard: [
-          [
-            { text: "🌐 Rasmiy sayt", url: "https://tunikabondlider.vercel.app" },
-            { text: "📢 Rasmiy Kanal", url: "https://t.me/tunikabondLiderkanali" }
-          ],
-          [
-            { text: "👨‍💼 Admin: @Mukhammad_azez", url: "https://t.me/Mukhammad_azez" }
-          ]
-        ]
-      };
-
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
@@ -90,8 +75,7 @@ export default async function handler(req, res) {
           body: JSON.stringify({
             chat_id: userChatId,
             text: userConfirmHtml,
-            parse_mode: 'HTML',
-            reply_markup: userMarkup
+            parse_mode: 'HTML'
           })
         });
       } catch (e) {
@@ -99,138 +83,82 @@ export default async function handler(req, res) {
       }
     }
 
-    // 2. Dispatch to Admin, Owner, and Channels
-    const targets = [ADMIN_ID, OWNER_ID, CHANNEL_ID, "@tunikabondlider_uz", "@tunikabondLiderkanali"];
-    for (const target of targets) {
-      try {
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
+    // 2. Dispatch ONLY to Private Channel WITHOUT buttons
+    const channelText = 
+      `🔥 <b>YANGI ARIZA — TUNIKABOND LIDER</b> 🔥\n\n` +
+      `👤 <b>Mijoz:</b> ${name || "Noma'lum"}\n` +
+      `📞 <b>Telefon:</b> <code>${phone}</code>\n` +
+      (service ? `🛠 <b>Xizmat / Mahsulot:</b> ${service}\n` : '') +
+      (calcData ? `\n📊 <b>Kalkulyator Hisobi:</b>\n • Maydoni: ${calcData.area || '-'} m²\n • Narx: <b>${calcData.cost || '-'}</b>\n` : '') +
+      (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
+      `📍 <b>Manba:</b> ${source || "Veb-sayt"}\n` +
+      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
+      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
+
+    try {
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CHANNEL_ID,
+          text: channelText,
+          parse_mode: 'HTML'
+        })
+      });
+    } catch (e) {
+      console.warn("Channel dispatch error:", e);
+    }
+
+    // 3. Sync to Cloud Leads Store for Admin Panel persistence
+    try {
+      const cRes = await fetch(CLOUD_LEADS_URL);
+      if (cRes.ok) {
+        const json = await cRes.json();
+        const current = json?.data?.leads || [];
+        const filtered = current.filter(l => String(l.id) !== String(leadRecord.id));
+        await fetch(CLOUD_LEADS_URL, {
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: target,
-            text: text,
-            parse_mode: 'HTML',
-            reply_markup: channelMarkup
+            name: 'tunikabond_leads_v2',
+            data: { leads: [leadRecord, ...filtered].slice(0, 100) }
           })
         });
-      } catch {}
-    }
+      }
+    } catch {}
 
     return res.status(201).json({
       success: true,
-      message: "Ariza muvaffaqiyatli qabul qilindi va Telegramga yuborildi",
-      lead: {
-        id: `lead-${Date.now()}`,
-        ...data,
-        status: "new",
-        timestamp: new Date().toISOString()
-      }
+      message: "Ariza muvaffaqiyatli qabul qilindi va kanalga yuborildi",
+      lead: leadRecord
     });
   }
 
-  // GET: Fetch and sync all leads from Telegram Channel & Bot
+  // GET: Fetch and sync all leads for Admin Panel
   if (req.method === 'GET') {
-    const leads = [];
-    const seenKeys = new Set();
+    const leads = [...inMemoryLeads];
+    const seenIds = new Set(leads.map(l => String(l.id)));
 
-    // 1. Parse all public posts from Telegram channel https://t.me/s/tunikabondlider_uz
+    // Try fetching from Cloud Store
     try {
-      const chanRes = await fetch("https://t.me/s/tunikabondlider_uz", {
-        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
-      });
-
-      if (chanRes.ok) {
-        const html = await chanRes.text();
-        const msgRegex = /<div class="tgme_widget_message_text js-message_text"[^>]*>([\s\S]*?)<\/div>/g;
-        let match;
-        let idx = 1;
-
-        while ((match = msgRegex.exec(html)) !== null) {
-          const raw = match[1];
-          if (raw.includes("YANGI ARIZA") || raw.includes("Mijoz:") || raw.includes("Telefon:")) {
-            const cleanText = raw
-              .replace(/<br\s*\/?>/gi, "\n")
-              .replace(/<[^>]+>/g, "")
-              .replace(/&amp;/g, "&")
-              .replace(/&lt;/g, "<")
-              .replace(/&gt;/g, ">")
-              .replace(/&#39;/g, "'")
-              .replace(/&quot;/g, '"');
-
-            const nameM = cleanText.match(/Mijoz:\s*([^\n]+)/);
-            const phoneM = cleanText.match(/Telefon:\s*([^\n]+)/);
-            const serviceM = cleanText.match(/Xizmat(?:\/Mahsulot|\s*\/\s*Mahsulot)?:\s*([^\n]+)/);
-            const noteM = cleanText.match(/Qo['\u2019]shimcha izoh:\s*([^\n]+)/);
-            const srcM = cleanText.match(/Manba:\s*([^\n]+)/);
-            const timeM = cleanText.match(/Vaqt:\s*([^\n]+)/);
-
-            if (phoneM) {
-              const phone = phoneM[1].trim();
-              const timeStr = timeM ? timeM[1].trim() : '';
-              const key = `${phone}_${timeStr}`;
-
-              if (!seenKeys.has(key)) {
-                seenKeys.add(key);
-                leads.push({
-                  id: `tg-channel-${idx++}`,
-                  name: nameM ? nameM[1].trim() : "Mijoz",
-                  phone: phone,
-                  service: serviceM ? serviceM[1].trim() : "Tunikabond Lider",
-                  message: noteM ? noteM[1].trim() : "",
-                  source: srcM ? `Telegram (${srcM[1].trim()})` : "Telegram Kanal (@tunikabondlider_uz)",
-                  timestamp: timeStr || new Date().toISOString(),
-                  status: "new"
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("Channel read error:", err);
-    }
-
-    // 2. Fetch direct messages / contacts from Telegram Bot (getUpdates)
-    try {
-      const updatesRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?limit=50`);
-      if (updatesRes.ok) {
-        const uJson = await updatesRes.json();
-        if (uJson.ok && Array.isArray(uJson.result)) {
-          uJson.result.forEach(u => {
-            const m = u.message;
-            if (m && m.from && !m.from.is_bot) {
-              const fromName = `${m.from.first_name || ''} ${m.from.last_name || ''}`.trim() || m.from.username || 'Telegram Mijoz';
-              const text = (m.text || '').trim();
-              const contactPhone = m.contact?.phone_number || '';
-              const phoneMatch = text.match(/\+?998\s*\d{2}\s*\d{3}\s*\d{2}\s*\d{2}|\b\d{9}\b/);
-              const phone = contactPhone || (phoneMatch ? phoneMatch[0] : (m.from.username ? `@${m.from.username}` : `ID: ${m.from.id}`));
-
-              const key = `bot-msg-${m.from.id}-${m.date}`;
-              if (!seenKeys.has(key)) {
-                seenKeys.add(key);
-                leads.push({
-                  id: `tg-bot-${m.message_id}-${m.date}`,
-                  name: fromName,
-                  phone: phone,
-                  service: "Telegram Bot Murojaati",
-                  message: text !== '/start' ? text : "Botga /start bosdi",
-                  source: m.from.username ? `Telegram Bot (@${m.from.username})` : `Telegram Bot (${m.from.id})`,
-                  timestamp: new Date(m.date * 1000).toISOString(),
-                  status: "new"
-                });
-              }
+      const cRes = await fetch(CLOUD_LEADS_URL);
+      if (cRes.ok) {
+        const json = await cRes.json();
+        if (json?.data?.leads && Array.isArray(json.data.leads)) {
+          json.data.leads.forEach(l => {
+            if (l && l.id && !seenIds.has(String(l.id))) {
+              seenIds.add(String(l.id));
+              leads.push(l);
             }
           });
         }
       }
-    } catch (err) {
-      console.warn("Updates read error:", err);
-    }
+    } catch {}
 
     // Sort newest first
     leads.sort((a, b) => {
-      const tA = new Date(a.timestamp).getTime() || 0;
-      const tB = new Date(b.timestamp).getTime() || 0;
+      const tA = new Date(a.timestamp || a.date).getTime() || 0;
+      const tB = new Date(b.timestamp || b.date).getTime() || 0;
       return tB - tA;
     });
 

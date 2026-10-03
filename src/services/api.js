@@ -370,6 +370,18 @@ export const apiGetLeads = async () => {
     localLeads = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
   } catch {}
 
+  // 3. Fetch from Cloud Leads Store if accessible
+  let cloudLeads = [];
+  try {
+    const cRes = await fetch(CLOUD_LEADS_URL);
+    if (cRes.ok) {
+      const cJson = await cRes.json();
+      if (cJson?.data?.leads && Array.isArray(cJson.data.leads)) {
+        cloudLeads = cJson.data.leads;
+      }
+    }
+  } catch {}
+
   // Local statuses map so admin status changes are preserved
   const localStatusMap = new Map();
   localLeads.forEach(l => {
@@ -382,7 +394,7 @@ export const apiGetLeads = async () => {
   });
 
   const map = new Map();
-  [...backendLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
+  [...backendLeads, ...cloudLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
     if (l && (l.id || l.phone)) {
       const key = String(l.id || `${l.phone}_${l.timestamp || l.date}`);
       if (!map.has(key)) {
