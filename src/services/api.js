@@ -72,6 +72,7 @@ export const STORAGE_TEAM_KEY = 'tl_dynamic_team';
 export const STORAGE_SWATCHES_KEY = 'tunikabond_custom_swatches';
 export const STORAGE_CALC_KEY = 'tl_dynamic_calc_settings';
 export const STORAGE_LEADS_KEY = 'tunikabond_leads';
+export const STORAGE_DELETED_LEADS_KEY = 'tunikabond_deleted_leads_v1';
 export const STORAGE_ADMINS_KEY = 'tunikabond_custom_admins';
 
 export const notifyDataChanged = () => {
@@ -208,6 +209,22 @@ export const apiGetAdmins = async () => {
 
   // Return admins without exposing plaintext passwords
   return getStoredAdmins().map(({ password, ...rest }) => rest);
+};
+
+export const apiDeleteAdmin = async (adminId) => {
+  try {
+    const existing = JSON.parse(localStorage.getItem(STORAGE_ADMINS_KEY) || '[]');
+    const target = existing.find(a => String(a.id) === String(adminId) || a.username === adminId);
+    if (target && (target.username.toLowerCase() === 'muhammadazez' || target.username.toLowerCase() === 'admin')) {
+      return { success: false, error: "Asosiy administratorni o'chirib bo'lmaydi" };
+    }
+    const updated = existing.filter(a => String(a.id) !== String(adminId) && a.username !== adminId);
+    localStorage.setItem(STORAGE_ADMINS_KEY, JSON.stringify(updated));
+    notifyDataChanged();
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: "O'chirishda xatolik yuz berdi" };
+  }
 };
 
 // --- STATS API ---
@@ -393,10 +410,23 @@ export const apiGetLeads = async () => {
     }
   });
 
+  // Tombstone filter: avoid resurrecting leads that were deleted by admin
+  let deletedSet = new Set();
+  try {
+    const rawDeleted = JSON.parse(localStorage.getItem(STORAGE_DELETED_LEADS_KEY) || '[]');
+    deletedSet = new Set(rawDeleted.map(String));
+  } catch {}
+
   const map = new Map();
   [...backendLeads, ...cloudLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
     if (l && (l.id || l.phone)) {
+      if (l.id && deletedSet.has(String(l.id))) {
+        return;
+      }
       const key = String(l.id || `${l.phone}_${l.timestamp || l.date}`);
+      if (deletedSet.has(key)) {
+        return;
+      }
       if (!map.has(key)) {
         // Restore local status if admin already updated it
         const savedStatus = localStatusMap.get(String(l.id)) || (l.phone && localStatusMap.get(String(l.phone)));
@@ -483,6 +513,16 @@ export const apiDeleteLead = async (leadId) => {
     const existing = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
     const updated = existing.filter(l => String(l.id) !== String(leadId));
     localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  // Mark in tombstone set so it is never revived by external feeds or Telegram getUpdates
+  try {
+    const deletedList = JSON.parse(localStorage.getItem(STORAGE_DELETED_LEADS_KEY) || '[]');
+    const strId = String(leadId);
+    if (!deletedList.includes(strId)) {
+      deletedList.push(strId);
+      localStorage.setItem(STORAGE_DELETED_LEADS_KEY, JSON.stringify(deletedList.slice(-300)));
+    }
   } catch {}
 
   // Sync to Cloud Storage

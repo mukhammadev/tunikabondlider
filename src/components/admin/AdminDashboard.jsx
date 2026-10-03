@@ -4,7 +4,7 @@ import {
   apiGetProducts, apiCreateProduct, apiUpdateProduct, apiDeleteProduct,
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
-  apiGetAdmins, apiRegister, apiUploadFile,
+  apiGetAdmins, apiRegister, apiDeleteAdmin, apiUploadFile,
   apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch,
   apiExportAllData, apiImportData
 } from '../../services/api';
@@ -19,7 +19,8 @@ import {
   Plus, Trash2, Edit3, CheckCircle2, Clock, Phone, Send, X, 
   ExternalLink, Search, RefreshCw, Shield, AlertCircle,
   Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck,
-  Palette, Bot, MessageSquare, Check, Save, Radio
+  Palette, Bot, MessageSquare, Check, Save, Radio,
+  ShieldCheck, Layers, Eye, Filter, TrendingUp, Sparkles
 } from 'lucide-react';
 
 export const AdminDashboard = ({ 
@@ -30,9 +31,11 @@ export const AdminDashboard = ({
   isStandaloneApp = false,
   swatchesList: propSwatchesList
 }) => {
-  const [activeTab, setActiveTab] = useState('leads'); // stats | leads | products | portfolio | team | swatches | telegram | admins
+  const [activeTab, setActiveTab] = useState('overview'); // overview | leads | products | portfolio | team | swatches | telegram | admins
   const [stats, setStats] = useState(null);
   const [leads, setLeads] = useState([]);
+  const [leadSearch, setLeadSearch] = useState('');
+  const [leadStatusFilter, setLeadStatusFilter] = useState('all');
   const [productsList, setProductsList] = useState([]);
   const [portfolioList, setPortfolioList] = useState([]);
   const [teamList, setTeamList] = useState([]);
@@ -536,6 +539,18 @@ export const AdminDashboard = ({
     }
   };
 
+  const handleDeleteAdmin = async (adminId) => {
+    if (window.confirm("Haqiqatan ham ushbu adminni tizimdan o'chirmoqchimisiz?")) {
+      const res = await apiDeleteAdmin(adminId);
+      if (res.success) {
+        setAdminsList(adminsList.filter(a => String(a.id) !== String(adminId) && a.username !== adminId));
+        notifyChange();
+      } else {
+        alert(res.error || "Adminni o'chirishda xatolik yuz berdi");
+      }
+    }
+  };
+
   // --- SWATCHES (RANGLAR) ACTIONS ---
   const handleOpenSwatchCreate = () => {
     setEditingSwatch(null);
@@ -699,6 +714,21 @@ export const AdminDashboard = ({
         <aside className="hidden md:flex w-64 bg-brand-surface/70 border-r border-white/10 p-4 flex-col justify-between flex-shrink-0">
           <nav className="space-y-1.5">
             <button
+              onClick={() => setActiveTab('overview')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'overview' 
+                  ? 'bg-brand-red text-white shadow-glow-red' 
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Umumiy Ko'rinish</span>
+              </div>
+              <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-slate-300">Asosiy</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('leads')}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                 activeTab === 'leads' 
@@ -828,39 +858,203 @@ export const AdminDashboard = ({
         {/* Content Area */}
         <main className="flex-1 p-3 sm:p-6 overflow-y-auto bg-brand-dark/50 pb-28 md:pb-6">
           
-          {/* TAB 1: LEADS (Arizalar) */}
-          {activeTab === 'leads' && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="font-display font-extrabold text-2xl text-white">
-                    Kelib tushgan arizalar ({leads.length})
-                  </h2>
-                  <p className="text-xs text-slate-400">
-                    Mijozlar qoldirgan aloqa raqamlari va hisob-kitoblar
-                  </p>
+          {/* TAB 0: OVERVIEW (Umumiy Ko'rinish / Statistika) */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Welcome & Banner */}
+              <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 relative overflow-hidden bg-gradient-to-br from-brand-surface/90 via-brand-surface/60 to-brand-dark/90">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-red/20 text-brand-red border border-brand-red/30 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" /> Tunikabond Lider Admin v2.0
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        Tizim faol
+                      </span>
+                    </div>
+                    <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
+                      Xush kelibsiz, {currentUser?.fullName || currentUser?.username}!
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-300 mt-1">
+                      Sayt faoliyati, yangi arizalar, mahsulotlar va telegram botingiz monitoringi.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => loadData(false)}
+                      className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-bold flex items-center gap-2 border border-white/15 transition-all cursor-pointer"
+                    >
+                      <RefreshCw className={`w-4 h-4 text-sky-400 ${loading ? 'animate-spin' : ''}`} />
+                      <span>Yangilash</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('leads')}
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover hover:scale-105 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 transition-all cursor-pointer"
+                    >
+                      <Inbox className="w-4 h-4 text-white" />
+                      <span>Arizalarni ko'rish</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* KPI Stat Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                {/* 1. Leads */}
+                <div 
+                  onClick={() => setActiveTab('leads')}
+                  className="glass-card p-4 rounded-2xl border border-white/10 hover:border-brand-red/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-brand-red/20 text-brand-red flex items-center justify-center font-bold">
+                      <Inbox className="w-4 h-4" />
+                    </div>
+                    {leads.filter(l => l.status === 'new' || !l.status).length > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-brand-red text-white animate-pulse">
+                        +{leads.filter(l => l.status === 'new' || !l.status).length} yangi
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-display font-black text-2xl text-white">{leads.length}</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Arizalar</div>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="text-xs text-slate-300">
-                    Yangi arizalar: <strong className="text-brand-red font-bold">{leads.filter(l => l.status === 'new' || !l.status).length} ta</strong>
-                  </span>
+                {/* 2. Products */}
+                <div 
+                  onClick={() => setActiveTab('products')}
+                  className="glass-card p-4 rounded-2xl border border-white/10 hover:border-brand-red/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+                      <Package className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-display font-black text-2xl text-white">{productsList.length}</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Mahsulotlar</div>
+                  </div>
+                </div>
+
+                {/* 3. Portfolio */}
+                <div 
+                  onClick={() => setActiveTab('portfolio')}
+                  className="glass-card p-4 rounded-2xl border border-white/10 hover:border-brand-red/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+                      <Briefcase className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-display font-black text-2xl text-white">{portfolioList.length}</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Obyektlar</div>
+                  </div>
+                </div>
+
+                {/* 4. Team */}
+                <div 
+                  onClick={() => setActiveTab('team')}
+                  className="glass-card p-4 rounded-2xl border border-white/10 hover:border-brand-red/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                      <Hammer className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-display font-black text-2xl text-white">{teamList.length}</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Ustalar</div>
+                  </div>
+                </div>
+
+                {/* 5. Swatches */}
+                <div 
+                  onClick={() => setActiveTab('swatches')}
+                  className="glass-card p-4 rounded-2xl border border-white/10 hover:border-brand-red/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                      <Palette className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-display font-black text-2xl text-white">{swatchesList.length}</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Ranglar</div>
+                  </div>
+                </div>
+
+                {/* 6. Telegram Channel */}
+                <div 
+                  onClick={() => setActiveTab('telegram')}
+                  className="glass-card p-4 rounded-2xl border border-white/10 hover:border-sky-500/50 cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between group"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+                      <Send className="w-4 h-4" />
+                    </div>
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  </div>
+                  <div>
+                    <div className="font-display font-black text-lg text-emerald-400">Faol</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Telegram Bot</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions Shortcuts */}
+              <div className="glass-panel p-5 rounded-2xl border border-white/10">
+                <h3 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-brand-red" />
+                  <span>Tezkor Amallar</span>
+                </h3>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={handleOpenProductCreate}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-brand-red" />
+                    <span>Yangi Mahsulot</span>
+                  </button>
 
                   <button
                     type="button"
-                    onClick={() => loadData(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold shadow-sm transition-all cursor-pointer"
-                    title="Telegram va bulutdan arizalarni qayta yuklash"
+                    onClick={handleOpenPortfolioCreate}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Telegramdan Yangilash</span>
+                    <Plus className="w-3.5 h-3.5 text-brand-red" />
+                    <span>Yangi Obyekt</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleOpenTeamCreate}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-brand-red" />
+                    <span>Yangi Usta</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleOpenSwatchCreate}
+                    className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-brand-red" />
+                    <span>Yangi Rang</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={handleExportCsv}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
-                    title="Barcha arizalarni Excel formatida yuklab olish"
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Excel (.csv)</span>
@@ -868,160 +1062,365 @@ export const AdminDashboard = ({
                 </div>
               </div>
 
-              {leads.length === 0 ? (
-                <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
-                  <Inbox className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                  <p className="text-slate-400 text-sm">Hozircha arizalar mavjud emas</p>
+              {/* Recent Leads Preview */}
+              <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-white text-base flex items-center gap-2">
+                      <Inbox className="w-5 h-5 text-brand-red" />
+                      <span>So'nggi Kelib Tushgan Arizalar</span>
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Eng so'nggi murojaat qilgan mijozlar ro'yxati
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('leads')}
+                    className="text-xs text-brand-red hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>Barchasini ko'rish ({leads.length})</span>
+                    <span>&rarr;</span>
+                  </button>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4">
-                  {leads.map((lead) => (
-                    <div 
-                      key={lead.id} 
-                      className={`glass-panel p-5 rounded-2xl border transition-all ${
-                        (lead.status === 'new' || !lead.status) 
-                          ? 'border-brand-red/50 shadow-glow-red bg-brand-red/5' 
-                          : 'border-white/10'
-                      }`}
-                    >
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                        
-                        {/* Customer Info */}
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2.5 flex-wrap">
-                            <span className="font-display font-bold text-lg text-white">
+
+                {leads.length === 0 ? (
+                  <div className="py-8 text-center text-slate-400 text-xs">
+                    Hozircha arizalar mavjud emas.
+                  </div>
+                ) : (
+                  <div className="divide-y divide-white/10">
+                    {leads.slice(0, 5).map((lead) => (
+                      <div key={lead.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-white text-sm">
                               {lead.name || "Noma'lum mijoz"}
                             </span>
-                            
-                            <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
-                              lead.status === 'in_progress' 
-                                ? 'bg-amber-500 text-black' 
-                                : lead.status === 'completed' 
-                                ? 'bg-emerald-500 text-white' 
-                                : lead.status === 'cancelled'
-                                ? 'bg-slate-600 text-white'
-                                : 'bg-brand-red text-white'
+                            <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                              lead.status === 'in_progress' ? 'bg-amber-500 text-black' :
+                              lead.status === 'completed' ? 'bg-emerald-500 text-white' :
+                              lead.status === 'cancelled' ? 'bg-slate-600 text-white' :
+                              'bg-brand-red text-white'
                             }`}>
-                              {lead.status === 'in_progress' 
-                                ? 'Jarayonda' 
-                                : lead.status === 'completed' 
-                                ? 'Bajarildi' 
-                                : lead.status === 'cancelled' 
-                                ? 'Bekor qilindi' 
-                                : 'Yangi'}
+                              {lead.status === 'in_progress' ? 'Jarayonda' :
+                               lead.status === 'completed' ? 'Bajarildi' :
+                               lead.status === 'cancelled' ? 'Bekor qilindi' : 'Yangi'}
                             </span>
-
-                            {lead.source && (
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${
-                                lead.source.includes('Telegram')
-                                  ? 'bg-sky-500/20 text-sky-400 border-sky-500/30'
-                                  : 'bg-white/10 text-slate-300 border-white/10'
-                              }`}>
-                                <Send className="w-2.5 h-2.5" />
-                                <span>{lead.source}</span>
-                              </span>
-                            )}
                           </div>
-
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
-                            <span className="font-bold text-white flex items-center gap-1">
-                              <span>📞</span>
-                              <span>{lead.phone}</span>
-                            </span>
+                          <div className="flex items-center gap-3 text-xs text-slate-300">
+                            <span>📞 {lead.phone}</span>
                             <span>🛠 {lead.service}</span>
-                            <span className="text-slate-400">⏰ {lead.timestamp ? (lead.timestamp.includes('T') ? new Date(lead.timestamp).toLocaleString('uz-UZ') : lead.timestamp) : ''}</span>
+                            <span className="text-slate-400">⏰ {lead.timestamp ? (lead.timestamp.includes('T') ? new Date(lead.timestamp).toLocaleDateString('uz-UZ') : lead.timestamp) : ''}</span>
                           </div>
-
-                          {lead.calcData && (
-                            <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200 mt-2">
-                              <strong>Kalkulyator:</strong> {lead.calcData.buildingType} | Maydon: {lead.calcData.area} m² | Narx: <span className="text-brand-red font-bold">{lead.calcData.cost}</span>
-                            </div>
-                          )}
-
-                          {lead.message && (
-                            <p className="text-xs text-slate-300 italic pt-1">
-                              💬 "{lead.message}"
-                            </p>
-                          )}
-
-                          {lead.photoUrl && (
-                            <div className="pt-2 flex items-center gap-2">
-                              <span className="text-[11px] text-slate-400">Biriktirilgan rasm:</span>
-                              <a
-                                href={lead.photoUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-brand-red/20 text-brand-red font-bold text-xs border border-brand-red/30 transition-colors"
-                              >
-                                <ImageIcon className="w-3.5 h-3.5" />
-                                <span>Rasmni ko'rish</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          )}
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          
-                          {/* Direct Phone Dial */}
+                        <div className="flex items-center gap-2">
                           {lead.phone && !lead.phone.startsWith('@') && (
                             <a
                               href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}
-                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                              title="Telefon qilish"
+                              className="px-2.5 py-1 rounded-lg bg-emerald-600/30 text-emerald-400 text-xs font-bold hover:bg-emerald-600 hover:text-white transition-colors"
                             >
-                              <Phone className="w-3.5 h-3.5" />
-                              <span>Qo'ng'iroq</span>
+                              Tel
                             </a>
                           )}
-
-                          {/* Telegram Direct Chat */}
-                          <a
-                            href={
-                              lead.phone && lead.phone.startsWith('@')
-                                ? `https://t.me/${lead.phone.replace('@', '')}`
-                                : `https://t.me/+${(lead.phone || '').replace(/\D/g, '')}`
-                            }
-                            target="_blank"
-                            rel="noreferrer"
-                            className="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
-                            title="Telegram orqali yozish"
-                          >
-                            <Send className="w-3.5 h-3.5" />
-                            <span>Telegram</span>
-                          </a>
-
-                          {/* Status Dropdown */}
-                          <select
-                            value={lead.status || 'new'}
-                            onChange={(e) => handleLeadStatusChange(lead.id, e.target.value)}
-                            className="px-3 py-1.5 rounded-xl bg-brand-surface border border-white/20 text-xs font-semibold text-white focus:outline-none focus:border-brand-red"
-                          >
-                            <option value="new">Yangi</option>
-                            <option value="in_progress">Jarayonda</option>
-                            <option value="completed">Bajarildi</option>
-                            <option value="cancelled">Bekor qilindi</option>
-                          </select>
-
-                          {/* Delete Lead */}
                           <button
-                            onClick={() => handleDeleteLead(lead.id)}
-                            className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors"
-                            title="O'chirish"
+                            type="button"
+                            onClick={() => setActiveTab('leads')}
+                            className="px-2.5 py-1 rounded-lg bg-white/10 text-slate-200 text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            Batafsil
                           </button>
-
                         </div>
-
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
+
+          {/* TAB 1: LEADS (Arizalar) */}
+          {activeTab === 'leads' && (() => {
+            const displayedLeads = leads.filter(l => {
+              const status = l.status || 'new';
+              if (leadStatusFilter !== 'all' && status !== leadStatusFilter) return false;
+              if (leadSearch.trim()) {
+                const q = leadSearch.toLowerCase().trim();
+                const n = (l.name || '').toLowerCase();
+                const p = (l.phone || '').toLowerCase();
+                const srv = (l.service || '').toLowerCase();
+                const m = (l.message || '').toLowerCase();
+                const src = (l.source || '').toLowerCase();
+                return n.includes(q) || p.includes(q) || srv.includes(q) || m.includes(q) || src.includes(q);
+              }
+              return true;
+            });
+
+            const newCount = leads.filter(l => l.status === 'new' || !l.status).length;
+            const inProgressCount = leads.filter(l => l.status === 'in_progress').length;
+            const completedCount = leads.filter(l => l.status === 'completed').length;
+            const cancelledCount = leads.filter(l => l.status === 'cancelled').length;
+
+            return (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="font-display font-extrabold text-2xl text-white">
+                      Kelib tushgan arizalar ({leads.length})
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      Mijozlar qoldirgan aloqa raqamlari va hisob-kitoblar
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="text-xs text-slate-300">
+                      Yangi arizalar: <strong className="text-brand-red font-bold">{newCount} ta</strong>
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => loadData(false)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold shadow-sm transition-all cursor-pointer"
+                      title="Telegram va bulutdan arizalarni qayta yuklash"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                      <span>Telegramdan Yangilash</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleExportCsv}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
+                      title="Barcha arizalarni Excel formatida yuklab olish"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Excel (.csv)</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Search Bar & Status Filter Pills */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  {/* Status Pills */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[
+                      { id: 'all', label: 'Barchasi', count: leads.length },
+                      { id: 'new', label: 'Yangi', count: newCount },
+                      { id: 'in_progress', label: 'Jarayonda', count: inProgressCount },
+                      { id: 'completed', label: 'Bajarildi', count: completedCount },
+                      { id: 'cancelled', label: 'Bekor qilindi', count: cancelledCount }
+                    ].map((tab) => {
+                      const isActive = leadStatusFilter === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setLeadStatusFilter(tab.id)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                            isActive
+                              ? 'bg-brand-red text-white shadow-glow-red font-black'
+                              : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+                          }`}
+                        >
+                          <span>{tab.label}</span>
+                          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-white/20' : 'bg-white/10'}`}>
+                            {tab.count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Search Input */}
+                  <div className="relative min-w-[240px] sm:w-72">
+                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={leadSearch}
+                      onChange={(e) => setLeadSearch(e.target.value)}
+                      placeholder="Mijoz ismi, tel yoki xizmat..."
+                      className="w-full pl-9 pr-8 py-2 rounded-xl bg-brand-surface border border-white/15 text-white text-xs focus:outline-none focus:border-brand-red transition-colors"
+                    />
+                    {leadSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setLeadSearch('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0.5 cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {displayedLeads.length === 0 ? (
+                  <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
+                    <Inbox className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-300 text-sm font-semibold mb-1">
+                      {leads.length === 0 ? "Hozircha arizalar mavjud emas" : "Qidiruv yoki tanlangan holat bo'yicha ariza topilmadi"}
+                    </p>
+                    {leadSearch && (
+                      <button
+                        type="button"
+                        onClick={() => { setLeadSearch(''); setLeadStatusFilter('all'); }}
+                        className="mt-2 text-xs text-brand-red hover:underline font-bold cursor-pointer"
+                      >
+                        Filtrlarni tozalash
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4">
+                    {displayedLeads.map((lead) => (
+                      <div 
+                        key={lead.id} 
+                        className={`glass-panel p-5 rounded-2xl border transition-all ${
+                          (lead.status === 'new' || !lead.status) 
+                            ? 'border-brand-red/50 shadow-glow-red bg-brand-red/5' 
+                            : 'border-white/10'
+                        }`}
+                      >
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                          
+                          {/* Customer Info */}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2.5 flex-wrap">
+                              <span className="font-display font-bold text-lg text-white">
+                                {lead.name || "Noma'lum mijoz"}
+                              </span>
+                              
+                              <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                                lead.status === 'in_progress' 
+                                  ? 'bg-amber-500 text-black' 
+                                  : lead.status === 'completed' 
+                                  ? 'bg-emerald-500 text-white' 
+                                  : lead.status === 'cancelled'
+                                  ? 'bg-slate-600 text-white'
+                                  : 'bg-brand-red text-white'
+                              }`}>
+                                {lead.status === 'in_progress' 
+                                  ? 'Jarayonda' 
+                                  : lead.status === 'completed' 
+                                  ? 'Bajarildi' 
+                                  : lead.status === 'cancelled' 
+                                  ? 'Bekor qilindi' 
+                                  : 'Yangi'}
+                              </span>
+
+                              {lead.source && (
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                                  lead.source.includes('Telegram')
+                                    ? 'bg-sky-500/20 text-sky-400 border-sky-500/30'
+                                    : 'bg-white/10 text-slate-300 border-white/10'
+                                }`}>
+                                  <Send className="w-2.5 h-2.5" />
+                                  <span>{lead.source}</span>
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
+                              <span className="font-bold text-white flex items-center gap-1">
+                                <span>📞</span>
+                                <span>{lead.phone}</span>
+                              </span>
+                              <span>🛠 {lead.service}</span>
+                              <span className="text-slate-400">⏰ {lead.timestamp ? (lead.timestamp.includes('T') ? new Date(lead.timestamp).toLocaleString('uz-UZ') : lead.timestamp) : ''}</span>
+                            </div>
+
+                            {lead.calcData && (
+                              <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200 mt-2">
+                                <strong>Kalkulyator:</strong> {lead.calcData.buildingType} | Maydon: {lead.calcData.area} m² | Narx: <span className="text-brand-red font-bold">{lead.calcData.cost}</span>
+                              </div>
+                            )}
+
+                            {lead.message && (
+                              <p className="text-xs text-slate-300 italic pt-1">
+                                💬 "{lead.message}"
+                              </p>
+                            )}
+
+                            {lead.photoUrl && (
+                              <div className="pt-2 flex items-center gap-2">
+                                <span className="text-[11px] text-slate-400">Biriktirilgan rasm:</span>
+                                <a
+                                  href={lead.photoUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-brand-red/20 text-brand-red font-bold text-xs border border-brand-red/30 transition-colors"
+                                >
+                                  <ImageIcon className="w-3.5 h-3.5" />
+                                  <span>Rasmni ko'rish</span>
+                                  <ExternalLink className="w-3 h-3" />
+                                </a>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            
+                            {/* Direct Phone Dial */}
+                            {lead.phone && !lead.phone.startsWith('@') && (
+                              <a
+                                href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}
+                                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                                title="Telefon qilish"
+                              >
+                                <Phone className="w-3.5 h-3.5" />
+                                <span>Qo'ng'iroq</span>
+                              </a>
+                            )}
+
+                            {/* Telegram Direct Chat */}
+                            <a
+                              href={
+                                lead.phone && lead.phone.startsWith('@')
+                                  ? `https://t.me/${lead.phone.replace('@', '')}`
+                                  : `https://t.me/+${(lead.phone || '').replace(/\D/g, '')}`
+                              }
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 hover:text-white border border-sky-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm"
+                              title="Telegram orqali yozish"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                              <span>Telegram</span>
+                            </a>
+
+                            {/* Status Dropdown */}
+                            <select
+                              value={lead.status || 'new'}
+                              onChange={(e) => handleLeadStatusChange(lead.id, e.target.value)}
+                              className="px-3 py-1.5 rounded-xl bg-brand-surface border border-white/20 text-xs font-semibold text-white focus:outline-none focus:border-brand-red cursor-pointer"
+                            >
+                              <option value="new">Yangi</option>
+                              <option value="in_progress">Jarayonda</option>
+                              <option value="completed">Bajarildi</option>
+                              <option value="cancelled">Bekor qilindi</option>
+                            </select>
+
+                            {/* Delete Lead */}
+                            <button
+                              onClick={() => handleDeleteLead(lead.id)}
+                              className="p-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
+                              title="O'chirish"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+
+                          </div>
+
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* TAB 2: PRODUCTS CRUD */}
           {activeTab === 'products' && (
@@ -1085,65 +1484,78 @@ export const AdminDashboard = ({
                 })}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {productsList
-                  .filter((prod) => {
-                    if (adminProductCat === 'all') return true;
-                    const c = String(prod?.category || '').toLowerCase().trim();
-                    if (adminProductCat === 'tunikabond') return c.includes('tunikabond') || c.includes('tunika');
-                    if (adminProductCat === 'alyukabond') return c.includes('alyukabond') || c.includes('alyuka') || c.includes('alukabond') || c.includes('alucobond');
-                    if (adminProductCat === 'cornice') return c.includes('cornice') || c.includes('karniz');
-                    if (adminProductCat === 'roofing') return c.includes('roofing') || c.includes('profnastil') || c.includes('tom');
-                    return c === adminProductCat;
-                  })
-                  .map((prod) => (
-                  <div key={prod.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40">
-                    <div>
-                      <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
-                        <img src={prod.image} alt="" className="w-full h-full object-cover" />
-                        <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-brand-red text-white text-[10px] font-black">
-                          {prod.badge || prod.category}
-                        </span>
-                      </div>
+              {(() => {
+                const filteredProducts = productsList.filter((prod) => {
+                  if (adminProductCat === 'all') return true;
+                  const c = String(prod?.category || '').toLowerCase().trim();
+                  if (adminProductCat === 'tunikabond') return c.includes('tunikabond') || c.includes('tunika');
+                  if (adminProductCat === 'alyukabond') return c.includes('alyukabond') || c.includes('alyuka') || c.includes('alukabond') || c.includes('alucobond');
+                  if (adminProductCat === 'cornice') return c.includes('cornice') || c.includes('karniz');
+                  if (adminProductCat === 'roofing') return c.includes('roofing') || c.includes('profnastil') || c.includes('tom');
+                  return c === adminProductCat;
+                });
 
-                      <h3 className="font-display font-bold text-base text-white mb-1">
-                        {prod.name?.uz || prod.name}
-                      </h3>
-                      <p className="text-xs text-slate-400 mb-3 line-clamp-2">
-                        {prod.shortDesc?.uz || prod.shortDesc}
-                      </p>
-
-                      <div className="space-y-1 text-xs text-slate-300 border-t border-white/10 pt-2 mb-3">
-                        <div className="flex justify-between">
-                          <span className="text-slate-400">Qalinlik:</span>
-                          <span className="font-semibold text-white">{prod.thickness}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-slate-400">Narx:</span>
-                          <span className="font-bold text-brand-red">{prod.priceRange}</span>
-                        </div>
-                      </div>
+                if (filteredProducts.length === 0) {
+                  return (
+                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
+                      <Package className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                      <p className="text-slate-400 text-sm">Ushbu toifada mahsulot topilmadi</p>
                     </div>
+                  );
+                }
 
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/10">
-                      <button
-                        onClick={() => handleOpenProductEdit(prod)}
-                        className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Tahrirlash</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(prod.id)}
-                        className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors"
-                        title="O'chirish"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredProducts.map((prod) => (
+                      <div key={prod.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40">
+                        <div>
+                          <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
+                            <img src={prod.image} alt="" className="w-full h-full object-cover" />
+                            <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-brand-red text-white text-[10px] font-black">
+                              {prod.badge || prod.category}
+                            </span>
+                          </div>
+
+                          <h3 className="font-display font-bold text-base text-white mb-1">
+                            {prod.name?.uz || prod.name}
+                          </h3>
+                          <p className="text-xs text-slate-400 mb-3 line-clamp-2">
+                            {prod.shortDesc?.uz || prod.shortDesc}
+                          </p>
+
+                          <div className="space-y-1 text-xs text-slate-300 border-t border-white/10 pt-2 mb-3">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Qalinlik:</span>
+                              <span className="font-semibold text-white">{prod.thickness}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Narx:</span>
+                              <span className="font-bold text-brand-red">{prod.priceRange}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                          <button
+                            onClick={() => handleOpenProductEdit(prod)}
+                            className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Tahrirlash</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(prod.id)}
+                            className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
+                            title="O'chirish"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </div>
           )}
 
@@ -1211,62 +1623,75 @@ export const AdminDashboard = ({
                 })}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {portfolioList
-                  .filter((item) => {
-                    if (adminPortfolioCat === 'all') return true;
-                    const c = String(item?.category || '').toLowerCase().trim();
-                    if (adminPortfolioCat === 'naves') return c.includes('naves');
-                    if (adminPortfolioCat === 'koziryok') return c.includes('kozir');
-                    if (adminPortfolioCat === 'darvozaxona') return c.includes('darvoza');
-                    if (adminPortfolioCat === 'fasad') return c.includes('fasad') || c.includes('tunikabond') || c.includes('alyukabond') || c.includes('residential') || c.includes('commercial');
-                    if (adminPortfolioCat === 'cornices') return c.includes('cornice') || c.includes('karniz') || c.includes('shift');
-                    return c === adminPortfolioCat;
-                  })
-                  .map((item) => (
-                  <div key={item.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10">
-                    <div>
-                      <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
-                        <img src={item.image} alt="" className="w-full h-full object-cover" />
-                        <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-white text-[10px] font-bold">
-                          {item.location}
-                        </span>
-                      </div>
+              {(() => {
+                const filteredPortfolio = portfolioList.filter((item) => {
+                  if (adminPortfolioCat === 'all') return true;
+                  const c = String(item?.category || '').toLowerCase().trim();
+                  if (adminPortfolioCat === 'naves') return c.includes('naves');
+                  if (adminPortfolioCat === 'koziryok') return c.includes('kozir');
+                  if (adminPortfolioCat === 'darvozaxona') return c.includes('darvoza');
+                  if (adminPortfolioCat === 'fasad') return c.includes('fasad') || c.includes('tunikabond') || c.includes('alyukabond') || c.includes('residential') || c.includes('commercial');
+                  if (adminPortfolioCat === 'cornices') return c.includes('cornice') || c.includes('karniz') || c.includes('shift');
+                  return c === adminPortfolioCat;
+                });
 
-                      <h3 className="font-display font-bold text-base text-white mb-2 line-clamp-2">
-                        {item.title?.uz || item.title}
-                      </h3>
+                if (filteredPortfolio.length === 0) {
+                  return (
+                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
+                      <Briefcase className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                      <p className="text-slate-400 text-sm">Ushbu toifada loyiha topilmadi</p>
+                    </div>
+                  );
+                }
 
-                      <div className="space-y-1 text-xs text-slate-300 mb-4">
-                        <div>📁 Yo'nalish: <strong className="text-brand-red font-bold uppercase">{item.category}</strong></div>
-                        <div>🛠 Material: {item.material}</div>
-                        <div>📐 Hajmi: {item.area} | ⏱ Muddat: {item.time}</div>
-                        <div className="flex items-center gap-1.5 pt-1 text-slate-200">
-                          <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                          <span>Mas'ul usta: <strong className="text-white">{item.masterName || "Biriktirilmagan"}</strong></span>
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredPortfolio.map((item) => (
+                      <div key={item.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10">
+                        <div>
+                          <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
+                            <img src={item.image} alt="" className="w-full h-full object-cover" />
+                            <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-white text-[10px] font-bold">
+                              {item.location}
+                            </span>
+                          </div>
+
+                          <h3 className="font-display font-bold text-base text-white mb-2 line-clamp-2">
+                            {item.title?.uz || item.title}
+                          </h3>
+
+                          <div className="space-y-1 text-xs text-slate-300 mb-4">
+                            <div>📁 Yo'nalish: <strong className="text-brand-red font-bold uppercase">{item.category}</strong></div>
+                            <div>🛠 Material: {item.material}</div>
+                            <div>📐 Hajmi: {item.area} | ⏱ Muddat: {item.time}</div>
+                            <div className="flex items-center gap-1.5 pt-1 text-slate-200">
+                              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Mas'ul usta: <strong className="text-white">{item.masterName || "Biriktirilmagan"}</strong></span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-2 border-t border-white/10">
+                          <button
+                            onClick={() => handleOpenPortfolioEdit(item)}
+                            className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Tahrirlash</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeletePortfolio(item.id)}
+                            className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
+                            title="O'chirish"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-white/10">
-                      <button
-                        onClick={() => handleOpenPortfolioEdit(item)}
-                        className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>Tahrirlash</span>
-                      </button>
-                      <button
-                        onClick={() => handleDeletePortfolio(item.id)}
-                        className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors"
-                        title="O'chirish"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </div>
           )}
 
@@ -1403,84 +1828,97 @@ export const AdminDashboard = ({
               </div>
 
               {/* Swatches Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {swatchesList
-                  .filter(s => swatchCategoryFilter === 'all' || s.category === swatchCategoryFilter)
-                  .map((swatch) => {
-                    const name = typeof swatch.name === 'object' ? (swatch.name.uz || swatch.name.ru || '') : (swatch.name || '');
-                    return (
-                      <div 
-                        key={swatch.id} 
-                        className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40 bg-brand-surface/70 transition-all"
-                      >
-                        <div>
-                          {/* Sample Box */}
-                          <div 
-                            className="relative h-36 rounded-xl overflow-hidden mb-3 border border-white/15 shadow-inner"
-                            style={{
-                              background: swatch.image 
-                                ? `url(${swatch.image}) center/cover no-repeat` 
-                                : (swatch.bgGradient || swatch.colorHex || '#444')
-                            }}
-                          >
-                            <span className="absolute top-2 right-2 px-2.5 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-black text-white border border-white/20 shadow">
-                              {swatch.code}
-                            </span>
-                            <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-brand-red/90 text-white text-[9px] font-bold uppercase tracking-wider">
-                              {swatch.category === 'wood' ? "Yog'och" : swatch.category === 'metallic' ? "Metallik" : swatch.category === 'ral' ? "RAL" : "Maxsus"}
-                            </span>
-                          </div>
+              {(() => {
+                const filteredSwatches = swatchesList.filter(s => swatchCategoryFilter === 'all' || s.category === swatchCategoryFilter);
 
-                          <h3 className="font-display font-bold text-sm sm:text-base text-white mb-1 group-hover:text-brand-red transition-colors">
-                            {name}
-                          </h3>
-                          {typeof swatch.name === 'object' && swatch.name.ru && (
-                            <p className="text-[11px] text-slate-400 mb-2 italic">
-                              {swatch.name.ru}
-                            </p>
-                          )}
-                          <p className="text-xs text-slate-300 font-medium mb-3">
-                            {swatch.texture}
-                          </p>
+                if (filteredSwatches.length === 0) {
+                  return (
+                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
+                      <Palette className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                      <p className="text-slate-400 text-sm">Ushbu toifada rang namunasi topilmadi</p>
+                    </div>
+                  );
+                }
 
-                          <div className="space-y-1.5 text-xs text-slate-300 border-t border-white/10 pt-2.5 mb-3">
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Yuzasi / Faktura:</span>
-                              <span className="font-semibold text-white">{swatch.finish}</span>
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                    {filteredSwatches.map((swatch) => {
+                      const name = typeof swatch.name === 'object' ? (swatch.name.uz || swatch.name.ru || '') : (swatch.name || '');
+                      return (
+                        <div 
+                          key={swatch.id} 
+                          className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40 bg-brand-surface/70 transition-all"
+                        >
+                          <div>
+                            {/* Sample Box */}
+                            <div 
+                              className="relative h-36 rounded-xl overflow-hidden mb-3 border border-white/15 shadow-inner"
+                              style={{
+                                background: swatch.image 
+                                  ? `url(${swatch.image}) center/cover no-repeat` 
+                                  : (swatch.bgGradient || swatch.colorHex || '#444')
+                              }}
+                            >
+                              <span className="absolute top-2 right-2 px-2.5 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-black text-white border border-white/20 shadow">
+                                {swatch.code}
+                              </span>
+                              <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-brand-red/90 text-white text-[9px] font-bold uppercase tracking-wider">
+                                {swatch.category === 'wood' ? "Yog'och" : swatch.category === 'metallic' ? "Metallik" : swatch.category === 'ral' ? "RAL" : "Maxsus"}
+                              </span>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Qoplama:</span>
-                              <span className="font-semibold text-white">{swatch.coating}</span>
-                            </div>
-                            {swatch.application && (
-                              <div className="pt-1 text-[11px] text-slate-400 line-clamp-2">
-                                <span className="text-slate-400 font-medium">Qo'llanishi: </span>
-                                {swatch.application}
-                              </div>
+
+                            <h3 className="font-display font-bold text-sm sm:text-base text-white mb-1 group-hover:text-brand-red transition-colors">
+                              {name}
+                            </h3>
+                            {typeof swatch.name === 'object' && swatch.name.ru && (
+                              <p className="text-[11px] text-slate-400 mb-2 italic">
+                                {swatch.name.ru}
+                              </p>
                             )}
+                            <p className="text-xs text-slate-300 font-medium mb-3">
+                              {swatch.texture}
+                            </p>
+
+                            <div className="space-y-1.5 text-xs text-slate-300 border-t border-white/10 pt-2.5 mb-3">
+                              <div className="flex justify-between">
+                                <span className="text-slate-400">Yuzasi / Faktura:</span>
+                                <span className="font-semibold text-white">{swatch.finish}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-400">Qoplama:</span>
+                                <span className="font-semibold text-white">{swatch.coating}</span>
+                              </div>
+                              {swatch.application && (
+                                <div className="pt-1 text-[11px] text-slate-400 line-clamp-2">
+                                  <span className="text-slate-400 font-medium">Qo'llanishi: </span>
+                                  {swatch.application}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-2.5 border-t border-white/10">
+                            <button
+                              onClick={() => handleOpenSwatchEdit(swatch)}
+                              className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Tahrirlash</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteSwatch(swatch.id)}
+                              className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
+                              title="O'chirish"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-2 pt-2.5 border-t border-white/10">
-                          <button
-                            onClick={() => handleOpenSwatchEdit(swatch)}
-                            className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                            <span>Tahrirlash</span>
-                          </button>
-                          <button
-                            onClick={() => handleDeleteSwatch(swatch.id)}
-                            className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
-                            title="O'chirish"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -1524,9 +1962,23 @@ export const AdminDashboard = ({
                       </div>
                     </div>
 
-                    <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                      Faol
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                        Faol
+                      </span>
+                      {a.username?.toLowerCase() !== 'muhammadazez' && 
+                       a.username?.toLowerCase() !== 'admin' && 
+                       a.username?.toLowerCase() !== (currentUser?.username || '').toLowerCase() && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAdmin(a.id)}
+                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors"
+                          title="Adminni o'chirish"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1825,7 +2277,7 @@ export const AdminDashboard = ({
                             {rec.enabled ? 'Faol' : 'O\'chiq'}
                           </button>
 
-                          {idx >= 2 && (
+                          {telegramConfig.recipients.length > 1 && (
                             <button
                               type="button"
                               onClick={() => handleDeleteRecipient(idx)}
@@ -1882,7 +2334,17 @@ export const AdminDashboard = ({
         </main>
 
         {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet screens only) */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-1 py-1.5 flex items-center justify-between shadow-2xl safe-area-bottom overflow-x-auto no-scrollbar">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-xl border-t border-white/10 px-1 py-1.5 flex items-center justify-between shadow-2xl safe-area-bottom overflow-x-auto no-scrollbar gap-1">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
+              activeTab === 'overview' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="text-[10px] truncate w-full text-center">Asosiy</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('leads')}
             className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all relative ${
