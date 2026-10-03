@@ -54,59 +54,34 @@ export default async function handler(req, res) {
       inMemoryLeads.unshift(leadRecord);
     }
 
-    // 1. Send confirmation message directly to user if submitted via Telegram Mini App
-    const userChatId = data.telegramUserId || data.chatId || data.userId;
-    if (userChatId) {
-      const userConfirmHtml = 
-        `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
-        `📋 <b>Ariza ma'lumotlari:</b>\n` +
-        `👤 <b>Mijoz:</b> ${name || "Hurmatli mijoz"}\n` +
+
+
+    // 2. Dispatch ONLY to Private Channel WITHOUT buttons (if not already dispatched by client)
+    if (!data.telegramDispatched) {
+      const channelText = 
+        `🔥 <b>YANGI ARIZA — TUNIKABOND LIDER</b> 🔥\n\n` +
+        `👤 <b>Mijoz:</b> ${name || "Noma'lum"}\n` +
         `📞 <b>Telefon:</b> <code>${phone}</code>\n` +
         (service ? `🛠 <b>Xizmat / Mahsulot:</b> ${service}\n` : '') +
-        (calcData ? `📊 <b>Kalkulyator Hisobi:</b> ${calcData.area || '-'} m² (${calcData.cost || '-'})\n` : '') +
+        (calcData ? `\n📊 <b>Kalkulyator Hisobi:</b>\n • Maydoni: ${calcData.area || '-'} m²\n • Narx: <b>${calcData.cost || '-'}</b>\n` : '') +
         (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
-        `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
-        `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
+        `📍 <b>Manba:</b> ${source || "Veb-sayt"}\n` +
+        `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
+        `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
 
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: userChatId,
-            text: userConfirmHtml,
+            chat_id: CHANNEL_ID,
+            text: channelText,
             parse_mode: 'HTML'
           })
         });
       } catch (e) {
-        console.warn("User confirmation send error:", e);
+        console.warn("Channel dispatch error:", e);
       }
-    }
-
-    // 2. Dispatch ONLY to Private Channel WITHOUT buttons
-    const channelText = 
-      `🔥 <b>YANGI ARIZA — TUNIKABOND LIDER</b> 🔥\n\n` +
-      `👤 <b>Mijoz:</b> ${name || "Noma'lum"}\n` +
-      `📞 <b>Telefon:</b> <code>${phone}</code>\n` +
-      (service ? `🛠 <b>Xizmat / Mahsulot:</b> ${service}\n` : '') +
-      (calcData ? `\n📊 <b>Kalkulyator Hisobi:</b>\n • Maydoni: ${calcData.area || '-'} m²\n • Narx: <b>${calcData.cost || '-'}</b>\n` : '') +
-      (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
-      `📍 <b>Manba:</b> ${source || "Veb-sayt"}\n` +
-      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
-      `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
-
-    try {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CHANNEL_ID,
-          text: channelText,
-          parse_mode: 'HTML'
-        })
-      });
-    } catch (e) {
-      console.warn("Channel dispatch error:", e);
     }
 
     // 3. Sync to Cloud Leads Store for Admin Panel persistence

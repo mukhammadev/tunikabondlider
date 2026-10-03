@@ -243,28 +243,15 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
     ? rawToken 
     : DEFAULT_TELEGRAM_CONFIG.botToken;
 
-  const recipients = (config.recipients && config.recipients.length > 0)
-    ? config.recipients
-    : DEFAULT_TELEGRAM_CONFIG.recipients;
-
-  // Filter out invalid IDs and personal accounts
-  let activeRecipients = recipients.filter(r => {
-    if (r.enabled === false || !r.id) return false;
-    const sId = String(r.id).trim();
-    if (sId === "-1003209002534" || sId.includes("1003209002534")) return false;
-    if (sId === "1003939636" || sId === "6481310196") return false;
-    return true;
-  });
-
-  // Guarantee Tunikabond Lider Private Channel (-1004415750690) is always the target
-  if (!activeRecipients.some(r => String(r.id).trim() === "-1004415750690")) {
-    activeRecipients.unshift({
+  // Strictly dispatch ONLY to the Private Channel (-1004415750690)
+  const activeRecipients = [
+    {
       id: "-1004415750690",
       label: "Xususiy Arizalar Kanali (-1004415750690)",
       type: "channel",
       enabled: true
-    });
-  }
+    }
+  ];
 
   const htmlText = formatLeadHtml(leadData);
 
@@ -338,29 +325,7 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
   const results = await Promise.allSettled(dispatchPromises);
   const anySuccess = results.some(r => r.status === 'fulfilled' && r.value?.ok);
 
-  // If lead came from a Telegram user (Mini App), send them direct confirmation details
-  if (leadData.telegramUserId) {
-    const userConfirmHtml = 
-      `✅ <b>Arizangiz muvaffaqiyatli qabul qilindi!</b>\n\n` +
-      `📋 <b>Ariza ma'lumotlari:</b>\n` +
-      `👤 <b>Mijoz:</b> ${escapeHtml(leadData.name || 'Hurmatli mijoz')}\n` +
-      `📞 <b>Telefon:</b> <code>${escapeHtml(leadData.phone || '-')}</code>\n` +
-      (leadData.service ? `🛠 <b>Xizmat / Mahsulot:</b> ${escapeHtml(leadData.service)}\n` : '') +
-      (leadData.calcData ? `📊 <b>Kalkulyator Hisobi:</b> ${escapeHtml(String(leadData.calcData.area || '-'))} m² (${escapeHtml(String(leadData.calcData.cost || '-'))})\n` : '') +
-      (leadData.message ? `💬 <b>Qo'shimcha izoh:</b> ${escapeHtml(leadData.message)}\n` : '') +
-      `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
-      `🤝 <b>Siz bilan tez orada bog‘lanamiz!</b>`;
 
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: leadData.telegramUserId,
-        text: userConfirmHtml,
-        parse_mode: 'HTML'
-      })
-    }).catch(e => console.warn('User direct confirmation error:', e));
-  }
 
   return {
     success: anySuccess,
@@ -423,7 +388,10 @@ export const submitLead = async (leadData) => {
     fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(standardizedLead)
+      body: JSON.stringify({
+        ...standardizedLead,
+        telegramDispatched: telegramResult?.success ?? false
+      })
     }).catch(() => {});
   } catch {}
 
