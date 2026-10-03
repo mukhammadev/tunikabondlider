@@ -35,7 +35,7 @@ export const Footer = ({ t, onNavigate }) => {
                   TUNIKABOND <span className="text-brand-red">LIDER</span>
                 </span>
                 <span className="block text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-medium">
-                  Fasad & Tom Yechimlari
+                  {t.footer?.tagline || "Fasad & Tom Yechimlari"}
                 </span>
               </div>
             </button>
@@ -47,7 +47,7 @@ export const Footer = ({ t, onNavigate }) => {
           {/* Quick Links */}
           <div>
             <h4 className="font-display font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4">
-              {t.nav.services} & Bo'limlar
+              {t.footer?.sectionsTitle || `${t.nav.services} & Bo'limlar`}
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
               <li>
@@ -74,7 +74,7 @@ export const Footer = ({ t, onNavigate }) => {
                   onClick={() => handleNav('portfolio')}
                   className="hover:text-brand-red transition-colors text-left cursor-pointer"
                 >
-                  {t.nav.portfolio} & Ustalar
+                  {t.nav.portfolio} & {t.nav.team || "Ustalar"}
                 </button>
               </li>
               <li>
@@ -137,7 +137,7 @@ export const Footer = ({ t, onNavigate }) => {
           {/* Telegram Admin & Channels */}
           <div>
             <h4 className="font-display font-bold text-sm text-slate-900 dark:text-white uppercase tracking-wider mb-4">
-              Telegram & Ijtimoiy tarmoqlar
+              {t.contact?.socialsTitle || "Telegram & Ijtimoiy tarmoqlar"}
             </h4>
             <div className="flex flex-col gap-2.5">
               
@@ -150,9 +150,9 @@ export const Footer = ({ t, onNavigate }) => {
               >
                 <div className="flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-[#29b6f6]" />
-                  <span>Admin: @Mukhammad_azez</span>
+                  <span>{t.footer?.adminLabel || "Admin"}: @Mukhammad_azez</span>
                 </div>
-                <span className="text-[10px] bg-[#0088cc] px-2 py-0.5 rounded text-white font-bold">Yozish</span>
+                <span className="text-[10px] bg-[#0088cc] px-2 py-0.5 rounded text-white font-bold">{t.footer?.writeAdmin || "Yozish"}</span>
               </a>
 
               {/* Telegram Channel */}
@@ -163,7 +163,7 @@ export const Footer = ({ t, onNavigate }) => {
                 className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-200/60 hover:bg-brand-red/10 dark:bg-white/5 dark:hover:bg-brand-red/15 border border-slate-300 dark:border-white/10 hover:border-brand-red/40 text-slate-700 dark:text-slate-200 transition-all text-xs font-semibold"
               >
                 <Send className="w-4 h-4 text-brand-red" />
-                <span>Rasmiy Kanal: @tunikabondLiderkanali</span>
+                <span>{t.footer?.officialChannel || "Rasmiy Kanal"}: @tunikabondLiderkanali</span>
               </a>
 
               {/* Instagram */}

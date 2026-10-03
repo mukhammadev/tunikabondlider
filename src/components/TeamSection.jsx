@@ -7,6 +7,7 @@ import {
 
 export const TeamSection = ({ 
   t, 
+  currentLang = 'uz',
   teamMembers = [], 
   portfolioList = [], 
   onOpenLeadModalWithMaster,
@@ -15,6 +16,63 @@ export const TeamSection = ({
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedMaster, setSelectedMaster] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
+
+  // Dynamic localization helpers for team members
+  const getMemberRole = (member) => {
+    if (!member) return '';
+    if (typeof member.role === 'object' && member.role !== null) {
+      return member.role[currentLang] || member.role.uz || '';
+    }
+    if (currentLang === 'ru') {
+      if (member.id === 'team-boss') return 'Руководитель & Главный инженер';
+      if (member.id === 'team-asst') return 'CEO — Генеральный директор';
+      if (member.id === 'team-dilshod') return 'Мастер — Монтаж фасадов и Алюкобонда';
+      if (member.id === 'team-sanjar') return 'Мастер — Козырьки и декор фасадов';
+      if (member.id === 'team-bobur') return 'Мастер — Металлокаркас и монтаж навесов';
+      if (member.id === 'team-akmal') return 'Мастер — Въездные ворота и входные порталы';
+    } else if (currentLang === 'en') {
+      if (member.id === 'team-boss') return 'Founder & Chief Engineer';
+      if (member.id === 'team-asst') return 'CEO — Managing Director';
+      if (member.id === 'team-dilshod') return 'Master Craftsman — Facades & Alucobond';
+      if (member.id === 'team-sanjar') return 'Master Craftsman — Awnings & Facade Decor';
+      if (member.id === 'team-bobur') return 'Master Craftsman — Canopies & Subframes';
+      if (member.id === 'team-akmal') return 'Master Craftsman — Gate Portals & Entrances';
+    }
+    return member.role || '';
+  };
+
+  const getMemberBio = (member) => {
+    if (!member) return '';
+    if (typeof member.bio === 'object' && member.bio !== null) {
+      return member.bio[currentLang] || member.bio.uz || '';
+    }
+    if (currentLang === 'ru') {
+      if (member.id === 'team-boss') return 'Руководитель и главный инженер компании Tunikabond Lider. Лично гарантирует прочность конструкций и 10-летнюю гарантию.';
+      if (member.id === 'team-asst') return 'CEO компании, ответственный за операционную деятельность, контроль качества и поставку сырья.';
+      if (member.id === 'team-dilshod') return 'Ведущий мастер по гибке Алюкобонда, лазерной формовке и монтажу сложных вентилируемых фасадов.';
+      if (member.id === 'team-sanjar') return 'Специалист по изготовлению прочных козырьков над входом и окнами в консольном и подвесном стиле.';
+      if (member.id === 'team-bobur') return 'Мастер по изготовлению автомобильных и дворовых навесов из усиленных профилей и установке водостоков.';
+      if (member.id === 'team-akmal') return 'Мастер по оформлению въездных ворот, колонн и входных арок панелями Туникабонд и карнизами.';
+    } else if (currentLang === 'en') {
+      if (member.id === 'team-boss') return 'Founder and Chief Engineer of Tunikabond Lider. Personally guarantees structural strength and contractual 10-year warranty.';
+      if (member.id === 'team-asst') return 'Company CEO managing international raw material sourcing, field operations, and quality audits.';
+      if (member.id === 'team-dilshod') return 'Senior craftsman specializing in alucobond bending, laser profiling, and complex ventilated facades.';
+      if (member.id === 'team-sanjar') return 'Specialist in cantilever and suspended awnings over entrances and windows with rock-solid durability.';
+      if (member.id === 'team-bobur') return 'Expert in carport and courtyard canopies built with heavy-duty steel profiles and drainage systems.';
+      if (member.id === 'team-akmal') return 'Specialist in entrance gatehouses, columns, and entrance portals cladded with Tunikabond and cornice systems.';
+    }
+    return member.bio || t.team?.defaultBio || '';
+  };
+
+  const getMemberLabel = (member) => {
+    if (!member) return '';
+    if (typeof member.label === 'object' && member.label !== null) {
+      return member.label[currentLang] || member.label.uz || '';
+    }
+    if (member.id === 'team-boss') return t.team?.filterBoss || "Firma Boshlig'i";
+    if (member.id === 'team-asst') return t.team?.filterCeo || "CEO";
+    return t.team?.filterMasters || "Usta";
+  };
 
   // If parent requests opening a master (e.g. from Portfolio catalog click)
   useEffect(() => {
@@ -66,18 +124,17 @@ export const TeamSection = ({
 
   const infiniteMembers = getInfiniteMembers();
 
-  // Continuous auto-rotation via requestAnimationFrame (no sudden stops, no rewind jumps)
+  // Continuous auto-rotation via requestAnimationFrame
   useEffect(() => {
     const el = scrollContainerRef.current;
     if (!el || filteredMembers.length === 0) return;
 
     let animId;
-    const speed = 0.85; // Silliq va bemalol o'qiladigan doimiy harakat
+    const speed = 0.85;
 
     const step = () => {
       if (!isPaused && !isInteracting && el) {
         el.scrollLeft += speed;
-        // Yarim qismiga borganda, ikkinchi nusxa boshiga silliq va ko'rinmas o'tadi
         if (el.scrollLeft >= el.scrollWidth / 2) {
           el.scrollLeft -= el.scrollWidth / 2;
         }
@@ -102,28 +159,50 @@ export const TeamSection = ({
   };
 
   const filterTabs = [
-    { id: 'all', label: "Barchasi" },
-    { id: 'boshliq', label: "Firma Boshlig'i" },
-    { id: 'ceo', label: "CEO" },
-    { id: 'masters', label: "Ustalar" }
+    { id: 'all', label: t.team?.filterAll || "Barchasi" },
+    { id: 'boshliq', label: t.team?.filterBoss || "Firma Boshlig'i" },
+    { id: 'ceo', label: t.team?.filterCeo || "CEO" },
+    { id: 'masters', label: t.team?.filterMasters || "Ustalar" }
   ];
 
   // Helper to get all completed works for selected master (Catalog works + Direct works)
   const getMasterWorks = (master) => {
     if (!master) return [];
 
+    const getLocalizedCat = (catRaw) => {
+      if (currentLang === 'ru') {
+        if (catRaw === 'naves') return 'Навес';
+        if (catRaw === 'koziryok') return 'Козырек';
+        if (catRaw === 'darvozaxona') return 'Ворота';
+        if (catRaw === 'cornices') return 'Карниз';
+        return 'Фасад';
+      }
+      if (currentLang === 'en') {
+        if (catRaw === 'naves') return 'Canopy';
+        if (catRaw === 'koziryok') return 'Awning';
+        if (catRaw === 'darvozaxona') return 'Gateway';
+        if (catRaw === 'cornices') return 'Cornice';
+        return 'Facade';
+      }
+      if (catRaw === 'naves') return 'Naves';
+      if (catRaw === 'koziryok') return 'Koziryok';
+      if (catRaw === 'darvozaxona') return 'Darvozaxona';
+      if (catRaw === 'cornices') return 'Karniz';
+      return 'Fasad';
+    };
+
     const catalogWorks = (portfolioList || [])
       .filter((p) => p.masterId === master.id || p.masterName?.toLowerCase() === master.name?.toLowerCase())
       .map((p) => {
-        const title = typeof p.title === 'object' ? (p.title.uz || p.title) : p.title;
-        const cat = p.category === 'naves' ? 'Naves' : p.category === 'koziryok' ? 'Koziryok' : p.category === 'darvozaxona' ? 'Darvozaxona' : p.category === 'cornices' ? 'Karniz' : 'Fasad';
+        const title = typeof p.title === 'object' ? (p.title[currentLang] || p.title.uz || p.title) : p.title;
+        const cat = getLocalizedCat(p.category);
         return {
           id: p.id,
           title: title,
           category: cat,
           image: p.image,
           location: p.location,
-          desc: `${p.material || 'Tunikabond'} • Hajmi: ${p.area || ''} • Bajarish muddati: ${p.time || ''}`
+          desc: `${p.material || 'Tunikabond'} • ${p.area ? `${p.area}` : ''}`
         };
       });
 
@@ -234,14 +313,14 @@ export const TeamSection = ({
                                 : 'bg-white/95 text-brand-red border-brand-red/30 dark:bg-brand-red/20 dark:text-white dark:border-brand-red/50'
                             }`}>
                               <Sparkles className="w-3 h-3 text-brand-red" />
-                              <span>{member.label || member.role}</span>
+                              <span>{getMemberLabel(member)}</span>
                             </span>
                           </div>
 
                           {/* Projects Count Pill */}
                           <div className="absolute bottom-3 right-3">
                             <span className="px-2.5 py-1 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-sm">
-                              {member.completedProjects || "250+ obyekt"}
+                              {member.completedProjects || `250+ ${t.team?.projectsUnit || "obyekt"}`}
                             </span>
                           </div>
 
@@ -249,7 +328,7 @@ export const TeamSection = ({
                           <div className="absolute bottom-3 left-3">
                             <span className="px-2.5 py-1 rounded-xl bg-brand-red text-white text-[11px] font-black flex items-center gap-1 shadow-sm">
                               <ShieldCheck className="w-3 h-3" />
-                              <span>{member.experience || "5+ yil"}</span>
+                              <span>{member.experience || `5+ ${t.team?.expUnit || "yil"}`}</span>
                             </span>
                           </div>
                         </div>
@@ -264,10 +343,10 @@ export const TeamSection = ({
                               </h3>
                             </div>
                             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 line-clamp-1 mb-2">
-                              {member.role}
+                              {getMemberRole(member)}
                             </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                              {member.bio || "Tunikabond Lider korxonasining tajribali ustasi."}
+                              {getMemberBio(member)}
                             </p>
                           </div>
 
@@ -275,7 +354,7 @@ export const TeamSection = ({
                           <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
                             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
                               <Hammer className="w-3.5 h-3.5 text-brand-red" />
-                              <span>{worksCount} ta katalog ishi</span>
+                              <span>{worksCount} {t.team?.worksCountSuffix || "ta katalog ishi"}</span>
                             </span>
 
                             <span className="text-xs font-bold text-brand-red flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -299,25 +378,25 @@ export const TeamSection = ({
             <button
               type="button"
               onClick={handlePrev}
-              className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95"
-              title="Oldingi usta"
+              className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              title="Oldingi"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               type="button"
               onClick={handleNext}
-              className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95"
-              title="Keyingi usta"
+              className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+              title="Keyingi"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
           {/* Micro status indicator */}
-          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-600 dark:text-slate-400 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring</span>
+          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-600 dark:text-slate-400 font-medium text-center px-4">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>{t.team?.streamNotice || "Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring"}</span>
           </div>
         </div>
 
@@ -343,10 +422,10 @@ export const TeamSection = ({
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-brand-red/20 text-brand-red border border-brand-red/40">
-                        {selectedMaster.label || selectedMaster.role}
+                        {getMemberLabel(selectedMaster)}
                       </span>
                       <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-                        {selectedMaster.experience || "5+ yil tajriba"}
+                        {selectedMaster.experience || `5+ ${t.team?.expUnit || "yil tajriba"}`}
                       </span>
                     </div>
                     <h3 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white mt-1 flex items-center gap-1.5">
@@ -354,7 +433,7 @@ export const TeamSection = ({
                       <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
-                      {selectedMaster.role}
+                      {getMemberRole(selectedMaster)}
                     </p>
                   </div>
                 </div>
@@ -362,7 +441,7 @@ export const TeamSection = ({
                 <button
                   type="button"
                   onClick={() => setSelectedMaster(null)}
-                  className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
                   title="Yopish"
                 >
                   <X className="w-5 h-5" />
@@ -376,44 +455,44 @@ export const TeamSection = ({
                 <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 space-y-3">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
                     <Briefcase className="w-4 h-4 text-brand-red" />
-                    <span>Usta haqida ma'lumot</span>
+                    <span>{t.team?.aboutMaster || "Usta haqida ma'lumot"}</span>
                   </h4>
                   <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
-                    {selectedMaster.bio || "Tunikabond Lider korxonasining rasmiy sertifikatlangan ustasi. Barcha ishlar shartnoma asosida 10 yillik kafolat bilan topshiriladi."}
+                    {getMemberBio(selectedMaster)}
                   </p>
 
                   {/* Key stats row */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                     <div className="p-3 rounded-xl bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/5 shadow-sm">
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">Ish tajribasi:</span>
-                      <span className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{selectedMaster.experience || "6+ yil"}</span>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t.team?.expLabel || "Ish tajribasi:"}</span>
+                      <span className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{selectedMaster.experience || `6+ ${t.team?.expUnit || "yil"}`}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/5 shadow-sm">
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">Topshirgan obyektlari:</span>
-                      <span className="font-bold text-brand-red text-sm sm:text-base">{selectedMaster.completedProjects || "350+ ta"}</span>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t.team?.projectsLabel || "Topshirgan obyektlari:"}</span>
+                      <span className="font-bold text-brand-red text-sm sm:text-base">{selectedMaster.completedProjects || `350+ ${t.team?.projectsUnit || "ta"}`}</span>
                     </div>
                     <div className="col-span-2 sm:col-span-1 p-3 rounded-xl bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/5 shadow-sm">
-                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">Rasmiy kafolat:</span>
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm sm:text-base">10 yil shartnoma bilan</span>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t.team?.warrantyLabel || "Rasmiy kafolat:"}</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm sm:text-base">{t.team?.warrantyValue || "10 yil shartnoma bilan"}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Specific Completed Works Section */}
                 <div>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                     <h4 className="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
                       <Hammer className="w-4 h-4 text-brand-red" />
-                      <span>Ushbu usta bajargan namunali ishlar ({masterWorks.length})</span>
+                      <span>{t.team?.sampleWorksTitle || "Ushbu usta bajargan namunali ishlar"} ({masterWorks.length})</span>
                     </h4>
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      (Naves, Koziryok, Darvozaxona, Fasad)
+                      {t.team?.worksSub || "(Naves, Koziryok, Darvozaxona, Fasad)"}
                     </span>
                   </div>
 
                   {masterWorks.length === 0 ? (
                     <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-xs sm:text-sm bg-slate-50 dark:bg-brand-surface/40 rounded-2xl border border-slate-200 dark:border-white/5">
-                      Ushbu ustaga biriktirilgan foto hisobotlar yaqin orada yangilanadi.
+                      {t.team?.noWorks || "Ushbu ustaga biriktirilgan foto hisobotlar yaqin orada yangilanadi."}
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -442,7 +521,7 @@ export const TeamSection = ({
                             <div className="absolute bottom-2.5 right-2.5 opacity-0 group-hover/work:opacity-100 transition-opacity">
                               <span className="p-1.5 rounded-lg bg-black/60 text-white backdrop-blur-sm flex items-center gap-1 text-[11px]">
                                 <Eye className="w-3.5 h-3.5" />
-                                <span>Kattalashtirish</span>
+                                <span>{t.team?.zoomText || "Kattalashtirish"}</span>
                               </span>
                             </div>
                           </div>
@@ -475,7 +554,7 @@ export const TeamSection = ({
               {/* Modal Footer (Action CTAs) */}
               <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/90 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-xs text-slate-600 dark:text-slate-300 text-center sm:text-left">
-                  Usta manzilingizga borib o'lchov oladi va smeta tuzib beradi.
+                  {t.team?.modalFooterNote || "Usta manzilingizga borib o'lchov oladi va smeta tuzib beradi."}
                 </div>
 
                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -484,7 +563,7 @@ export const TeamSection = ({
                     className="flex-1 sm:flex-none px-4 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-slate-800 dark:text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors"
                   >
                     <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>Qo'ng'iroq qilish</span>
+                    <span>{t.team?.callBtn || "Qo'ng'iroq qilish"}</span>
                   </a>
 
                   <button
@@ -496,10 +575,10 @@ export const TeamSection = ({
                         onOpenLeadModalWithMaster(masterName);
                       }
                     }}
-                    className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-gradient-to-r from-brand-redLight to-brand-red hover:from-brand-red hover:to-brand-redHover text-white font-extrabold text-xs sm:text-sm shadow-glow-red flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95"
+                    className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-gradient-to-r from-brand-redLight to-brand-red hover:from-brand-red hover:to-brand-redHover text-white font-extrabold text-xs sm:text-sm shadow-glow-red flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4" />
-                    <span>{t.team?.callMaster || "Shu ustani chaqirish (Bepul o'lchov)"}</span>
+                    <span>{t.team?.callMasterBtn || t.team?.callMaster || "Shu ustani chaqirish (Bepul o'lchov)"}</span>
                   </button>
                 </div>
               </div>

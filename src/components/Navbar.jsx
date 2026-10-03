@@ -129,7 +129,7 @@ export const Navbar = ({
                 className={`p-1.5 rounded-lg border transition-all hover:border-brand-red/50 active:scale-95 ${
                   isLight ? 'bg-black/5 border-slate-200 text-slate-800' : 'bg-white/10 border-white/15 text-slate-200'
                 }`}
-                title={isLight ? "Tungi rejim" : "Kunduzgi rejim"}
+                title={isLight ? (t.nav?.themeNight || "Tungi rejim") : (t.nav?.themeDay || "Kunduzgi rejim")}
               >
                 {isLight ? <Moon className="w-3.5 h-3.5 text-indigo-500" /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
               </button>
@@ -174,7 +174,7 @@ export const Navbar = ({
 
             {/* Language */}
             <div className={`flex items-center justify-between px-3 py-2 rounded-xl border mb-3 ${isLight ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/10'}`}>
-              <span className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>Tilni tanlang:</span>
+              <span className={`text-xs font-bold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>{t.nav?.selectLang || "Tilni tanlang:"}</span>
               <div className={`flex rounded-lg p-0.5 border text-xs font-bold ${isLight ? 'bg-white border-slate-200' : 'bg-white/8 border-white/10'}`}>
                 {['uz', 'ru', 'en'].map((lng) => (
                   <button key={lng} onClick={() => setLang(lng)}

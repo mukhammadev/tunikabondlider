@@ -81,10 +81,10 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                 <Layers className="w-8 h-8" />
               </div>
               <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">
-                Hozircha mahsulotlar mavjud emas
+                {t.products?.emptyTitle || "Hozircha mahsulotlar mavjud emas"}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Ushbu toifaga yaqin orada yangi modellar qo'shiladi.
+                {t.products?.emptyDesc || "Ushbu toifaga yaqin orada yangi modellar qo'shiladi."}
               </p>
             </div>
           ) : (
@@ -110,7 +110,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                     
                     {/* Badge */}
                     <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-brand-red text-white text-xs font-black shadow-md">
-                      {product.badge || "Yangi"}
+                      {product.badge || t.productModal?.defaultBadge || "Ommabop"}
                     </div>
 
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end text-xs font-bold text-white">
@@ -151,7 +151,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                 <div className="p-6 pt-0">
                   <div className="mb-4">
                     <span className="block text-[11px] text-slate-600 dark:text-slate-400 uppercase tracking-wider font-semibold">
-                      Zavod narxi:
+                      {t.products?.factoryPriceLabel || "Zavod narxi:"}
                     </span>
                     <span className="font-display font-extrabold text-base text-brand-red">
                       {product.priceRange}

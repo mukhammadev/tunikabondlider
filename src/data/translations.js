@@ -7,13 +7,70 @@ export const translations = {
       calculator: "Kalkulyator",
       swatches: "Ranglar",
       portfolio: "Loyihalar",
+      team: "Ustalar",
       about: "Biz haqimizda",
       faq: "FAQ",
       contact: "Aloqa",
       callUs: "Qo'ng'iroq qilish",
       requestMeasurement: "Bepul o'lchash",
       themeDay: "Kun",
-      themeNight: "Tun"
+      themeNight: "Tun",
+      selectLang: "Tilni tanlang:"
+    },
+    pages: {
+      products: {
+        title: "Mahsulotlar Katalogi va Ranglar",
+        subtitle: "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, naves va karnizlar palitrasi.",
+        badge: "Katalog & Ranglar",
+        breadcrumb: "Katalog"
+      },
+      portfolio: {
+        title: "Bajarilgan Loyihalar va Professional Ustalar",
+        subtitle: "2000+ muvaffaqiyatli topshirilgan kottedj, savdo binosi va shaxsiy xonadonlar fasadlari hamda tajribali ustalar jamoasi.",
+        badge: "Loyihalar & Ustalar",
+        breadcrumb: "Loyihalar"
+      },
+      about: {
+        title: "Biz Haqimizda & 10 Yil Rasmiy Kafolat",
+        subtitle: "Tunikabond Lider — O'zbekiston bo'ylab 6 yildan ortiq vaqt davomida yuqori sifatli fasad va tom yechimlarini yetkazib beruvchi yetakchi kompaniya.",
+        badge: "Biz haqimizda",
+        breadcrumb: "Biz haqimizda"
+      },
+      contact: {
+        title: "Bog'lanish & Ustaxona Manzili",
+        subtitle: "Siz uchun to'xtovsiz xizmatdamiz! Savollaringiz bormi yoki bepul o'lchov kerakmi? Istalgan vaqtda murojaat qiling.",
+        badge: "24/7 Aloqa",
+        breadcrumb: "Aloqa"
+      }
+    },
+    bento: {
+      badge: "Sayt bo'limlari va xizmatlar",
+      title: "Kerakli Bo'limni Tanlang",
+      subtitle: "Har bir bo'lim alohida sahifa sifatida qulay ajratilgan. Qiziqqan yo'nalishingiz bo'yicha to'liq ma'lumot oling.",
+      products: {
+        title: "Tunikabond & Alyukabond Katalogi",
+        subtitle: "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, 30+ ranglar va karniz turlari.",
+        badge: "To'g'ridan-to'g'ri ishlab chiqaruvchi",
+        cta: "Katalogni ko'rish"
+      },
+      portfolio: {
+        title: "2000+ Bajarilgan Loyihalar",
+        subtitle: "Naveslar, fasadlar, darvozaxonalar va karnizlar bo'yicha tayyor obyektlar fotogalereyasi.",
+        badge: "Tayyor ishlar",
+        cta: "Galereyani ko'rish"
+      },
+      about: {
+        title: "Biz haqimizda & 10 Yil Kafolat",
+        subtitle: "6 yillik tajriba, rasmiy kafolat shartnomasi, mijozlarning video va matnli sharhlari hamda tez-tez beriladigan savollar.",
+        badge: "Ishonch va sifat",
+        cta: "Kompaniya haqida"
+      },
+      contact: {
+        title: "24/7 Aloqa & Bepul O'lchash",
+        subtitle: "Siz uchun to'xtovsiz xizmatdamiz! Bepul o'lchovga buyurtma bering yoki ustaxonamiz xaritasini ko'ring.",
+        badge: "To'xtovsiz xizmat",
+        cta: "Bog'lanish & Xarita"
+      }
     },
     hero: {
       badge: "O'zbekistonda №1 Premium Fasad Yechimlari",
@@ -23,10 +80,12 @@ export const translations = {
       subtitle: "Tunikabond, Alyukabond panellari, zamonaviy karnizlar va sifatli tom yopish xizmatlari. 6 yildan ortiq tajriba, 2000+ muvaffaqiyatli loyiha va 10 yillik rasmiy kafolat bilan.",
       ctaCalculate: "Narxni hisoblash",
       ctaCatalog: "Katalogni ko'rish",
+      ctaMeasurement: "Bepul O'lchash & Konsultatsiya",
       statExp: "Yillik tajriba",
       statProjects: "Tugallangan obyektlar",
       statWarranty: "Yillik rasmiy kafolat",
-      statMeasurement: "Bepul o'lchash va maslahat"
+      statMeasurement: "Bepul o'lchash va maslahat",
+      yearsUnit: "Yil"
     },
     calculator: {
       badge: "Interaktiv hisoblagich",
@@ -68,7 +127,10 @@ export const translations = {
       thickness: "Qalinlik:",
       coating: "Qoplama turi:",
       ralCode: "RAL / Rang kodi:",
-      application: "Qo'llanilishi:"
+      application: "Qo'llanilishi:",
+      seeMore: "Ko'rish →",
+      textureLabel: "Faktura / Yuzasi:",
+      sampleBtn: "Ushbu rangda namuna so'rash"
     },
     products: {
       badge: "Mahsulotlar katalogi",
@@ -82,7 +144,25 @@ export const translations = {
       detailsBtn: "Batafsil / Buyurtma",
       thicknessLabel: "Qalinlik:",
       warrantyLabel: "Kafolat:",
-      coatingLabel: "Qoplama:"
+      coatingLabel: "Qoplama:",
+      emptyTitle: "Hozircha mahsulotlar mavjud emas",
+      emptyDesc: "Ushbu toifaga yaqin orada yangi modellar qo'shiladi.",
+      factoryPriceLabel: "Zavod narxi:"
+    },
+    productModal: {
+      closeAria: "Yopish",
+      defaultBadge: "Ommabop",
+      officialWarranty: "rasmiy kafolat",
+      specsTitle: "Texnik parametrlar va afzalliklari:",
+      priceLabel: "Amaldagi zavod narxi:",
+      defaultPrice: "Kelishilgan narxda",
+      orderBtn: "Ushbu mahsulotga buyurtma berish",
+      fallbackThickness: "Qalinlik",
+      fallbackCoating: "Qoplama",
+      fallbackWarranty: "Kafolat muddati",
+      fallbackCategory: "Toifasi",
+      fallbackDelivery: "Yetkazib berish",
+      fallbackDeliveryVal: "Toshkent va barcha viloyatlar bo'ylab bepul"
     },
     portfolio: {
       badge: "Konstruksiyalar & Ishlar Katalogi",
@@ -96,7 +176,10 @@ export const translations = {
       cornices: "Karniz va Shift",
       clickToZoom: "Kattalashtirish uchun bosing",
       masterLabel: "Mas'ul usta:",
-      viewMasterBtn: "Usta profili va ishlari"
+      viewMasterBtn: "Usta profili va ishlari",
+      durationLabel: "Muddat:",
+      emptyTitle: "Hozircha loyihalar mavjud emas",
+      emptyDesc: "Ushbu toifaga yaqin orada yangi namunali ishlar joylashtiriladi."
     },
     team: {
       badge: "Bizning Professional Jamoa",
@@ -108,29 +191,149 @@ export const translations = {
       viewWorks: "Ishlarini ko'rish",
       experience: "Tajriba",
       objects: "Obyektlar",
-      callMaster: "Shu ustani chaqirish (Bepul o'lchov)"
+      callMaster: "Shu ustani chaqirish (Bepul o'lchov)",
+      filterAll: "Barchasi",
+      filterBoss: "Firma Boshlig'i",
+      filterCeo: "CEO",
+      filterMasters: "Ustalar",
+      worksCountSuffix: "ta katalog ishi",
+      streamNotice: "Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring",
+      aboutMaster: "Usta haqida ma'lumot",
+      defaultBio: "Tunikabond Lider korxonasining rasmiy sertifikatlangan ustasi. Barcha ishlar shartnoma asosida 10 yillik kafolat bilan topshiriladi.",
+      expLabel: "Ish tajribasi:",
+      projectsLabel: "Topshirgan obyektlari:",
+      warrantyLabel: "Rasmiy kafolat:",
+      warrantyValue: "10 yil shartnoma bilan",
+      sampleWorksTitle: "Ushbu usta bajargan namunali ishlar",
+      worksSub: "(Naves, Koziryok, Darvozaxona, Fasad)",
+      noWorks: "Ushbu ustaga biriktirilgan foto hisobotlar yaqin orada yangilanadi.",
+      zoomText: "Kattalashtirish",
+      modalFooterNote: "Usta manzilingizga borib o'lchov oladi va smeta tuzib beradi.",
+      callBtn: "Qo'ng'iroq qilish",
+      callMasterBtn: "Shu ustani chaqirish (Bepul o'lchov)",
+      expUnit: "yil tajriba",
+      projectsUnit: "ta obyekt"
     },
     whyUs: {
       badge: "Nega Tunikabond Lider?",
       title: "Mijozlarimiz Nega Aynan Bizni Tanlashadi?",
       subtitle: "Biz shunchaki material sotmaymiz — binongizning uzoq yillik go'zalligi va xavfsizligini kafolatlaymiz.",
+      p1Badge: "10 YIL KAFOLAT",
       p1Title: "10 Yillik Rasmiy Kafolat",
       p1Desc: "Barcha materiallar va montaj ishlarimizga shartnoma asosida 10 yilgacha rasmiy kafolat taqdim etamiz.",
+      p1Pt1: "Yuridik Shartnoma",
+      p1Pt2: "Zavod Sertifikati",
+      p1Pt3: "100% Ishonch",
+      p2Badge: "MILLIMETR ANIKLIK",
       p2Title: "100% Bepul O'lchash va Smeta",
       p2Desc: "Mutaxassisimiz manzilingizga borib, binoni aniq lazer bilan o'lchaydi va bepul smeta hisoblab beradi.",
+      p3Badge: "O'Z VAQTIDA",
       p3Title: "Tezkor va Toza Montaj",
       p3Desc: "O'zimizning 20+ kishilik tajribali ustalar brigadasi obyektni belgilangan muddatda toza topshiradi.",
+      p4Badge: "O'RTAKASHLARSIZ",
       p4Title: "Birinchi Qo'l Zavod Narxlari",
       p4Desc: "Hech qanday vositachilarsiz, to'g'ridan-to'g'ri ishlab chiqaruvchi narxlarida eng maqbul narx taklif qilamiz.",
+      p4Pt1: "1 m² 75 000 so'mdan",
+      p4Pt2: "Halol hisob-kitob",
+      p4Pt3: "Zavod kafolati",
+      p5Badge: "100% HIMOYALANGAN",
+      p5Temp: "-40°C DAN +60°C GACHA SINOVDAN O'TGAN",
       p5Title: "Ob-havoga 100% Chidamlilik",
       p5Desc: "Quyosh nurlari, yomg'ir, sovuq va shamol ta'sirida rangini yo'qotmaydi va zanglamaydi.",
+      p5Pt1: "Ultrafiolet (UV) nurlaridan himoya",
+      p5Pt2: "Zanglamas polimer qoplama",
+      p5Pt3: "Yomg'ir va do'ldan shikastlanmaydi",
+      p5Pt4: "Ranglar o'chmaydi",
       p6Title: "3D Dizayn Loyihalash",
       p6Desc: "Montaj boshlanishidan oldin bino yakuniy ko'rinishining 3D loyihasini tayyorlab, tasdiqlatib olamiz."
+    },
+    trustReviews: {
+      badgeWarranty: "Ishonch va Kafolat",
+      titleWarrantyStart: "Rasmiy Kafolat va",
+      titleWarrantyHighlight: "Sifat Sertifikatlari",
+      subtitleWarranty: "Biz faqat so'zda emas, balki qonuniy kuchga ega 10 yillik rasmiy shartnoma va sifat sertifikatlari bilan xizmat ko'rsatamiz.",
+      badgeReviews: "Mijozlarimiz Fikrlari",
+      titleReviewsStart: "Mijozlarimiz Biz Haqimizda",
+      titleReviewsHighlight: "Nima Deydi?",
+      subtitleReviews: "Yuzlab muvaffaqiyatli topshirilgan fasad va tom loyihalarimiz egalarining samimiy baholari.",
+      contractRecorded: "Har bir shartnomada qayd etiladi",
+      ctaBoxTitle: "Binongiz uchun eng sifatli fasad yechimini xohlaysizmi?",
+      ctaBoxSubtitle: "Katalog va hisob-kitob bilan tanishish uchun usta-muhandisimiz bilan bepul bog'laning.",
+      ctaBoxBtn: "Bepul O'lchashga Buyurtma",
+      certificates: [
+        {
+          title: "10 Yillik Rasmiy Kafolat Shartnomasi",
+          desc: "Har bir mijoz bilan yuridik kuchga ega rasmiy kafolat shartnomasi imzolanadi. Rang o'chishi va korroziyaga 100% javobgarlik.",
+          badge: "Kafolat 10 Yil"
+        },
+        {
+          title: "Muvofiqlik va Sifat Sertifikati",
+          desc: "O'zbekiston Davlat Standartlari (O'zDSt) talablariga to'liq javob beruvchi yuqori sifatli xomashyo va alyuminiy kompozit.",
+          badge: "O'zDSt Tasdiqlangan"
+        },
+        {
+          title: "Yong'in Xavfsizligi A2 Sinifi",
+          desc: "Tunikabond va Alyukabond panellari alangalanmaydigan mineral o'zakka ega bo'lib, xalqaro yong'in xavfsizligi me'yorlariga javob beradi.",
+          badge: "Olovga Bardoshli"
+        }
+      ],
+      reviews: [
+        {
+          name: "Akmal Qodirov",
+          role: "Tadbirkor, 'Golden Plast' MChJ rahbari",
+          location: "Toshkent, Sergeli",
+          project: "Ofis binosi fasadi (850 m²)",
+          comment: "Tunikabond Lider jamoasiga alohida minnatdorchilik bildiraman. 850 kvadratlik binomizni 14 kunda a'lo darajada bitirib berishdi. Ranglari quyoshda o'chmaydi, montaj juda aniq va toza bajarilgan.",
+          date: "2026-yil, Mart"
+        },
+        {
+          name: "Sherzodbek To'xtayev",
+          role: "Xususiy kottej egasi",
+          location: "Toshkent viloyati, Qibray",
+          project: "Kottej fasadi va karnizlari (420 m²)",
+          comment: "Usta Muhammadaziz aka bilan Telegram orqali bog'langan edim, o'sha kuniyoq kelib lazerda o'lchab ketishdi. Neoklassik karniz va yog'och teksturali tunikabond o'rnatdik. Uyimiz ko'chada eng chiroylisi bo'lib turibdi.",
+          date: "2026-yil, Fevral"
+        },
+        {
+          name: "Dilshod Yusupov",
+          role: "Avtosalon menejeri",
+          location: "Samarqand shahri",
+          project: "Avtosalon tashqi fasadi (1,100 m²)",
+          comment: "Avval boshqa ustalarga murojaat qilgandik, muddatni cho'zib yuborishgan. Tunikabond Lider esa shartnomada ko'rsatilgan kunda 100% sifat bilan topshirdi. 10 yillik rasmiy kafolat qog'ozini ham berishdi.",
+          date: "2026-yil, Yanvar"
+        }
+      ]
+    },
+    leadModal: {
+      badge: "Bepul o'lchov va smeta",
+      defaultTitle: "Bepul Usta Chaqirish",
+      desc: "Raqamingizni qoldiring, mutaxassisimiz bepul namuna va lazerli o'lchov asbobi bilan tashrif buyuradi.",
+      calcCostLabel: "Hisoblangan xarajat:",
+      calcArea: "Hajmi:",
+      calcMaterial: "Material:",
+      calcEstSum: "Taxminiy summa:",
+      nameLabel: "Ismingiz *",
+      namePlaceholder: "Jasur Aliyev",
+      phoneLabel: "Telefon raqamingiz *",
+      phonePlaceholder: "+998 (90) 123-45-67",
+      noteLabel: "Manzilingiz yoki qo'shimcha izoh",
+      notePlaceholder: "Masalan: Yunusobod 14-mavze, kottedj",
+      photoLabel: "Bino yoki uy rasmi (ixtiyoriy)",
+      photoUploadPrompt: "Rasmni tanlang yoki suratga oling",
+      photoUploading: "Yuklanmoqda...",
+      photoRemove: "Rasmni o'chirish",
+      submitBtn: "Arizani tasdiqlash",
+      submitting: "Yuborilmoqda...",
+      freeGuarantee: "100% Bepul va majburiyatlarsiz",
+      successTitle: "Arizangiz qabul qilindi!",
+      successDescStart: "Mutaxassisimiz va admin",
+      successDescEnd: "tez orada siz bilan bog'lanadi."
     },
     process: {
       badge: "Ish tartibi",
       title: "Hamkorlik Bosqichlari",
       subtitle: "4 oddiy qadamda orzuingizdagi binoga ega bo'ling.",
+      stepWord: "Qadam",
       s1Title: "Ariza qoldirish",
       s1Desc: "Sayt orqali yoki telefon qilib bepul konsultatsiyaga yozilasiz.",
       s2Title: "Bepul o'lchov & aniq smeta",
@@ -159,7 +362,24 @@ export const translations = {
       phoneTitle: "Telefonlarimiz",
       workHoursTitle: "Siz uchun to'xtovsiz xizmatdamiz",
       workHoursText: "24/7 — Dam olish kunlarisiz, qo'ng'iroqlar va buyurtmalar har doim qabul qilinadi",
-      socialsTitle: "Ijtimoiy tarmoqlarimiz"
+      socialsTitle: "Ijtimoiy tarmoqlarimiz",
+      adminManager: "Telegram Admin & Menejer",
+      writeBtn: "Yozish",
+      mainWorkshopBadge: "Bosh Sex",
+      freeParking: "Bepul avtoturargoh",
+      liveShowroom: "Jonli namunalar zali",
+      mapPinBadge: "Tunikabond Lider Ishxonasi",
+      yandexMapBtn: "Yandex Xarita",
+      googleMapBtn: "Google Maps",
+      visitNotice: "Tashrifdan oldin qo'ng'iroq qilsangiz, ustamiz sizni kutib oladi va barcha namunalarni jonli ko'rsatib beradi.",
+      newLeadBtn: "Yana yangi ariza qoldirish",
+      fastResponse: "Tezkor qayta aloqa (15 daqiqada)",
+      consentNotice: "Tugmani bosish orqali siz shaxsiy ma'lumotlaringizni qayta ishlashga rozilik bildirasiz.",
+      optTunikabond: "Tunikabond Fasad Panellari",
+      optAlyukabond: "Alyukabond Kompozit Panellari",
+      optCornice: "Zamonaviy Karnizlar",
+      optRoofing: "Profnastil va Tom Yopish",
+      optMeasurement: "Bepul Usta Chaqirish (O'lchash)"
     },
     faq: {
       badge: "Ko'p beriladigan savollar",
@@ -167,11 +387,22 @@ export const translations = {
       subtitle: "Mijozlarimiz eng ko'p qiziqadigan muhim masalalar."
     },
     footer: {
+      tagline: "Fasad & Tom Yechimlari",
+      sectionsTitle: "Xizmatlar & Bo'limlar",
       desc: "Tunikabond Lider — O'zbekistonda zamonaviy fasad va sifatli tom yopish bo'yicha yetakchi kompaniya.",
       rights: "Barcha huquqlar himoyalangan.",
-      developedWith: "Sifat va ishonch bilan yaratilgan"
+      developedWith: "Sifat va ishonch bilan yaratilgan",
+      writeAdmin: "Yozish",
+      officialChannel: "Rasmiy Kanal",
+      adminLabel: "Admin"
+    },
+    brandIntro: {
+      tagline: "Arxitektura • Fasad • Sifat",
+      subTagline: "Premium Fasad & Naves Tizimlari",
+      skipBtn: "O'tkazish"
     }
   },
+
   ru: {
     nav: {
       home: "Главная",
@@ -180,13 +411,70 @@ export const translations = {
       calculator: "Калькулятор",
       swatches: "Цвета",
       portfolio: "Проекты",
+      team: "Мастера",
       about: "О нас",
       faq: "FAQ",
       contact: "Контакты",
       callUs: "Позвонить",
       requestMeasurement: "Бесплатный замер",
       themeDay: "День",
-      themeNight: "Ночь"
+      themeNight: "Ночь",
+      selectLang: "Выберите язык:"
+    },
+    pages: {
+      products: {
+        title: "Каталог Продукции и Цветов",
+        subtitle: "Сертифицированные панели Туникабонд, Алюкобонд, палитра навесов и карнизов из России и Китая.",
+        badge: "Каталог & Цвета",
+        breadcrumb: "Каталог"
+      },
+      portfolio: {
+        title: "Выполненные Проекты и Профессиональные Мастера",
+        subtitle: "2000+ успешно сданных фасадов коттеджей, коммерческих объектов и домов, а также команда опытных мастеров.",
+        badge: "Проекты & Мастера",
+        breadcrumb: "Проекты"
+      },
+      about: {
+        title: "О Нас & Официальная Гарантия 10 Лет",
+        subtitle: "Tunikabond Lider — ведущая компания в Узбекистане, более 6 лет поставляющая высококачественные фасадные и кровельные решения.",
+        badge: "О нас",
+        breadcrumb: "О нас"
+      },
+      contact: {
+        title: "Контакты & Адрес Мастерской",
+        subtitle: "Работаем круглосуточно 24/7! Есть вопросы или нужен бесплатный лазерный замер? Обращайтесь в любое время.",
+        badge: "24/7 Связь",
+        breadcrumb: "Контакты"
+      }
+    },
+    bento: {
+      badge: "Разделы сайта и услуги",
+      title: "Выберите Нужный Раздел",
+      subtitle: "Каждый раздел удобно выделен в отдельную страницу. Получите подробную информацию по интересующему направлению.",
+      products: {
+        title: "Каталог Туникабонд & Алюкобонд",
+        subtitle: "Сертифицированные панели Туникабонд и Алюкобонд из РФ и Китая, 30+ цветов и виды карнизов.",
+        badge: "Прямой производитель",
+        cta: "Смотреть каталог"
+      },
+      portfolio: {
+        title: "2000+ Выполненных Проектов",
+        subtitle: "Фотогалерея готовых объектов: навесы, фасады, въездные ворота и карнизы.",
+        badge: "Готовые объекты",
+        cta: "Смотреть галерею"
+      },
+      about: {
+        title: "О нас & 10 Лет Гарантии",
+        subtitle: "6 лет опыта, официальный договор гарантии, реальные отзывы клиентов и ответы на частые вопросы.",
+        badge: "Надежность и качество",
+        cta: "О компании"
+      },
+      contact: {
+        title: "24/7 Связь & Бесплатный Замер",
+        subtitle: "Работаем круглосуточно! Закажите бесплатный выезд на замер или посмотрите карту проезда к цеху.",
+        badge: "Круглосуточный сервис",
+        cta: "Контакты & Карта"
+      }
     },
     hero: {
       badge: "Фасадные решения №1 в Узбекистане",
@@ -196,10 +484,12 @@ export const translations = {
       subtitle: "Панели Туникабонд, Алюкобонд, современные карнизы и качественные кровельные работы. Более 6 лет опыта, 2000+ успешных объектов и 10 лет официальной гарантии.",
       ctaCalculate: "Рассчитать стоимость",
       ctaCatalog: "Смотреть каталог",
+      ctaMeasurement: "Бесплатный Замер и Консультация",
       statExp: "Лет опыта",
       statProjects: "Сданных объектов",
       statWarranty: "Лет гарантии",
-      statMeasurement: "Бесплатный замер и смета"
+      statMeasurement: "Бесплатный замер и смета",
+      yearsUnit: "Лет"
     },
     calculator: {
       badge: "Интерактивный расчет",
@@ -241,7 +531,10 @@ export const translations = {
       thickness: "Толщина:",
       coating: "Тип покрытия:",
       ralCode: "Код цвета / RAL:",
-      application: "Применение:"
+      application: "Применение:",
+      seeMore: "Смотреть →",
+      textureLabel: "Фактура / Поверхность:",
+      sampleBtn: "Запросить образец в этом цвете"
     },
     products: {
       badge: "Каталог продукции",
@@ -251,62 +544,203 @@ export const translations = {
       tunikabond: "Туникабонд",
       alyukabond: "Алюкобонд",
       cornice: "Карнизы",
-      roofing: "Профнастил и Кровля",
-      detailsBtn: "Подробнее / Заказать",
+      roofing: "Профнастил & Кровля",
+      detailsBtn: "Подробнее / Заказ",
       thicknessLabel: "Толщина:",
       warrantyLabel: "Гарантия:",
-      coatingLabel: "Покрытие:"
+      coatingLabel: "Покрытие:",
+      emptyTitle: "Товары временно отсутствуют",
+      emptyDesc: "В эту категорию скоро будут добавлены новые модели.",
+      factoryPriceLabel: "Цена завода:"
+    },
+    productModal: {
+      closeAria: "Закрыть",
+      defaultBadge: "Популярное",
+      officialWarranty: "официальная гарантия",
+      specsTitle: "Технические параметры и преимущества:",
+      priceLabel: "Действующая цена завода:",
+      defaultPrice: "Договорная цена",
+      orderBtn: "Заказать данный материал",
+      fallbackThickness: "Толщина",
+      fallbackCoating: "Покрытие",
+      fallbackWarranty: "Срок гарантии",
+      fallbackCategory: "Категория",
+      fallbackDelivery: "Доставка",
+      fallbackDeliveryVal: "Бесплатно по Ташкенту и всем областям"
     },
     portfolio: {
-      badge: "Каталог Конструкций и Работ",
-      title: "Навесы, Козырьки, Въездные Группы и Фасады",
-      subtitle: "Выберите нужную категорию и оцените готовые работы. Каждый объект закреплен за ответственным мастером компании.",
+      badge: "Каталог Конструкций & Работ",
+      title: "Навесы, Козырьки, Въездные Ворота и Фасады",
+      subtitle: "Выберите интересующее направление и оцените готовые работы. За каждым проектом закреплен ответственный мастер компании.",
       all: "Все",
       naves: "Навесы",
       koziryok: "Козырьки",
-      darvozaxona: "Въездные группы (Дарвозахона)",
+      darvozaxona: "Ворота/Въезды",
       fasad: "Фасады",
       cornices: "Карнизы и Потолки",
       clickToZoom: "Нажмите для увеличения",
       masterLabel: "Ответственный мастер:",
-      viewMasterBtn: "Профиль и работы мастера"
+      viewMasterBtn: "Профиль мастера и работы",
+      durationLabel: "Срок:",
+      emptyTitle: "Пока нет проектов",
+      emptyDesc: "В эту категорию скоро будут добавлены новые примеры работ."
     },
     team: {
-      badge: "Наша Команда",
+      badge: "Наша Профессиональная Команда",
       title: "Опытные Мастера и Руководство",
-      subtitle: "Квалифицированные специалисты и инженеры с многолетним стажем работы.",
+      subtitle: "Ведущие специалисты, инженеры и мастера с многолетним практическим опытом монтажа.",
       all: "Все",
       masters: "Мастера",
-      leadership: "Руководство компании",
-      viewWorks: "Посмотреть работы",
+      leadership: "Руководство Фирмы",
+      viewWorks: "Смотреть работы",
       experience: "Опыт",
-      objects: "Объектов",
-      callMaster: "Вызвать мастера на замер"
+      objects: "Объекты",
+      callMaster: "Вызвать этого мастера (Бесплатный замер)",
+      filterAll: "Все",
+      filterBoss: "Руководитель",
+      filterCeo: "CEO",
+      filterMasters: "Мастера",
+      worksCountSuffix: "работ в каталоге",
+      streamNotice: "Плавный поток: наведите курсор для паузы, нажмите для просмотра работ мастера",
+      aboutMaster: "Информация о мастере",
+      defaultBio: "Сертифицированный специалист компании Tunikabond Lider. Все работы сдаются по договору с гарантией 10 лет.",
+      expLabel: "Опыт работы:",
+      projectsLabel: "Сданных объектов:",
+      warrantyLabel: "Официальная гарантия:",
+      warrantyValue: "10 лет по договору",
+      sampleWorksTitle: "Примеры выполненных работ мастера",
+      worksSub: "(Навесы, Козырьки, Ворота, Фасады)",
+      noWorks: "Фотоотчеты по данному мастеру будут добавлены в ближайшее время.",
+      zoomText: "Увеличить",
+      modalFooterNote: "Мастер выезжает на ваш объект, производит замер и составляет смету.",
+      callBtn: "Позвонить",
+      callMasterBtn: "Вызвать этого мастера (Бесплатный замер)",
+      expUnit: "лет опыта",
+      projectsUnit: "объектов"
     },
     whyUs: {
       badge: "Почему Tunikabond Lider?",
-      title: "Почему Клиенты Доверяют Нам?",
-      subtitle: "Мы не просто продаем материал — мы гарантируем долговечность, безопасность и эстетическую привлекательность вашего здания.",
+      title: "Почему Клиенты Выбирают Именно Нас?",
+      subtitle: "Мы не просто продаем материалы — мы гарантируем многолетнюю эстетику и безопасность вашего фасада.",
+      p1Badge: "10 ЛЕТ ГАРАНТИИ",
       p1Title: "10 Лет Официальной Гарантии",
-      p1Desc: "Предоставляем официальную гарантию по договору на все материалы и монтажные работы до 10 лет.",
+      p1Desc: "Предоставляем юридическую гарантию по официальному договору на все материалы и монтажные работы до 10 лет.",
+      p1Pt1: "Юридический Договор",
+      p1Pt2: "Заводской Сертификат",
+      p1Pt3: "100% Надежность",
+      p2Badge: "ТОЧНОСТЬ ДО ММ",
       p2Title: "100% Бесплатный Замер и Смета",
-      p2Desc: "Наш специалист оперативно приедет на объект, произведет лазерный замер и составит точную смету.",
+      p2Desc: "Инженер приедет по вашему адресу с образцами, выполнит точный лазерный замер и подготовит подробную смету.",
+      p3Badge: "ТОЧНО В СРОК",
       p3Title: "Быстрый и Аккуратный Монтаж",
-      p3Desc: "Собственная бригада из 20+ опытных мастеров выполнит монтаж точно в срок и сдаст объект в чистоте.",
-      p4Title: "Цены от Производителя (Первые руки)",
-      p4Desc: "Без посредников и переплат, напрямую от заводов-производителей по самым честным ценам.",
-      p5Title: "Стойкость к Любым Погодным Условиям",
-      p5Desc: "Не выцветает на солнце, устойчив к жаре, морозам, дождю, граду и коррозии.",
-      p6Title: "3D Визуализация и Дизайн",
-      p6Desc: "До начала работ подготавливаем реалистичный 3D дизайн-проект фасада вашего объекта."
+      p3Desc: "Собственная бригада из 20+ квалифицированных мастеров сдает объект точно в оговоренные сроки и в чистоте.",
+      p4Badge: "БЕЗ ПОСРЕДНИКОВ",
+      p4Title: "Прямые Цены от Завода",
+      p4Desc: "Работаем без посредников, предлагая лучшие цены напрямую от производителя с гарантией честности.",
+      p4Pt1: "от 75 000 сум / м²",
+      p4Pt2: "Честный расчет",
+      p4Pt3: "Заводская гарантия",
+      p5Badge: "100% ЗАЩИТА",
+      p5Temp: "ИСПЫТАНО ОТ -40°C ДО +60°C",
+      p5Title: "100% Стойкость к Погодным Условиям",
+      p5Desc: "Материалы не выгорают на солнце, устойчивы к морозам, граду, сильным ветрам и не подвержены коррозии.",
+      p5Pt1: "Защита от ультрафиолета (УФ)",
+      p5Pt2: "Антикоррозийное покрытие",
+      p5Pt3: "Устойчивость к граду и ливням",
+      p5Pt4: "Цвета не тускнеют",
+      p6Title: "3D Архитектурное Проектирование",
+      p6Desc: "До начала монтажа разрабатываем и утверждаем визуализацию 3D проекта будущего вида вашего здания."
+    },
+    trustReviews: {
+      badgeWarranty: "Доверие и Гарантия",
+      titleWarrantyStart: "Официальная Гарантия и",
+      titleWarrantyHighlight: "Сертификаты Качества",
+      subtitleWarranty: "Мы работаем не на словах, а на основании официального юридического договора на 10 лет и сертификатов соответствия.",
+      badgeReviews: "Отзывы Клиентов",
+      titleReviewsStart: "Что Клиенты Говорят",
+      titleReviewsHighlight: "О Нашей Работе?",
+      subtitleReviews: "Честные оценки владельцев сотен успешно сданных фасадных и кровельных объектов.",
+      contractRecorded: "Фиксируется в каждом договоре",
+      ctaBoxTitle: "Ищете идеальное фасадное решение для вашего здания?",
+      ctaBoxSubtitle: "Свяжитесь с нашим инженером для бесплатной консультации, каталога и расчета сметы.",
+      ctaBoxBtn: "Заказать Бесплатный Замер",
+      certificates: [
+        {
+          title: "Официальный Договор Гарантии на 10 Лет",
+          desc: "С каждым клиентом заключается официальный договор с юридической силой. 100% ответственность за сохранность цвета и защиту от коррозии.",
+          badge: "Гарантия 10 Лет"
+        },
+        {
+          title: "Сертификат Соответствия и Качества",
+          desc: "Высококачественное сырье и алюминиевые композиты, полностью соответствующие государственным стандартам O'zDSt.",
+          badge: "Стандарт O'zDSt"
+        },
+        {
+          title: "Класс Пожарной Безопасности A2",
+          desc: "Панели Туникабонд и Алюкобонд имеют негорючий минеральный сердечник и соответствуют международным нормам пожаробезопасности.",
+          badge: "Огнестойкий A2"
+        }
+      ],
+      reviews: [
+        {
+          name: "Акмаль Кадыров",
+          role: "Предприниматель, руководитель ООО 'Golden Plast'",
+          location: "г. Ташкент, Сергели",
+          project: "Фасад офисного здания (850 м²)",
+          comment: "Огромная благодарность команде Tunikabond Lider. Наш фасад площадью 850 м² сдали за 14 дней в превосходном качестве. Цвета не выгорают, монтаж выполнен предельно аккуратно.",
+          date: "Март 2026 г."
+        },
+        {
+          name: "Шерзодбек Тухтаев",
+          role: "Владелец частного коттеджа",
+          location: "Ташкентская обл., Кибрай",
+          project: "Фасад коттеджа и карнизы (420 м²)",
+          comment: "Связался с мастером Мухаммадазизом через Telegram — в тот же день приехали с лазерным замером. Установили неоклассический карниз и туникабонд под дерево. Наш дом самый красивый на улице.",
+          date: "Февраль 2026 г."
+        },
+        {
+          name: "Дильшод Юсупов",
+          role: "Менеджер автосалона",
+          location: "г. Самарканд",
+          project: "Внешний фасад автосалона (1 100 м²)",
+          comment: "Ранее обращались к другим бригадам, сильно затягивали сроки. Команда Tunikabond Lider сдала объект точно в день по договору со 100% качеством и официальной 10-летней гарантией.",
+          date: "Январь 2026 г."
+        }
+      ]
+    },
+    leadModal: {
+      badge: "Бесплатный замер и смета",
+      defaultTitle: "Вызов Мастера на Замер",
+      desc: "Оставьте ваш номер, наш инженер приедет с физическими образцами и лазерным оборудованием.",
+      calcCostLabel: "Расчетная стоимость:",
+      calcArea: "Площадь:",
+      calcMaterial: "Материал:",
+      calcEstSum: "Ориентировочная сумма:",
+      nameLabel: "Ваше имя *",
+      namePlaceholder: "Жасур Алиев",
+      phoneLabel: "Номер телефона *",
+      phonePlaceholder: "+998 (90) 123-45-67",
+      noteLabel: "Адрес объекта или примечание",
+      notePlaceholder: "Например: Юнусабад 14-квартал, коттедж",
+      photoLabel: "Фото здания (по желанию)",
+      photoUploadPrompt: "Выберите фото или сделайте снимок",
+      photoUploading: "Загрузка...",
+      photoRemove: "Удалить фото",
+      submitBtn: "Подтвердить заявку",
+      submitting: "Отправка...",
+      freeGuarantee: "100% Бесплатно и без обязательств",
+      successTitle: "Ваша заявка принята!",
+      successDescStart: "Наш специалист и администратор",
+      successDescEnd: "свяжутся с вами в ближайшее время."
     },
     process: {
       badge: "Порядок работы",
       title: "Этапы Сотрудничества",
-      subtitle: "4 простых шага к современному фасаду вашей мечты.",
+      subtitle: "4 простых шага к фасаду вашей мечты.",
+      stepWord: "Шаг",
       s1Title: "Оставить заявку",
-      s1Desc: "Оставьте заявку на сайте или позвоните для бесплатной консультации.",
-      s2Title: "Бесплатный замер & точный расчет",
+      s1Desc: "Заполните форму на сайте или позвоните для бесплатной первичной консультации.",
+      s2Title: "Бесплатный замер & смета",
       s2Desc: "Мастер приедет с образцами материалов, произведет точный замер и подготовит расчет.",
       s3Title: "Производство & Доставка",
       s3Desc: "Панели изготавливаются точно под размеры вашего здания и доставляются на объект.",
@@ -332,7 +766,24 @@ export const translations = {
       phoneTitle: "Наши телефоны",
       workHoursTitle: "Работаем для вас без перерывов",
       workHoursText: "Круглосуточно 24/7 — прием звонков и заявок без выходных",
-      socialsTitle: "Мы в соцсетях"
+      socialsTitle: "Мы в соцсетях",
+      adminManager: "Telegram Админ и менеджер",
+      writeBtn: "Написать",
+      mainWorkshopBadge: "Главный Цех",
+      freeParking: "Бесплатная парковка",
+      liveShowroom: "Шоурум живых образцов",
+      mapPinBadge: "Мастерская Tunikabond Lider",
+      yandexMapBtn: "Яндекс Карты",
+      googleMapBtn: "Google Карты",
+      visitNotice: "Пожалуйста, позвоните перед визитом: наш мастер встретит вас и покажет все материалы вживую.",
+      newLeadBtn: "Отправить еще заявку",
+      fastResponse: "Быстрый ответ (в течение 15 минут)",
+      consentNotice: "Нажимая кнопку, вы даете согласие на обработку персональных данных.",
+      optTunikabond: "Фасадные панели Туникабонд",
+      optAlyukabond: "Композитные панели Алюкобонд",
+      optCornice: "Современные карнизы",
+      optRoofing: "Профнастил и кровля",
+      optMeasurement: "Бесплатный вызов мастера (Замер)"
     },
     faq: {
       badge: "Часто задаваемые вопросы",
@@ -340,11 +791,22 @@ export const translations = {
       subtitle: "Все, что нужно знать о материалах, сроках и гарантиях."
     },
     footer: {
+      tagline: "Фасадные & Кровельные Решения",
+      sectionsTitle: "Услуги & Разделы",
       desc: "Tunikabond Lider — ведущая компания в Узбекистане по современным фасадным и кровельным решениям.",
       rights: "Все права защищены.",
-      developedWith: "Создано с надежностью и качеством"
+      developedWith: "Создано с надежностью и качеством",
+      writeAdmin: "Написать",
+      officialChannel: "Официальный канал",
+      adminLabel: "Админ"
+    },
+    brandIntro: {
+      tagline: "Архитектура • Фасад • Качество",
+      subTagline: "Премиальные Фасадные & Навесные Системы",
+      skipBtn: "Пропустить"
     }
   },
+
   en: {
     nav: {
       home: "Home",
@@ -353,13 +815,70 @@ export const translations = {
       calculator: "Calculator",
       swatches: "Colors",
       portfolio: "Projects",
+      team: "Craftsmen",
       about: "About Us",
       faq: "FAQ",
       contact: "Contact",
       callUs: "Call Us",
       requestMeasurement: "Free Measurement",
       themeDay: "Day",
-      themeNight: "Night"
+      themeNight: "Night",
+      selectLang: "Choose language:"
+    },
+    pages: {
+      products: {
+        title: "Product Catalog & Architectural Finishes",
+        subtitle: "Certified Tunikabond and Alucobond panels, premium awnings, and cornice systems from Russia and China.",
+        badge: "Catalog & Colors",
+        breadcrumb: "Catalog"
+      },
+      portfolio: {
+        title: "Completed Projects & Professional Craftsmen",
+        subtitle: "2000+ successfully completed facades of luxury villas, commercial centers, and residences crafted by our masters.",
+        badge: "Projects & Craftsmen",
+        breadcrumb: "Projects"
+      },
+      about: {
+        title: "About Us & Official 10-Year Warranty",
+        subtitle: "Tunikabond Lider — Uzbekistan's premier architectural facade and roofing solutions provider for over 6 years.",
+        badge: "About Us",
+        breadcrumb: "About Us"
+      },
+      contact: {
+        title: "Contact & Workshop Headquarters",
+        subtitle: "Available 24/7! Have questions or need a free laser measurement? Contact our engineering team anytime.",
+        badge: "24/7 Support",
+        breadcrumb: "Contact"
+      }
+    },
+    bento: {
+      badge: "Site Sections & Services",
+      title: "Select Desired Section",
+      subtitle: "Every service is clearly structured as an individual section. Explore comprehensive details for your project.",
+      products: {
+        title: "Tunikabond & Alucobond Catalog",
+        subtitle: "Certified Tunikabond and Alucobond panels from Russia and China, 30+ textures, and modern cornice lines.",
+        badge: "Direct Manufacturer",
+        cta: "Browse Catalog"
+      },
+      portfolio: {
+        title: "2000+ Completed Projects",
+        subtitle: "Photo gallery of finished canopies, architectural facades, gateway portals, and neoclassical cornices.",
+        badge: "Completed Works",
+        cta: "View Gallery"
+      },
+      about: {
+        title: "About Us & 10-Year Warranty",
+        subtitle: "6+ years of field experience, official warranty contracts, verified customer reviews, and comprehensive FAQs.",
+        badge: "Trust & Quality",
+        cta: "About Company"
+      },
+      contact: {
+        title: "24/7 Contact & Free Measurement",
+        subtitle: "We are at your service 24/7! Request a free on-site laser measurement or view our workshop location map.",
+        badge: "Non-stop Service",
+        cta: "Contact & Map"
+      }
     },
     hero: {
       badge: "Top Facade Solutions in Uzbekistan",
@@ -369,10 +888,12 @@ export const translations = {
       subtitle: "Tunikabond, Alucobond panels, modern cornices, and premium roofing services. 6+ years of experience, 2000+ completed projects, and a 10-year official warranty.",
       ctaCalculate: "Calculate Cost",
       ctaCatalog: "Browse Catalog",
+      ctaMeasurement: "Free Measurement & Consultation",
       statExp: "Years Experience",
       statProjects: "Completed Projects",
       statWarranty: "Years Warranty",
-      statMeasurement: "Free Measurement & Estimate"
+      statMeasurement: "Free Measurement & Estimate",
+      yearsUnit: "Years"
     },
     calculator: {
       badge: "Interactive Estimator",
@@ -414,7 +935,10 @@ export const translations = {
       thickness: "Thickness:",
       coating: "Coating Type:",
       ralCode: "Color / RAL Code:",
-      application: "Best Used For:"
+      application: "Best Used For:",
+      seeMore: "View →",
+      textureLabel: "Texture / Finish:",
+      sampleBtn: "Request Sample in this Color"
     },
     products: {
       badge: "Product Catalog",
@@ -428,7 +952,25 @@ export const translations = {
       detailsBtn: "Details / Order",
       thicknessLabel: "Thickness:",
       warrantyLabel: "Warranty:",
-      coatingLabel: "Coating:"
+      coatingLabel: "Coating:",
+      emptyTitle: "No products currently available",
+      emptyDesc: "New models will be added to this category shortly.",
+      factoryPriceLabel: "Factory Price:"
+    },
+    productModal: {
+      closeAria: "Close",
+      defaultBadge: "Popular",
+      officialWarranty: "official warranty",
+      specsTitle: "Technical Specifications & Highlights:",
+      priceLabel: "Current Factory Price:",
+      defaultPrice: "Upon request",
+      orderBtn: "Order This Product",
+      fallbackThickness: "Thickness",
+      fallbackCoating: "Coating",
+      fallbackWarranty: "Warranty Period",
+      fallbackCategory: "Category",
+      fallbackDelivery: "Delivery",
+      fallbackDeliveryVal: "Free delivery across Tashkent and all regions"
     },
     portfolio: {
       badge: "Structures & Works Catalog",
@@ -442,7 +984,10 @@ export const translations = {
       cornices: "Cornices & Soffits",
       clickToZoom: "Click image to expand",
       masterLabel: "Assigned craftsman:",
-      viewMasterBtn: "Craftsman profile & works"
+      viewMasterBtn: "Craftsman profile & works",
+      durationLabel: "Duration:",
+      emptyTitle: "No projects currently",
+      emptyDesc: "New sample projects will be added to this category shortly."
     },
     team: {
       badge: "Our Team",
@@ -454,29 +999,149 @@ export const translations = {
       viewWorks: "View Works",
       experience: "Experience",
       objects: "Projects",
-      callMaster: "Request this Master (Free Quote)"
+      callMaster: "Request this Master (Free Quote)",
+      filterAll: "All",
+      filterBoss: "Founder & Chief",
+      filterCeo: "CEO",
+      filterMasters: "Craftsmen",
+      worksCountSuffix: "catalog works",
+      streamNotice: "Smooth auto-scroll: hover to pause, click to inspect craftsman's portfolio",
+      aboutMaster: "About the Craftsman",
+      defaultBio: "Certified master craftsman of Tunikabond Lider. All projects delivered under official 10-year contract.",
+      expLabel: "Field Experience:",
+      projectsLabel: "Completed Projects:",
+      warrantyLabel: "Official Warranty:",
+      warrantyValue: "10 years contractual",
+      sampleWorksTitle: "Sample Works Completed by Master",
+      worksSub: "(Canopies, Awnings, Gateways, Facades)",
+      noWorks: "Photo records for this master will be updated shortly.",
+      zoomText: "Enlarge",
+      modalFooterNote: "Craftsman visits your location, takes laser measurements, and prepares estimate.",
+      callBtn: "Call Now",
+      callMasterBtn: "Request this Master (Free Quote)",
+      expUnit: "years experience",
+      projectsUnit: "projects"
     },
     whyUs: {
       badge: "Why Tunikabond Lider?",
       title: "Why Clients Trust Our Team",
       subtitle: "We don't just sell materials — we engineer long-lasting durability, weather resistance, and architectural beauty.",
+      p1Badge: "10-YEAR WARRANTY",
       p1Title: "10-Year Official Warranty",
       p1Desc: "Comprehensive contractual warranty covering materials and installation for up to a decade.",
+      p1Pt1: "Binding Contract",
+      p1Pt2: "Factory Certificate",
+      p1Pt3: "100% Confidence",
+      p2Badge: "MILLIMETER PRECISION",
       p2Title: "100% Free Laser Measurement",
       p2Desc: "Our specialist arrives on-site with physical samples, takes laser measurements, and provides a clear quote.",
+      p3Badge: "ON-TIME DELIVERY",
       p3Title: "Rapid & Clean Installation",
       p3Desc: "Our in-house crew of 20+ craftsmen ensures punctual delivery and pristine post-work site cleanup.",
+      p4Badge: "NO MIDDLEMEN",
       p4Title: "Direct Factory Pricing",
       p4Desc: "Direct from the manufacturer with zero intermediary markups.",
+      p4Pt1: "From 75,000 UZS / sq.m",
+      p4Pt2: "Honest Calculation",
+      p4Pt3: "Factory Warranty",
+      p5Badge: "100% WEATHERPROOF",
+      p5Temp: "TESTED FROM -40°C TO +60°C",
       p5Title: "All-Weather Resistance",
       p5Desc: "Immune to blistering UV sun, harsh frosts, torrential rain, and corrosion.",
+      p5Pt1: "UV Solar Protection",
+      p5Pt2: "Corrosion-proof Polymer",
+      p5Pt3: "Hail & Torrential Rain Proof",
+      p5Pt4: "Fade-proof Colors",
       p6Title: "3D Architectural Visualization",
       p6Desc: "Preview the exact look of your building before fabrication begins with custom 3D renders."
+    },
+    trustReviews: {
+      badgeWarranty: "Trust & Warranty",
+      titleWarrantyStart: "Official Warranty &",
+      titleWarrantyHighlight: "Quality Certificates",
+      subtitleWarranty: "We operate with legally binding 10-year contracts and verified compliance certifications.",
+      badgeReviews: "Customer Reviews",
+      titleReviewsStart: "What Clients Say",
+      titleReviewsHighlight: "About Us",
+      subtitleReviews: "Genuine feedback from property owners of hundreds of successfully completed projects.",
+      contractRecorded: "Recorded in every contract",
+      ctaBoxTitle: "Looking for the best architectural facade solution?",
+      ctaBoxSubtitle: "Contact our engineering specialist for free measurement, samples, and exact estimates.",
+      ctaBoxBtn: "Request Free Measurement",
+      certificates: [
+        {
+          title: "10-Year Official Warranty Contract",
+          desc: "Every project is legally backed by an official warranty agreement guaranteeing color stability and corrosion resistance.",
+          badge: "10-Year Warranty"
+        },
+        {
+          title: "Quality & Compliance Certificate",
+          desc: "High-grade certified raw materials and aluminum composites fully compliant with state standards.",
+          badge: "O'zDSt Certified"
+        },
+        {
+          title: "Fire Safety Class A2",
+          desc: "Panels incorporate a fire-retardant mineral core adhering to international architectural fire safety norms.",
+          badge: "Fire Retardant A2"
+        }
+      ],
+      reviews: [
+        {
+          name: "Akmal Qodirov",
+          role: "Entrepreneur, 'Golden Plast' LLC CEO",
+          location: "Tashkent, Sergeli",
+          project: "Office building facade (850 sq.m)",
+          comment: "Special thanks to the Tunikabond Lider team. They completed our 850 sq.m facility in 14 days with exceptional craftsmanship. Clean installation and zero fading.",
+          date: "March 2026"
+        },
+        {
+          name: "Sherzodbek Tukhtaev",
+          role: "Private villa owner",
+          location: "Tashkent reg., Qibray",
+          project: "Cottage facade & cornices (420 sq.m)",
+          comment: "Reached out via Telegram and they arrived the very same day for laser measurement. Neo-classical cornices and wood grain tunikabond turned our residence into a showpiece.",
+          date: "February 2026"
+        },
+        {
+          name: "Dilshod Yusupov",
+          role: "Dealership manager",
+          location: "Samarkand city",
+          project: "Car showroom exterior (1,100 sq.m)",
+          comment: "Other contractors delayed previously, but Tunikabond Lider delivered exactly on schedule with 100% quality and issued an official 10-year warranty document.",
+          date: "January 2026"
+        }
+      ]
+    },
+    leadModal: {
+      badge: "Free Measurement & Estimate",
+      defaultTitle: "Request Free Measurement",
+      desc: "Leave your contact number; our technician will arrive with physical samples and laser equipment.",
+      calcCostLabel: "Estimated calculation:",
+      calcArea: "Area:",
+      calcMaterial: "Material:",
+      calcEstSum: "Estimated sum:",
+      nameLabel: "Your Name *",
+      namePlaceholder: "e.g. Jasur Aliyev",
+      phoneLabel: "Phone Number *",
+      phonePlaceholder: "+998 (90) 123-45-67",
+      noteLabel: "Address or Additional Notes",
+      notePlaceholder: "e.g. Yunusabad block 14, cottage",
+      photoLabel: "Building Photo (optional)",
+      photoUploadPrompt: "Select photo or snap picture",
+      photoUploading: "Uploading...",
+      photoRemove: "Remove photo",
+      submitBtn: "Confirm Request",
+      submitting: "Sending...",
+      freeGuarantee: "100% Free with zero obligation",
+      successTitle: "Request Received!",
+      successDescStart: "Our engineer and admin",
+      successDescEnd: "will reach out shortly."
     },
     process: {
       badge: "Workflow",
       title: "How We Work",
       subtitle: "4 simple steps to your dream building facade.",
+      stepWord: "Step",
       s1Title: "Submit Request",
       s1Desc: "Contact us via the website form or call directly for free consultation.",
       s2Title: "Free Measurement & Estimate",
@@ -505,7 +1170,24 @@ export const translations = {
       phoneTitle: "Phone Contacts",
       workHoursTitle: "Non-stop service for you",
       workHoursText: "24/7 — Operating around the clock, calls and requests accepted every day",
-      socialsTitle: "Connect With Us"
+      socialsTitle: "Connect With Us",
+      adminManager: "Telegram Admin & Manager",
+      writeBtn: "Chat",
+      mainWorkshopBadge: "Main Plant",
+      freeParking: "Free Parking",
+      liveShowroom: "Live Samples Showroom",
+      mapPinBadge: "Tunikabond Lider Plant",
+      yandexMapBtn: "Yandex Maps",
+      googleMapBtn: "Google Maps",
+      visitNotice: "Please call ahead of your visit: our engineer will welcome you and present all live samples.",
+      newLeadBtn: "Submit Another Request",
+      fastResponse: "Fast Callback (within 15 mins)",
+      consentNotice: "By clicking the button you agree to personal data processing.",
+      optTunikabond: "Tunikabond Facade Panels",
+      optAlyukabond: "Alucobond Composite Panels",
+      optCornice: "Modern Cornices & Soffits",
+      optRoofing: "Roofing & Corrugated Sheets",
+      optMeasurement: "Free Master Callout (Measurement)"
     },
     faq: {
       badge: "Frequently Asked Questions",
@@ -513,9 +1195,19 @@ export const translations = {
       subtitle: "Key insights on materials, timelines, pricing, and warranties."
     },
     footer: {
+      tagline: "Facade & Roofing Solutions",
+      sectionsTitle: "Services & Sections",
       desc: "Tunikabond Lider — Uzbekistan's premier provider of architectural facades and advanced roofing solutions.",
       rights: "All rights reserved.",
-      developedWith: "Crafted with precision & durability"
+      developedWith: "Crafted with precision & durability",
+      writeAdmin: "Message",
+      officialChannel: "Official Channel",
+      adminLabel: "Admin"
+    },
+    brandIntro: {
+      tagline: "Architecture • Facade • Quality",
+      subTagline: "Premium Facade & Canopy Systems",
+      skipBtn: "Skip"
     }
   }
 };

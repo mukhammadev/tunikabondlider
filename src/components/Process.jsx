@@ -74,7 +74,7 @@ export const Process = ({ t }) => {
                 </div>
 
                 <div className="pt-4 mt-6 border-t border-slate-200 dark:border-white/10 flex items-center text-xs font-semibold text-brand-red">
-                  <span>Qadam {idx + 1} / 4</span>
+                  <span>{t.process?.stepWord || "Qadam"} {idx + 1} / 4</span>
                 </div>
               </div>
             );

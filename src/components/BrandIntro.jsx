@@ -9,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
  * 4. Dual-Curtain Architectural Aperture Reveal (Top shutter up, Bottom shutter down)
  * 5. Ultra-snappy 1.25s duration: creates instant luxury without user boredom
  */
-export const BrandIntro = ({ onComplete }) => {
+export const BrandIntro = ({ onComplete, t }) => {
   const [phase, setPhase] = useState('init'); // 'init' -> 'shimmer' -> 'reveal' -> 'done'
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export const BrandIntro = ({ onComplete }) => {
     <div
       onClick={handleSkip}
       className="fixed inset-0 z-[9999] overflow-hidden select-none cursor-pointer"
-      aria-label="Tunikabond Lider brendining ochilish animatsiyasi"
+      aria-label="Tunikabond Lider"
     >
       {/* ═══ TOP SHUTTER CURTAIN ═══ */}
       <div
@@ -86,7 +86,7 @@ export const BrandIntro = ({ onComplete }) => {
         {/* Minimalist Bottom Brand Tagline */}
         <div className="absolute bottom-6 inset-x-0 text-center pointer-events-none">
           <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.3em] uppercase text-slate-500">
-            Arxitektura • Fasad • Sifat
+            {t?.brandIntro?.tagline || "Arxitektura • Fasad • Sifat"}
           </span>
         </div>
       </div>
@@ -97,7 +97,7 @@ export const BrandIntro = ({ onComplete }) => {
         onClick={handleSkip}
         className="absolute top-6 right-6 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-semibold border border-white/10 backdrop-blur-md transition-all z-30"
       >
-        <span>O'tkazish</span>
+        <span>{t?.brandIntro?.skipBtn || "O'tkazish"}</span>
         <ArrowRight className="w-3.5 h-3.5 text-brand-red" />
       </button>
 
@@ -137,7 +137,7 @@ export const BrandIntro = ({ onComplete }) => {
             <span className="text-brand-red">LIDER</span>
           </h1>
           <p className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-slate-400">
-            Premium Fasad & Naves Tizimlari
+            {t?.brandIntro?.subTagline || "Premium Fasad & Naves Tizimlari"}
           </p>
         </div>
 

@@ -1,8 +1,10 @@
 import React from 'react';
 import { X, ShieldCheck, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 
-export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProduct }) => {
+export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderProduct }) => {
   if (!product) return null;
+
+  const pm = t?.productModal || {};
 
   // Safe localized name resolution
   const name = typeof product.name === 'object' && product.name !== null
@@ -27,11 +29,11 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
   // Comprehensive fallback specs if specsList is empty
   if (!Array.isArray(specsList) || specsList.length === 0) {
     specsList = [
-      { label: "Qalinlik", value: product.thickness || "Standart" },
-      { label: "Qoplama", value: product.coating || "PVDF polimer" },
-      { label: "Kafolat muddati", value: product.warranty || "10 yil" },
-      { label: "Toifasi", value: product.category ? product.category.toUpperCase() : "Fasad paneli" },
-      { label: "Yetkazib berish", value: "Toshkent va barcha viloyatlar bo'ylab bepul" }
+      { label: pm.fallbackThickness || "Qalinlik", value: product.thickness || "Standart" },
+      { label: pm.fallbackCoating || "Qoplama", value: product.coating || "PVDF polimer" },
+      { label: pm.fallbackWarranty || "Kafolat muddati", value: product.warranty || "10 yil" },
+      { label: pm.fallbackCategory || "Toifasi", value: product.category ? product.category.toUpperCase() : "Fasad paneli" },
+      { label: pm.fallbackDelivery || "Yetkazib berish", value: pm.fallbackDeliveryVal || "Toshkent va barcha viloyatlar bo'ylab bepul" }
     ];
   }
 
@@ -47,8 +49,8 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-all z-10"
-          aria-label="Yopish"
+          className="absolute top-4 right-4 p-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-all z-10 cursor-pointer"
+          aria-label={pm.closeAria || "Yopish"}
         >
           <X className="w-5 h-5" />
         </button>
@@ -65,11 +67,11 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2">
             <span className="px-3 py-1 rounded-full bg-brand-red text-white font-black text-xs shadow-glow-red uppercase tracking-wider flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
-              <span>{product.badge || "Ommabop"}</span>
+              <span>{product.badge || pm.defaultBadge || "Ommabop"}</span>
             </span>
             <span className="px-3 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/15 text-xs text-brand-red font-bold flex items-center gap-1.5 shadow-sm">
               <ShieldCheck className="w-4 h-4" />
-              <span>{product.warranty || "10 yil"} rasmiy kafolat</span>
+              <span>{product.warranty || "10 yil"} {pm.officialWarranty || "rasmiy kafolat"}</span>
             </span>
           </div>
         </div>
@@ -88,7 +90,7 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
         <div className="mb-8">
           <h4 className="text-xs uppercase tracking-wider font-bold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-brand-red" />
-            <span>Texnik parametrlar va afzalliklari:</span>
+            <span>{pm.specsTitle || "Texnik parametrlar va afzalliklari:"}</span>
           </h4>
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/70 overflow-hidden divide-y divide-slate-200 dark:divide-white/10 text-xs sm:text-sm">
             {specsList.map((spec, i) => (
@@ -104,10 +106,10 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-slate-100 dark:bg-brand-surface border border-slate-200 dark:border-brand-red/30 shadow-inner">
           <div>
             <span className="block text-[11px] uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold">
-              Amaldagi zavod narxi:
+              {pm.priceLabel || "Amaldagi zavod narxi:"}
             </span>
             <div className="font-display font-black text-xl sm:text-2xl text-brand-red">
-              {product.priceRange || "Kelishilgan narxda"}
+              {product.priceRange || pm.defaultPrice || "Kelishilgan narxda"}
             </div>
           </div>
 
@@ -116,9 +118,9 @@ export const ProductModal = ({ product, currentLang = 'uz', onClose, onOrderProd
               onOrderProduct(name);
               onClose();
             }}
-            className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red hover:shadow-glow-red-lg flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all"
+            className="w-full sm:w-auto py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red hover:shadow-glow-red-lg flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
-            <span>Ushbu mahsulotga buyurtma berish</span>
+            <span>{pm.orderBtn || "Ushbu mahsulotga buyurtma berish"}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

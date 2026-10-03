@@ -13,51 +13,53 @@ import {
 } from 'lucide-react';
 
 export const HomeNavigationBento = ({ t, onNavigate }) => {
+  const b = t.bento || {};
+
   const cards = [
     {
       id: 'products',
-      title: "Tunikabond & Alyukabond Katalogi",
-      subtitle: "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, 30+ ranglar va karniz turlari.",
-      badge: "To'g'ridan-to'g'ri ishlab chiqaruvchi",
+      title: b.products?.title || "Tunikabond & Alyukabond Katalogi",
+      subtitle: b.products?.subtitle || "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, 30+ ranglar va karniz turlari.",
+      badge: b.products?.badge || "To'g'ridan-to'g'ri ishlab chiqaruvchi",
       badgeColor: "bg-brand-red/10 text-brand-red border-brand-red/30",
       icon: Layers,
-      ctaText: "Katalogni ko'rish",
+      ctaText: b.products?.cta || "Katalogni ko'rish",
       gradient: "from-brand-red/20 via-transparent to-transparent",
       accentBorder: "group-hover:border-brand-red/50",
       featured: true,
     },
     {
       id: 'portfolio',
-      title: "2000+ Bajarilgan Loyihalar",
-      subtitle: "Naveslar, fasadlar, darvozaxonalar va karnizlar bo'yicha tayyor obyektlar fotogalereyasi.",
-      badge: "Tayyor ishlar",
+      title: b.portfolio?.title || "2000+ Bajarilgan Loyihalar",
+      subtitle: b.portfolio?.subtitle || "Naveslar, fasadlar, darvozaxonalar va karnizlar bo'yicha tayyor obyektlar fotogalereyasi.",
+      badge: b.portfolio?.badge || "Tayyor ishlar",
       badgeColor: "bg-blue-500/10 text-blue-500 border-blue-500/30",
       icon: Compass,
-      ctaText: "Galereyani ko'rish",
+      ctaText: b.portfolio?.cta || "Galereyani ko'rish",
       gradient: "from-blue-500/15 via-transparent to-transparent",
       accentBorder: "group-hover:border-blue-500/50",
       featured: false,
     },
     {
       id: 'about',
-      title: "Biz haqimizda & 10 Yil Kafolat",
-      subtitle: "6 yillik tajriba, rasmiy kafolat shartnomasi, mijozlarning video va matnli sharhlari hamda tez-tez beriladigan savollar.",
-      badge: "Ishonch va sifat",
+      title: b.about?.title || "Biz haqimizda & 10 Yil Kafolat",
+      subtitle: b.about?.subtitle || "6 yillik tajriba, rasmiy kafolat shartnomasi, mijozlarning video va matnli sharhlari hamda tez-tez beriladigan savollar.",
+      badge: b.about?.badge || "Ishonch va sifat",
       badgeColor: "bg-amber-500/10 text-amber-500 border-amber-500/30",
       icon: ShieldCheck,
-      ctaText: "Kompaniya haqida",
+      ctaText: b.about?.cta || "Kompaniya haqida",
       gradient: "from-amber-500/15 via-transparent to-transparent",
       accentBorder: "group-hover:border-amber-500/50",
       featured: false,
     },
     {
       id: 'contact',
-      title: "24/7 Aloqa & Bepul O'lchash",
-      subtitle: "Siz uchun to'xtovsiz xizmatdamiz! Bepul o'lchovga buyurtma bering yoki ustaxonamiz xaritasini ko'ring.",
-      badge: "To'xtovsiz xizmat",
+      title: b.contact?.title || "24/7 Aloqa & Bepul O'lchash",
+      subtitle: b.contact?.subtitle || "Siz uchun to'xtovsiz xizmatdamiz! Bepul o'lchovga buyurtma bering yoki ustaxonamiz xaritasini ko'ring.",
+      badge: b.contact?.badge || "To'xtovsiz xizmat",
       badgeColor: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
       icon: Clock,
-      ctaText: "Bog'lanish & Xarita",
+      ctaText: b.contact?.cta || "Bog'lanish & Xarita",
       gradient: "from-emerald-500/15 via-transparent to-transparent",
       accentBorder: "group-hover:border-emerald-500/50",
       featured: true,
@@ -72,13 +74,13 @@ export const HomeNavigationBento = ({ t, onNavigate }) => {
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Sayt bo'limlari va xizmatlar</span>
+            <span>{b.badge || "Sayt bo'limlari va xizmatlar"}</span>
           </div>
           <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-slate-900 dark:text-white tracking-tight mb-4">
-            Kerakli Bo'limni Tanlang
+            {b.title || "Kerakli Bo'limni Tanlang"}
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300">
-            Har bir bo'lim alohida sahifa sifatida qulay ajratilgan. Qiziqqan yo'nalishingiz bo'yicha to'liq ma'lumot oling.
+            {b.subtitle || "Har bir bo'lim alohida sahifa sifatida qulay ajratilgan. Qiziqqan yo'nalishingiz bo'yicha to'liq ma'lumot oling."}
           </p>
         </div>
 

@@ -86,7 +86,7 @@ export const ContactSection = ({ t }) => {
                   </div>
                   <div>
                     <span className="block text-[11px] text-slate-500 dark:text-slate-300 uppercase tracking-wider font-semibold">
-                      Telegram Admin & Menejer
+                      {t.contact?.adminManager || "Telegram Admin & Menejer"}
                     </span>
                     <a 
                       href="https://t.me/Mukhammad_azez" 
@@ -105,7 +105,7 @@ export const ContactSection = ({ t }) => {
                   rel="noopener noreferrer"
                   className="px-3.5 py-1.5 rounded-xl bg-[#0088cc] hover:bg-[#0077b5] text-white text-xs font-bold transition-all shadow-sm"
                 >
-                  Yozish
+                  {t.contact?.writeBtn || "Yozish"}
                 </a>
               </div>
 
@@ -178,7 +178,7 @@ export const ContactSection = ({ t }) => {
                     rel="noopener noreferrer"
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-brand-surface border border-slate-200 dark:border-white/15 text-slate-800 dark:text-slate-200 hover:text-brand-red hover:border-brand-red transition-all text-xs font-bold shadow-sm"
                   >
-                    <span>Rasmiy Kanal</span>
+                    <span>{t.footer?.officialChannel || "Rasmiy Kanal"}</span>
                   </a>
                   <a
                     href="https://www.instagram.com/tunikabond_lider"
@@ -206,7 +206,7 @@ export const ContactSection = ({ t }) => {
                         {t.contact.addressTitle}
                       </h4>
                       <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-red/15 text-brand-red border border-brand-red/30">
-                        Bosh Sex
+                        {t.contact?.mainWorkshopBadge || "Bosh Sex"}
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 flex items-center gap-1 font-medium">
@@ -221,11 +221,11 @@ export const ContactSection = ({ t }) => {
               <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
                 <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-1 font-medium">
                   <Car className="w-3.5 h-3.5 text-brand-red" />
-                  <span>Bepul avtoturargoh</span>
+                  <span>{t.contact?.freeParking || "Bepul avtoturargoh"}</span>
                 </span>
                 <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-1 font-medium">
                   <Sparkles className="w-3.5 h-3.5 text-brand-red" />
-                  <span>Jonli namunalar zali</span>
+                  <span>{t.contact?.liveShowroom || "Jonli namunalar zali"}</span>
                 </span>
               </div>
 
@@ -248,7 +248,7 @@ export const ContactSection = ({ t }) => {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-red"></span>
                   </span>
-                  <span>Tunikabond Lider Ishxonasi</span>
+                  <span>{t.contact?.mapPinBadge || "Tunikabond Lider Ishxonasi"}</span>
                 </div>
               </div>
 
@@ -261,7 +261,7 @@ export const ContactSection = ({ t }) => {
                   className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 hover:border-brand-red/50 text-slate-800 dark:text-white text-xs font-bold transition-all shadow-sm group"
                 >
                   <Navigation className="w-3.5 h-3.5 text-brand-red group-hover:scale-110 transition-transform" />
-                  <span>Yandex Xarita</span>
+                  <span>{t.contact?.yandexMapBtn || "Yandex Xarita"}</span>
                 </a>
                 <a
                   href="https://www.google.com/maps/search/?api=1&query=41.219574,69.285698"
@@ -270,12 +270,12 @@ export const ContactSection = ({ t }) => {
                   className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 hover:border-brand-red/50 text-slate-800 dark:text-white text-xs font-bold transition-all shadow-sm group"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-brand-red group-hover:scale-110 transition-transform" />
-                  <span>Google Maps</span>
+                  <span>{t.contact?.googleMapBtn || "Google Maps"}</span>
                 </a>
               </div>
 
               <p className="text-[11px] text-slate-500 dark:text-slate-400 text-center leading-normal pt-1">
-                Tashrifdan oldin qo'ng'iroq qilsangiz, ustamiz sizni kutib oladi va barcha namunalarni jonli ko'rsatib beradi.
+                {t.contact?.visitNotice || "Tashrifdan oldin qo'ng'iroq qilsangiz, ustamiz sizni kutib oladi va barcha namunalarni jonli ko'rsatib beradi."}
               </p>
             </div>
 
@@ -300,7 +300,7 @@ export const ContactSection = ({ t }) => {
                     onClick={() => setSuccess(false)}
                     className="px-6 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs hover:bg-white/20 transition-all"
                   >
-                    Yana yangi ariza qoldirish
+                    {t.contact?.newLeadBtn || "Yana yangi ariza qoldirish"}
                   </button>
                 </div>
               ) : (
@@ -308,7 +308,7 @@ export const ContactSection = ({ t }) => {
                   
                   <div className="flex items-center gap-2 text-xs font-bold text-brand-red uppercase tracking-wider mb-2">
                     <ShieldCheck className="w-4 h-4" />
-                    <span>Tezkor qayta aloqa (15 daqiqada)</span>
+                    <span>{t.contact?.fastResponse || "Tezkor qayta aloqa (15 daqiqada)"}</span>
                   </div>
 
                   {/* Name field */}
@@ -351,11 +351,11 @@ export const ContactSection = ({ t }) => {
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                       className="w-full px-4 py-3.5 rounded-xl bg-white dark:bg-brand-dark/70 border border-slate-300 dark:border-white/15 text-slate-900 dark:text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all text-sm"
                     >
-                      <option value="Tunikabond Fasad Paneli" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Tunikabond Fasad Panellari</option>
-                      <option value="Alyukabond Kompozit" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Alyukabond Kompozit Panellari</option>
-                      <option value="Zamonaviy Karnizlar" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Zamonaviy Karnizlar</option>
-                      <option value="Profnastil va Tom Yopish" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Profnastil va Tom Yopish</option>
-                      <option value="Bepul O'lchash va Smeta" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Bepul Usta Chaqirish (O'lchash)</option>
+                      <option value="Tunikabond Fasad Paneli" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{t.contact?.optTunikabond || "Tunikabond Fasad Panellari"}</option>
+                      <option value="Alyukabond Kompozit" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{t.contact?.optAlyukabond || "Alyukabond Kompozit Panellari"}</option>
+                      <option value="Zamonaviy Karnizlar" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{t.contact?.optCornice || "Zamonaviy Karnizlar"}</option>
+                      <option value="Profnastil va Tom Yopish" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{t.contact?.optRoofing || "Profnastil va Tom Yopish"}</option>
+                      <option value="Bepul O'lchash va Smeta" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">{t.contact?.optMeasurement || "Bepul Usta Chaqirish (O'lchash)"}</option>
                     </select>
                   </div>
 
@@ -390,7 +390,7 @@ export const ContactSection = ({ t }) => {
                   </button>
 
                   <p className="text-[11px] text-slate-600 dark:text-slate-400 text-center font-medium">
-                    Tugmani bosish orqali siz shaxsiy ma'lumotlaringizni qayta ishlashga rozilik bildirasiz.
+                    {t.contact?.consentNotice || "Tugmani bosish orqali siz shaxsiy ma'lumotlaringizni qayta ishlashga rozilik bildirasiz."}
                   </p>
 
                 </form>

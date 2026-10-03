@@ -1,59 +1,19 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Award, Star, CheckCircle, FileText, ExternalLink, ThumbsUp, Quote } from 'lucide-react';
 
-export const TrustAndReviews = ({ onOpenLeadModal }) => {
+export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   const [selectedCert, setSelectedCert] = useState(null);
 
-  const certificates = [
-    {
-      title: "10 Yillik Rasmiy Kafolat Shartnomasi",
-      desc: "Har bir mijoz bilan yuridik kuchga ega rasmiy kafolat shartnomasi imzolanadi. Rang o'chishi va korroziyaga 100% javobgarlik.",
-      badge: "Kafolat 10 Yil",
-      icon: Award
-    },
-    {
-      title: "Muvofiqlik va Sifat Sertifikati",
-      desc: "O'zbekiston Davlat Standartlari (O'zDSt) talablariga to'liq javob beruvchi yuqori sifatli xomashyo va alyuminiy kompozit.",
-      badge: "O'zDSt Tasdiqlangan",
-      icon: FileText
-    },
-    {
-      title: "Yong'in Xavfsizligi A2 Sinifi",
-      desc: "Tunikabond va Alyukabond panellari alangalanmaydigan mineral o'zakka ega bo'lib, xalqaro yong'in xavfsizligi me'yorlariga javob beradi.",
-      badge: "Olovga Bardoshli",
-      icon: ShieldCheck
-    }
-  ];
+  const tr = t?.trustReviews || {};
 
-  const reviews = [
-    {
-      name: "Akmal Qodirov",
-      role: "Tadbirkor, 'Golden Plast' MChJ rahbari",
-      location: "Toshkent, Sergeli",
-      project: "Ofis binosi fasadi (850 m²)",
-      rating: 5,
-      comment: "Tunikabond Lider jamoasiga alohida minnatdorchilik bildiraman. 850 kvadratlik binomizni 14 kunda a'lo darajada bitirib berishdi. Ranglari quyoshda o'chmaydi, montaj juda aniq va toza bajarilgan.",
-      date: "2026-yil, Mart"
-    },
-    {
-      name: "Sherzodbek To'xtayev",
-      role: "Xususiy kottej egasi",
-      location: "Toshkent viloyati, Qibray",
-      project: "Kottej fasadi va karnizlari (420 m²)",
-      rating: 5,
-      comment: "Usta Muhammadaziz aka bilan Telegram orqali bog'langan edim, o'sha kuniyoq kelib lazerda o'lchab ketishdi. Neoklassik karniz va yog'och teksturali tunikabond o'rnatdik. Uyimiz ko'chada eng chiroylisi bo'lib turibdi.",
-      date: "2026-yil, Fevral"
-    },
-    {
-      name: "Dilshod Yusupov",
-      role: "Avtosalon menejeri",
-      location: "Samarqand shahri",
-      project: "Avtosalon tashqi fasadi (1,100 m²)",
-      rating: 5,
-      comment: "Avval boshqa ustalarga murojaat qilgandik, muddatni cho'zib yuborishgan. Tunikabond Lider esa shartnomada ko'rsatilgan kunda 100% sifat bilan topshirdi. 10 yillik rasmiy kafolat qog'ozini ham berishdi.",
-      date: "2026-yil, Yanvar"
-    }
-  ];
+  const certIcons = [Award, FileText, ShieldCheck];
+
+  const certificates = (tr.certificates || []).map((c, idx) => ({
+    ...c,
+    icon: certIcons[idx] || Award
+  }));
+
+  const reviews = tr.reviews || [];
 
   return (
     <section id="trust-reviews" className="py-20 sm:py-28 relative overflow-hidden bg-brand-surface/30">
@@ -68,13 +28,14 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
           <div className="text-center max-w-3xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 text-emerald-800 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-4">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Ishonch va Kafolat</span>
+              <span>{tr.badgeWarranty || "Ishonch va Kafolat"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
-              Rasmiy Kafolat va <span className="red-gradient-text">Sifat Sertifikatlari</span>
+              {tr.titleWarrantyStart || "Rasmiy Kafolat va"}{' '}
+              <span className="red-gradient-text">{tr.titleWarrantyHighlight || "Sifat Sertifikatlari"}</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
-              Biz faqat so'zda emas, balki qonuniy kuchga ega 10 yillik rasmiy shartnoma va sifat sertifikatlari bilan xizmat ko'rsatamiz.
+              {tr.subtitleWarranty || "Biz faqat so'zda emas, balki qonuniy kuchga ega 10 yillik rasmiy shartnoma va sifat sertifikatlari bilan xizmat ko'rsatamiz."}
             </p>
           </div>
 
@@ -106,7 +67,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
 
                   <div className="pt-6 mt-6 border-t border-slate-200 dark:border-white/10 flex items-center gap-2 text-xs font-semibold text-brand-red">
                     <CheckCircle className="w-4 h-4" />
-                    <span>Har bir shartnomada qayd etiladi</span>
+                    <span>{tr.contractRecorded || "Har bir shartnomada qayd etiladi"}</span>
                   </div>
                 </div>
               );
@@ -119,13 +80,14 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
           <div className="text-center max-w-3xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-red/10 border border-brand-red/30 text-brand-red text-xs font-bold uppercase tracking-wider mb-4">
               <ThumbsUp className="w-3.5 h-3.5" />
-              <span>Mijozlarimiz Fikrlari</span>
+              <span>{tr.badgeReviews || "Mijozlarimiz Fikrlari"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
-              Mijozlarimiz Biz Haqimizda <span className="red-gradient-text">Nima Deydi?</span>
+              {tr.titleReviewsStart || "Mijozlarimiz Biz Haqimizda"}{' '}
+              <span className="red-gradient-text">{tr.titleReviewsHighlight || "Nima Deydi?"}</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
-              Yuzlab muvaffaqiyatli topshirilgan fasad va tom loyihalarimiz egalarining samimiy baholari.
+              {tr.subtitleReviews || "Yuzlab muvaffaqiyatli topshirilgan fasad va tom loyihalarimiz egalarining samimiy baholari."}
             </p>
           </div>
 
@@ -138,7 +100,7 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
                 <div>
                   {/* Rating Stars */}
                   <div className="flex items-center gap-1 mb-4 text-amber-500 dark:text-amber-400">
-                    {[...Array(rev.rating)].map((_, i) => (
+                    {[...Array(rev.rating || 5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-amber-500 dark:fill-amber-400" />
                     ))}
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-400 ml-2">5.0 / 5.0</span>
@@ -171,17 +133,17 @@ export const TrustAndReviews = ({ onOpenLeadModal }) => {
           <div className="mt-14 p-8 rounded-3xl bg-white dark:bg-gradient-to-r dark:from-brand-surface dark:via-brand-surface/90 dark:to-brand-surface border border-slate-200 dark:border-brand-red/30 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900 dark:text-white">
-                Binongiz uchun eng sifatli fasad yechimini xohlaysizmi?
+                {tr.ctaBoxTitle || "Binongiz uchun eng sifatli fasad yechimini xohlaysizmi?"}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
-                Katalog va hisob-kitob bilan tanishish uchun usta-muhandisimiz bilan bepul bog'laning.
+                {tr.ctaBoxSubtitle || "Katalog va hisob-kitob bilan tanishish uchun usta-muhandisimiz bilan bepul bog'laning."}
               </p>
             </div>
             <button
-              onClick={() => onOpenLeadModal("Sertifikatlar va Sharhlar bo'limidan buyurtma")}
-              className="px-6 py-3.5 rounded-2xl bg-brand-red hover:bg-brand-redHover text-white text-sm font-bold shadow-glow-red hover:scale-105 active:scale-95 transition-all shrink-0"
+              onClick={() => onOpenLeadModal(tr.ctaBoxBtn || "Bepul O'lchashga Buyurtma")}
+              className="px-6 py-3.5 rounded-2xl bg-brand-red hover:bg-brand-redHover text-white text-sm font-bold shadow-glow-red hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer"
             >
-              Bepul O'lchashga Buyurtma
+              {tr.ctaBoxBtn || "Bepul O'lchashga Buyurtma"}
             </button>
           </div>
 

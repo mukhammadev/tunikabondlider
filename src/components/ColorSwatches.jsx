@@ -20,6 +20,14 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
     return String(item.name);
   };
 
+  const getLocalizedField = (field) => {
+    if (!field) return '';
+    if (typeof field === 'object') {
+      return field[currentLang] || field.uz || field.ru || '';
+    }
+    return String(field);
+  };
+
   const categories = [
     { id: 'all', label: t.swatches.all },
     { id: 'wood', label: t.swatches.wood },
@@ -92,13 +100,13 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
                     {name}
                   </h3>
                   <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-3">
-                    {item.texture}
+                    {getLocalizedField(item.texture)}
                   </p>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                  <span>{item.finish}</span>
-                  <span className="text-brand-red font-bold">Ko'rish →</span>
+                  <span>{getLocalizedField(item.finish)}</span>
+                  <span className="text-brand-red font-bold">{t?.swatches?.seeMore || "Ko'rish →"}</span>
                 </div>
               </div>
             );
@@ -146,15 +154,15 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
                 <span>{t.swatches.coating}</span>
-                <span className="font-bold text-slate-900 dark:text-white">{selectedSwatch.coating}</span>
+                <span className="font-bold text-slate-900 dark:text-white">{getLocalizedField(selectedSwatch.coating)}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
-                <span>Faktura / Yuzasi:</span>
-                <span className="font-bold text-slate-900 dark:text-white">{selectedSwatch.finish}</span>
+                <span>{t?.swatches?.textureLabel || "Faktura / Yuzasi:"}</span>
+                <span className="font-bold text-slate-900 dark:text-white">{getLocalizedField(selectedSwatch.finish)}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300">
                 <span>{t.swatches.application}</span>
-                <span className="font-bold text-slate-900 dark:text-white text-right max-w-[240px]">{selectedSwatch.application}</span>
+                <span className="font-bold text-slate-900 dark:text-white text-right max-w-[240px]">{getLocalizedField(selectedSwatch.application)}</span>
               </div>
             </div>
 
@@ -167,7 +175,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
               }}
               className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
             >
-              <span>Ushbu rangda namuna so'rash</span>
+              <span>{t?.swatches?.sampleBtn || "Ushbu rangda namuna so'rash"}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 

@@ -84,13 +84,13 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
 
             <button
               type="button"
-              onClick={() => onOpenLeadModal ? onOpenLeadModal("Bepul o'lchash va konsultatsiya") : handleCatalogClick()}
+              onClick={() => onOpenLeadModal ? onOpenLeadModal(t.hero?.ctaMeasurement || "Bepul o'lchash va konsultatsiya") : handleCatalogClick()}
               className="w-full sm:w-auto relative group overflow-hidden inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white dark:bg-[#13192b] hover:bg-slate-50 dark:hover:bg-[#19223a] border-2 border-slate-300 dark:border-white/20 hover:border-brand-red dark:hover:border-brand-red text-slate-900 dark:text-white font-extrabold text-base shadow-lg shadow-black/5 dark:shadow-black/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <div className="w-7 h-7 rounded-lg bg-brand-red/15 dark:bg-brand-red/25 text-brand-red flex items-center justify-center shrink-0 group-hover:bg-brand-red group-hover:text-white transition-colors">
                 <Building2 className="w-4 h-4" />
               </div>
-              <span>Bepul O'lchash & Konsultatsiya</span>
+              <span>{t.hero?.ctaMeasurement || "Bepul O'lchash & Konsultatsiya"}</span>
             </button>
           </div>
 
@@ -127,7 +127,7 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-display">
-                  {counts.warranty} Yil
+                  {counts.warranty} {t.hero?.yearsUnit || "Yil"}
                 </div>
               </div>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">{t.hero.statWarranty}</p>

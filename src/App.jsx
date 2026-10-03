@@ -188,24 +188,24 @@ export function App() {
 
   const handleOpenSwatchModal = (swatchName) => {
     setLeadModalData({
-      service: `Rang namunasi: ${swatchName}`,
-      source: "Ranglar va teksturalar palitrasi"
+      service: `${t.swatches?.badge || "Rang namunasi"}: ${swatchName}`,
+      source: t.nav?.swatches || "Ranglar va teksturalar palitrasi"
     });
     setLeadModalOpen(true);
   };
 
   const handleOpenProductOrder = (productName) => {
     setLeadModalData({
-      service: `Mahsulot buyurtmasi: ${productName}`,
-      source: "Mahsulotlar katalogi"
+      service: `${t.products?.badge || "Mahsulot buyurtmasi"}: ${productName}`,
+      source: t.nav?.products || "Mahsulotlar katalogi"
     });
     setLeadModalOpen(true);
   };
 
   const handleOpenMasterModal = (masterName) => {
     setLeadModalData({
-      service: `Usta chaqirish: ${masterName} (Bepul o'lchov)`,
-      source: "Bizning Jamoa & Ustalar"
+      service: `${t.team?.callMaster || "Usta chaqirish"}: ${masterName}`,
+      source: t.nav?.team || "Ustalar"
     });
     setLeadModalOpen(true);
   };
@@ -215,7 +215,7 @@ export function App() {
       
       {/* Brand Intro & Splash Screen Animation on Site Load & Refresh */}
       {showBrandIntro && (
-        <BrandIntro onComplete={() => setShowBrandIntro(false)} />
+        <BrandIntro onComplete={() => setShowBrandIntro(false)} t={t} />
       )}
 
       {/* Navigation Header */}
@@ -259,6 +259,8 @@ export function App() {
             {/* Warranty & Reviews */}
             <TrustAndReviews
               onOpenLeadModal={handleOpenLeadModal}
+              t={t}
+              currentLang={currentLang}
             />
 
             {/* Contact / Location */}
@@ -272,10 +274,11 @@ export function App() {
         {currentPage === 'products' && (
           <div className="animate-fadeIn">
             <PageBanner
-              title="Mahsulotlar Katalogi va Ranglar"
-              subtitle="Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, naves va karnizlar palitrasi."
-              badge="Katalog & Ranglar"
-              breadcrumb="Katalog"
+              title={t.pages?.products?.title || "Mahsulotlar Katalogi va Ranglar"}
+              subtitle={t.pages?.products?.subtitle || "Rossiya va Xitoyning sertifikatlangan Tunikabond, Alyukabond panellari, naves va karnizlar palitrasi."}
+              badge={t.pages?.products?.badge || "Katalog & Ranglar"}
+              breadcrumb={t.pages?.products?.breadcrumb || "Katalog"}
+              homeText={t.nav?.home || "Bosh sahifa"}
               onBackToHome={() => navigateToPage('home')}
             />
             <Products
@@ -297,10 +300,11 @@ export function App() {
         {currentPage === 'portfolio' && (
           <div className="animate-fadeIn">
             <PageBanner
-              title="Bajarilgan Loyihalar va Professional Ustalar"
-              subtitle="2000+ muvaffaqiyatli topshirilgan kottedj, savdo binosi va shaxsiy xonadonlar fasadlari hamda tajribali ustalar jamoasi."
-              badge="Loyihalar & Ustalar"
-              breadcrumb="Loyihalar"
+              title={t.pages?.portfolio?.title || "Bajarilgan Loyihalar va Professional Ustalar"}
+              subtitle={t.pages?.portfolio?.subtitle || "2000+ muvaffaqiyatli topshirilgan kottedj, savdo binosi va shaxsiy xonadonlar fasadlari hamda tajribali ustalar jamoasi."}
+              badge={t.pages?.portfolio?.badge || "Loyihalar & Ustalar"}
+              breadcrumb={t.pages?.portfolio?.breadcrumb || "Loyihalar"}
+              homeText={t.nav?.home || "Bosh sahifa"}
               onBackToHome={() => navigateToPage('home')}
             />
             <Portfolio
@@ -317,6 +321,7 @@ export function App() {
             />
             <TeamSection
               t={t}
+              currentLang={currentLang}
               teamMembers={teamList}
               portfolioList={portfolioList}
               activeMasterId={activeMasterId}
@@ -329,10 +334,11 @@ export function App() {
         {currentPage === 'about' && (
           <div className="animate-fadeIn">
             <PageBanner
-              title="Biz Haqimizda & 10 Yil Rasmiy Kafolat"
-              subtitle="Tunikabond Lider — O'zbekiston bo'ylab 6 yildan ortiq vaqt davomida yuqori sifatli fasad va tom yechimlarini yetkazib beruvchi yetakchi kompaniya."
-              badge="Biz haqimizda"
-              breadcrumb="Biz haqimizda"
+              title={t.pages?.about?.title || "Biz Haqimizda & 10 Yil Rasmiy Kafolat"}
+              subtitle={t.pages?.about?.subtitle || "Tunikabond Lider — O'zbekiston bo'ylab 6 yildan ortiq vaqt davomida yuqori sifatli fasad va tom yechimlarini yetkazib beruvchi yetakchi kompaniya."}
+              badge={t.pages?.about?.badge || "Biz haqimizda"}
+              breadcrumb={t.pages?.about?.breadcrumb || "Biz haqimizda"}
+              homeText={t.nav?.home || "Bosh sahifa"}
               onBackToHome={() => navigateToPage('home')}
             />
             <WhyUs
@@ -340,6 +346,8 @@ export function App() {
             />
             <TrustAndReviews
               onOpenLeadModal={handleOpenLeadModal}
+              t={t}
+              currentLang={currentLang}
             />
             <Process
               t={t}
@@ -355,10 +363,11 @@ export function App() {
         {currentPage === 'contact' && (
           <div className="animate-fadeIn">
             <PageBanner
-              title="Bog'lanish & Ustaxona Manzili"
-              subtitle="Siz uchun to'xtovsiz xizmatdamiz! Savollaringiz bormi yoki bepul o'lchov kerakmi? Istalgan vaqtda murojaat qiling."
-              badge="24/7 Aloqa"
-              breadcrumb="Aloqa"
+              title={t.pages?.contact?.title || "Bog'lanish & Ustaxona Manzili"}
+              subtitle={t.pages?.contact?.subtitle || "Siz uchun to'xtovsiz xizmatdamiz! Savollaringiz bormi yoki bepul o'lchov kerakmi? Istalgan vaqtda murojaat qiling."}
+              badge={t.pages?.contact?.badge || "24/7 Aloqa"}
+              breadcrumb={t.pages?.contact?.breadcrumb || "Aloqa"}
+              homeText={t.nav?.home || "Bosh sahifa"}
               onBackToHome={() => navigateToPage('home')}
             />
             <ContactSection
@@ -379,6 +388,7 @@ export function App() {
       <ProductModal
         product={selectedProduct}
         currentLang={currentLang}
+        t={t}
         onClose={() => setSelectedProduct(null)}
         onOrderProduct={handleOpenProductOrder}
       />

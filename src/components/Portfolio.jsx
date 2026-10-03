@@ -40,12 +40,12 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
   const getCategoryLabel = (cat) => {
     const normalized = getPortfolioCategory({ category: cat });
     switch (normalized) {
-      case 'naves': return 'Naves';
-      case 'koziryok': return 'Koziryok';
-      case 'darvozaxona': return 'Darvozaxona';
-      case 'fasad': return 'Fasad';
-      case 'cornices': return 'Karniz';
-      default: return 'Loyiha';
+      case 'naves': return t.portfolio?.naves || 'Naves';
+      case 'koziryok': return t.portfolio?.koziryok || 'Koziryok';
+      case 'darvozaxona': return t.portfolio?.darvozaxona || 'Darvozaxona';
+      case 'fasad': return t.portfolio?.fasad || 'Fasad';
+      case 'cornices': return t.portfolio?.cornices || 'Karniz';
+      default: return t.portfolio?.badge || 'Loyiha';
     }
   };
 
@@ -101,10 +101,10 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                 <Compass className="w-8 h-8" />
               </div>
               <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">
-                Hozircha loyihalar mavjud emas
+                {t.portfolio?.emptyTitle || "Hozircha loyihalar mavjud emas"}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Ushbu toifaga yaqin orada yangi namunali ishlar joylashtiriladi.
+                {t.portfolio?.emptyDesc || "Ushbu toifaga yaqin orada yangi namunali ishlar joylashtiriladi."}
               </p>
             </div>
           ) : (
@@ -160,7 +160,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-brand-red flex-shrink-0" />
-                        <span>Muddat: {item.time}</span>
+                        <span>{t.portfolio?.durationLabel || "Muddat:"} {item.time}</span>
                       </div>
                     </div>
 
@@ -174,7 +174,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                           }
                         }}
                         className="mt-4 pt-3.5 border-t border-slate-200 dark:border-white/10 flex items-center justify-between group/master hover:bg-slate-100 dark:hover:bg-white/[0.04] p-2 rounded-xl transition-all cursor-pointer"
-                        title="Usta profili va ishlarini ko'rish"
+                        title={t.portfolio?.viewMasterBtn || "Usta profili va ishlarini ko'rish"}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <img
@@ -183,7 +183,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                             className="w-9 h-9 rounded-full object-cover border-2 border-brand-red/60 shadow-sm flex-shrink-0"
                           />
                           <div className="min-w-0">
-                            <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">Mas'ul usta:</span>
+                            <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">{t.portfolio?.masterLabel || "Mas'ul usta:"}</span>
                             <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/master:text-brand-red transition-colors flex items-center gap-1 truncate">
                               <span>{item.masterName}</span>
                               <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
@@ -192,7 +192,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                         </div>
 
                         <span className="text-[11px] font-bold text-brand-red flex items-center gap-0.5 flex-shrink-0 group-hover/master:translate-x-1 transition-transform">
-                          <span>Usta profili</span>
+                          <span>{t.portfolio?.viewMasterBtn || "Usta profili"}</span>
                           <ArrowRight className="w-3 h-3" />
                         </span>
                       </div>
@@ -269,7 +269,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                     className="w-10 h-10 rounded-full object-cover border-2 border-brand-red"
                   />
                   <div>
-                    <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">Mas'ul usta:</span>
+                    <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">{t.portfolio?.masterLabel || "Mas'ul usta:"}</span>
                     <span className="font-bold text-sm text-slate-900 dark:text-white hover:text-brand-red flex items-center gap-1">
                       {selectedImage.masterName} <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                     </span>

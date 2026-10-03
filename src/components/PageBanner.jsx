@@ -6,6 +6,7 @@ export const PageBanner = ({
   subtitle, 
   badge, 
   breadcrumb, 
+  homeText = "Bosh sahifa",
   onBackToHome 
 }) => {
   return (
@@ -25,7 +26,7 @@ export const PageBanner = ({
             <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
             <span className="flex items-center gap-1">
               <Home className="w-3 h-3 text-brand-red" />
-              Bosh sahifa
+              {homeText}
             </span>
           </button>
           <span className="text-slate-400">/</span>

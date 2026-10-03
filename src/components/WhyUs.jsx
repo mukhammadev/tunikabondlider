@@ -36,7 +36,7 @@ export const WhyUs = ({ t }) => {
                 <ShieldCheck className="w-7 h-7" />
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-brand-red/20 text-brand-red border border-brand-red/30">
-                10 YIL KAFOLAT
+                {t.whyUs?.p1Badge || "10 YIL KAFOLAT"}
               </span>
             </div>
 
@@ -50,12 +50,12 @@ export const WhyUs = ({ t }) => {
             <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
               <span className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
                 <Sparkles className="w-3.5 h-3.5 text-brand-red" />
-                Yuridik Shartnoma
+                {t.whyUs?.p1Pt1 || "Yuridik Shartnoma"}
               </span>
               <span>•</span>
-              <span>Zavod Sertifikati</span>
+              <span>{t.whyUs?.p1Pt2 || "Zavod Sertifikati"}</span>
               <span>•</span>
-              <span className="text-emerald-700 dark:text-emerald-400 font-bold">100% Ishonch</span>
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold">{t.whyUs?.p1Pt3 || "100% Ishonch"}</span>
             </div>
           </div>
 
@@ -66,7 +66,7 @@ export const WhyUs = ({ t }) => {
             </div>
 
             <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-3">
-              MILLIMETR ANIKLIK
+              {t.whyUs?.p2Badge || "MILLIMETR ANIKLIK"}
             </div>
 
             <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
@@ -84,7 +84,7 @@ export const WhyUs = ({ t }) => {
             </div>
 
             <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/20 mb-3">
-              O'Z VAQTIDA
+              {t.whyUs?.p3Badge || "O'Z VAQTIDA"}
             </div>
 
             <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
@@ -102,7 +102,7 @@ export const WhyUs = ({ t }) => {
                 <Banknote className="w-7 h-7" />
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
-                O'RTAKASHLARSIZ
+                {t.whyUs?.p4Badge || "O'RTAKASHLARSIZ"}
               </span>
             </div>
 
@@ -114,11 +114,11 @@ export const WhyUs = ({ t }) => {
             </p>
 
             <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
-              <span className="text-slate-900 dark:text-white font-bold">1 m² 75 000 so'mdan</span>
+              <span className="text-slate-900 dark:text-white font-bold">{t.whyUs?.p4Pt1 || "1 m² 75 000 so'mdan"}</span>
               <span>•</span>
-              <span>Halol hisob-kitob</span>
+              <span>{t.whyUs?.p4Pt2 || "Halol hisob-kitob"}</span>
               <span>•</span>
-              <span className="text-brand-red font-bold">Zavod kafolati</span>
+              <span className="text-brand-red font-bold">{t.whyUs?.p4Pt3 || "Zavod kafolati"}</span>
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export const WhyUs = ({ t }) => {
                 </div>
                 <div>
                   <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-1">
-                    -40°C DAN +60°C GACHA SINOVDAN O'TGAN
+                    {t.whyUs?.p5Temp || "-40°C DAN +60°C GACHA SINOVDAN O'TGAN"}
                   </div>
                   <h3 className="font-display font-bold text-xl sm:text-2xl text-slate-900 dark:text-white group-hover:text-brand-red transition-colors">
                     {t.whyUs.p5Title}
@@ -139,7 +139,7 @@ export const WhyUs = ({ t }) => {
                 </div>
               </div>
               <span className="self-start sm:self-auto px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30">
-                100% HIMOYALANGAN
+                {t.whyUs?.p5Badge || "100% HIMOYALANGAN"}
               </span>
             </div>
 
@@ -148,13 +148,13 @@ export const WhyUs = ({ t }) => {
             </p>
 
             <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-slate-600 dark:text-slate-400">
-              <span className="text-slate-900 dark:text-white font-bold">Ultrafiolet (UV) nurlaridan himoya</span>
+              <span className="text-slate-900 dark:text-white font-bold">{t.whyUs?.p5Pt1 || "Ultrafiolet (UV) nurlaridan himoya"}</span>
               <span>•</span>
-              <span>Zanglamas polimer qoplama</span>
+              <span>{t.whyUs?.p5Pt2 || "Zanglamas polimer qoplama"}</span>
               <span>•</span>
-              <span>Yomg'ir va do'ldan shikastlanmaydi</span>
+              <span>{t.whyUs?.p5Pt3 || "Yomg'ir va do'ldan shikastlanmaydi"}</span>
               <span>•</span>
-              <span className="text-brand-red font-bold">Ranglar o'chmaydi</span>
+              <span className="text-brand-red font-bold">{t.whyUs?.p5Pt4 || "Ranglar o'chmaydi"}</span>
             </div>
           </div>
 
