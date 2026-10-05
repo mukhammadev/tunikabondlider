@@ -823,23 +823,48 @@ export const apiDeletePortfolio = async (itemId) => {
 
 // --- TEAM & MASTERS API ---
 export const apiGetTeam = async () => {
+  let list = null;
   try {
     const res = await apiFetch('/api/team/');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data) && data.length > 0) list = data;
     }
   } catch {}
 
-  try {
-    const saved = localStorage.getItem(STORAGE_TEAM_KEY) || localStorage.getItem('tunikabond_custom_team');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {}
+  if (!list) {
+    try {
+      const saved = localStorage.getItem(STORAGE_TEAM_KEY) || localStorage.getItem('tunikabond_custom_team');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+      }
+    } catch {}
+  }
 
-  return initialTeam;
+  if (!list || !Array.isArray(list) || list.length === 0) {
+    list = initialTeam;
+  }
+
+  // Deduplicate by ID and Name to guarantee no duplicated profiles
+  const seenIds = new Set();
+  const seenNames = new Set();
+  const uniqueList = [];
+
+  for (const m of list) {
+    if (!m) continue;
+    const idKey = m.id ? String(m.id).toLowerCase() : null;
+    const nameKey = m.name ? String(m.name).trim().toLowerCase() : null;
+
+    if (idKey && seenIds.has(idKey)) continue;
+    if (nameKey && seenNames.has(nameKey)) continue;
+
+    if (idKey) seenIds.add(idKey);
+    if (nameKey) seenNames.add(nameKey);
+    uniqueList.push(m);
+  }
+
+  return uniqueList.length > 0 ? uniqueList : initialTeam;
 };
 
 export const apiCreateTeamMember = async (memberData) => {

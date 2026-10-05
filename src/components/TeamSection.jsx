@@ -88,24 +88,30 @@ export const TeamSection = ({
 
   // Filter team members based on tabs: Barchasi, Firma Boshlig'i, CEO, Ustalar
   const filteredMembers = teamMembers.filter((m) => {
+    if (!m) return false;
+    const labelStr = (typeof m.label === 'object' ? (m.label?.uz || '') : (m.label || '')).toLowerCase();
+    const roleStr = (typeof m.role === 'object' ? (m.role?.uz || '') : (m.role || '')).toLowerCase();
+    const idStr = String(m.id || '').toLowerCase();
+
     if (activeFilter === 'all') return true;
     if (activeFilter === 'boshliq') {
       return (
-        m.label === "Firma Boshlig'i" ||
-        m.role?.toLowerCase().includes("boshlig'")
+        idStr === 'team-boss' ||
+        labelStr.includes("boshlig") ||
+        roleStr.includes("boshlig")
       );
     }
     if (activeFilter === 'ceo') {
       return (
-        m.label === "CEO" ||
-        m.role?.toLowerCase().includes("ceo")
+        idStr === 'team-asst' ||
+        labelStr.includes("ceo") ||
+        roleStr.includes("ceo")
       );
     }
     if (activeFilter === 'masters') {
-      return (
-        m.label === "Usta" ||
-        (!m.label?.includes("Boshlig'") && m.label !== "CEO" && !m.isLeader)
-      );
+      const isBoss = idStr === 'team-boss' || labelStr.includes("boshlig") || roleStr.includes("boshlig");
+      const isCeo = idStr === 'team-asst' || labelStr.includes("ceo") || roleStr.includes("ceo");
+      return !isBoss && !isCeo && !m.isLeader;
     }
     return true;
   });
@@ -114,20 +120,19 @@ export const TeamSection = ({
   const [isPaused, setIsPaused] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
 
-  // Helper to ensure infinite seamless loop without gaps
-  const getInfiniteMembers = () => {
-    if (filteredMembers.length === 0) return [];
-    if (filteredMembers.length === 1) return [filteredMembers[0], filteredMembers[0], filteredMembers[0], filteredMembers[0]];
-    if (filteredMembers.length === 2) return [...filteredMembers, ...filteredMembers, ...filteredMembers];
-    return [...filteredMembers, ...filteredMembers];
-  };
+  // When filtered members are few (e.g. 1 boss, 1 CEO, or <= 3), show clean centered grid
+  // so the same person is NEVER duplicated 4-7 times.
+  const isCarousel = activeFilter === 'all' && filteredMembers.length > 3;
 
-  const infiniteMembers = getInfiniteMembers();
+  // For carousel smooth loop: duplicate once. For grid mode: strictly unique items.
+  const displayMembers = isCarousel
+    ? [...filteredMembers, ...filteredMembers]
+    : filteredMembers;
 
-  // Continuous auto-rotation via requestAnimationFrame
+  // Continuous auto-rotation via requestAnimationFrame only when in carousel mode
   useEffect(() => {
     const el = scrollContainerRef.current;
-    if (!el || filteredMembers.length === 0) return;
+    if (!el || filteredMembers.length === 0 || !isCarousel) return;
 
     let animId;
     const speed = 0.85;
@@ -144,7 +149,7 @@ export const TeamSection = ({
 
     animId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(animId);
-  }, [isPaused, isInteracting, filteredMembers.length]);
+  }, [isPaused, isInteracting, filteredMembers.length, isCarousel]);
 
   const handlePrev = () => {
     if (scrollContainerRef.current) {
@@ -268,16 +273,15 @@ export const TeamSection = ({
             <div className="text-center py-16 text-slate-400 glass-panel rounded-3xl">
               Ushbu toifada hozircha xodimlar mavjud emas.
             </div>
-          ) : (
+          ) : isCarousel ? (
             <div className="relative overflow-hidden rounded-3xl">
-              
               {/* Seamless Infinite Gliding Track */}
               <div 
                 ref={scrollContainerRef}
                 className="flex overflow-x-auto scrollbar-none py-3 select-none cursor-grab active:cursor-grabbing"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {infiniteMembers.map((member, idx) => {
+                {displayMembers.map((member, idx) => {
                   const isBoss = member.label?.toLowerCase().includes('boshlig');
                   const isAssistant = member.label?.toLowerCase().includes('yordamchi');
                   const worksCount = getMasterWorks(member).length;
@@ -371,33 +375,139 @@ export const TeamSection = ({
                 })}
               </div>
             </div>
+          ) : (
+            /* Clean Static Grid for 1, 2 or filtered categories */
+            <div className={`grid gap-6 ${
+              filteredMembers.length === 1 
+                ? 'grid-cols-1 max-w-md mx-auto' 
+                : filteredMembers.length === 2 
+                ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto' 
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+            }`}>
+              {filteredMembers.map((member) => {
+                const isBoss = member.label?.toLowerCase().includes('boshlig');
+                const isAssistant = member.label?.toLowerCase().includes('yordamchi');
+                const worksCount = getMasterWorks(member).length;
+
+                return (
+                  <div
+                    key={member.id}
+                    className="p-1"
+                  >
+                    <div 
+                      onClick={() => setSelectedMaster(member)}
+                      className="group glass-panel rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 hover:border-brand-red/50 transition-all duration-300 hover:shadow-glow-red hover:-translate-y-1.5 cursor-pointer flex flex-col h-full bg-white dark:bg-brand-surface/80"
+                    >
+                      {/* Member Photo Box */}
+                      <div className="relative aspect-[4/3] overflow-hidden bg-brand-dark">
+                        <img
+                          src={member.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"}
+                          alt={member.name}
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 pointer-events-none"
+                          onError={(e) => {
+                            e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 pointer-events-none" />
+
+                        {/* Role Badge */}
+                        <div className="absolute top-3.5 left-3.5">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold shadow-md border backdrop-blur-md ${
+                            isBoss
+                              ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40'
+                              : isAssistant
+                              ? 'bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/40'
+                              : 'bg-white/95 text-brand-red border-brand-red/30 dark:bg-brand-red/20 dark:text-white dark:border-brand-red/50'
+                          }`}>
+                            <Sparkles className="w-3 h-3 text-brand-red" />
+                            <span>{getMemberLabel(member)}</span>
+                          </span>
+                        </div>
+
+                        {/* Projects Count Pill */}
+                        <div className="absolute bottom-3 right-3">
+                          <span className="px-2.5 py-1 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-sm">
+                            {member.completedProjects || `250+ ${t.team?.projectsUnit || "obyekt"}`}
+                          </span>
+                        </div>
+
+                        {/* Experience Pill */}
+                        <div className="absolute bottom-3 left-3">
+                          <span className="px-2.5 py-1 rounded-xl bg-brand-red text-white text-[11px] font-black flex items-center gap-1 shadow-sm">
+                            <ShieldCheck className="w-3 h-3" />
+                            <span>{member.experience || `5+ ${t.team?.expUnit || "yil"}`}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Card Content */}
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors flex items-center gap-1.5">
+                              <span>{member.name}</span>
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                            </h3>
+                          </div>
+                          <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 line-clamp-1 mb-2">
+                            {getMemberRole(member)}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                            {getMemberBio(member)}
+                          </p>
+                        </div>
+
+                        {/* Completed works count & Action button */}
+                        <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+                            <Hammer className="w-3.5 h-3.5 text-brand-red" />
+                            <span>{worksCount} {t.team?.worksCountSuffix || "ta katalog ishi"}</span>
+                          </span>
+
+                          <span className="text-xs font-bold text-brand-red flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            <span>{t.team?.viewWorks || "Ishlarini ko'rish"}</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </span>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
 
-          {/* Slider Navigation Arrows */}
-          <div className="flex items-center justify-between pointer-events-none absolute inset-y-0 -left-3 -right-3 sm:-left-5 sm:-right-5 z-20">
-            <button
-              type="button"
-              onClick={handlePrev}
-              className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
-              title="Oldingi"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
-              title="Keyingi"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
+          {/* Slider Navigation Arrows - only show in carousel mode */}
+          {isCarousel && (
+            <div className="flex items-center justify-between pointer-events-none absolute inset-y-0 -left-3 -right-3 sm:-left-5 sm:-right-5 z-20">
+              <button
+                type="button"
+                onClick={handlePrev}
+                className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+                title="Oldingi"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNext}
+                className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
+                title="Keyingi"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
 
-          {/* Micro status indicator */}
-          <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-600 dark:text-slate-400 font-medium text-center px-4">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span>{t.team?.streamNotice || "Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring"}</span>
-          </div>
+          {/* Micro status indicator - only show in carousel mode */}
+          {isCarousel && (
+            <div className="flex items-center justify-center gap-2 mt-6 text-xs text-slate-600 dark:text-slate-400 font-medium text-center px-4">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span>{t.team?.streamNotice || "Doimiy silliq aylanuvchi oqim: Ustalar ustiga olib borilsa to'xtaydi, bosing va ishlarini ko'ring"}</span>
+            </div>
+          )}
         </div>
 
       </div>
