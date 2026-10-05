@@ -58,15 +58,23 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/85 backdrop-blur-md animate-fadeIn">
-      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/20 shadow-2xl relative">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        className="glass-panel w-full max-w-md rounded-2xl p-5 sm:p-6 border border-slate-200 dark:border-white/15 shadow-2xl relative max-h-[92vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-colors"
+          className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-colors cursor-pointer"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {success ? (

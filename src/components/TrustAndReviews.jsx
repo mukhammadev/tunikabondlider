@@ -19,7 +19,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   // Initial reviews fallback from translations
   const defaultReviews = tr.reviews || [];
 
-  // Dynamic reviews state
+  // Dynamic reviews state: combined user reviews + default translation reviews
   const [allReviews, setAllReviews] = useState(defaultReviews);
   const [showAll, setShowAll] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,12 +39,21 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   // Load reviews on mount and when changed
   const loadReviews = async () => {
     try {
-      const stored = await apiGetReviews();
-      if (stored && Array.isArray(stored) && stored.length > 0) {
-        setAllReviews(stored);
-      } else {
-        setAllReviews(defaultReviews);
-      }
+      const storedUserReviews = await apiGetReviews();
+      const userList = Array.isArray(storedUserReviews) ? storedUserReviews : [];
+      // Combine user submitted reviews at the top, followed by default reviews
+      // Ensure no duplicates by ID or name+comment
+      const combined = [...userList];
+      const seen = new Set(userList.map(r => r.id || `${r.name}_${r.comment}`));
+
+      defaultReviews.forEach((dr, idx) => {
+        const key = dr.id || `default-${idx}-${dr.name}`;
+        if (!seen.has(key) && !seen.has(`${dr.name}_${dr.comment}`)) {
+          combined.push({ ...dr, id: key });
+        }
+      });
+
+      setAllReviews(combined.length > 0 ? combined : defaultReviews);
     } catch {
       setAllReviews(defaultReviews);
     }
@@ -59,7 +68,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
       window.removeEventListener('tunikabond_data_updated', handleUpdate);
       window.removeEventListener('storage', handleUpdate);
     };
-  }, [currentLang]);
+  }, [currentLang, tr.reviews]);
 
   // First 3 reviews by default, all when showAll is true
   const displayedReviews = showAll ? allReviews : allReviews.slice(0, 3);
@@ -314,24 +323,24 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
       {/* --- LEAVE REVIEW MODAL --- */}
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn"
           onClick={() => setIsModalOpen(false)}
         >
           <div 
-            className="glass-panel w-full max-w-lg rounded-3xl overflow-hidden border border-slate-200 dark:border-brand-red/30 shadow-glow-red flex flex-col bg-white dark:bg-brand-dark animate-scaleUp"
+            className="glass-panel w-full max-w-md rounded-2xl overflow-hidden border border-slate-200 dark:border-brand-red/30 shadow-2xl flex flex-col bg-white dark:bg-brand-dark max-h-[92vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 flex items-start justify-between bg-slate-50 dark:bg-brand-surface/90">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-brand-red/10 border border-brand-red/30 flex items-center justify-center text-brand-red">
-                  <MessageSquarePlus className="w-5 h-5" />
+            <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 flex items-start justify-between bg-slate-50 dark:bg-brand-surface/90">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-brand-red/10 border border-brand-red/30 flex items-center justify-center text-brand-red shrink-0">
+                  <MessageSquarePlus className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-display font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white">
+                  <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white">
                     {tr.reviewModalTitle || "Fikr va Sharh Qoldirish"}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {tr.reviewModalSubtitle || "Xizmatimiz haqidagi fikringiz biz uchun muhim!"}
                   </p>
                 </div>
@@ -340,31 +349,31 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmitReview} className="p-5 sm:p-6 space-y-4">
+            <form onSubmit={handleSubmitReview} className="p-4 sm:p-5 space-y-3.5 overflow-y-auto">
               
               {/* Rating selection (Interactive stars) */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                   {tr.ratingLabel || "Bahoingiz:"}
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   {[1, 2, 3, 4, 5].map((starVal) => (
                     <button
                       type="button"
                       key={starVal}
                       onClick={() => setForm({ ...form, rating: starVal })}
-                      className="p-1 hover:scale-125 transition-transform cursor-pointer"
+                      className="p-0.5 hover:scale-125 transition-transform cursor-pointer"
                       title={`${starVal} yulduz`}
                     >
                       <Star
-                        className={`w-7 h-7 ${
+                        className={`w-6 h-6 ${
                           starVal <= form.rating
                             ? 'text-amber-400 fill-amber-400'
                             : 'text-slate-300 dark:text-slate-600'
@@ -384,32 +393,32 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                   {tr.nameLabel || "Ismingiz *"}
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder={tr.namePlaceholder || "Jasur Aliyev"}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
                   />
                 </div>
               </div>
 
               {/* Project / Location row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                     {tr.projectLabel || "Obyekt / ish turi"}
                   </label>
                   <div className="relative">
-                    <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Briefcase className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={form.project}
                       onChange={(e) => setForm({ ...form, project: e.target.value })}
-                      placeholder={tr.projectPlaceholder || "Hovli navesi (120 m²)"}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
+                      placeholder={tr.projectPlaceholder || "Hovli navesi"}
+                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
                     />
                   </div>
                 </div>
@@ -419,13 +428,13 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                     {currentLang === 'ru' ? "Город / Район" : "Shahar / Tuman"}
                   </label>
                   <div className="relative">
-                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={form.location}
                       onChange={(e) => setForm({ ...form, location: e.target.value })}
                       placeholder={currentLang === 'ru' ? "г. Ташкент" : "Toshkent shahri"}
-                      className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
+                      className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
                     />
                   </div>
                 </div>
@@ -438,20 +447,20 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                 </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
                   value={form.comment}
                   onChange={(e) => setForm({ ...form, comment: e.target.value })}
                   placeholder={tr.commentPlaceholder || "Ish sifati, ustalar muomalasi va natija haqida yozing..."}
-                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none resize-none leading-relaxed"
+                  className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none resize-none leading-relaxed"
                 />
               </div>
 
               {/* Form Buttons */}
-              <div className="pt-2 flex items-center justify-end gap-3">
+              <div className="pt-1 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
                 >
                   {currentLang === 'ru' ? "Отмена" : "Bekor qilish"}
                 </button>
@@ -459,9 +468,9 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-redLight to-brand-red hover:from-brand-red hover:to-brand-redHover text-white text-xs sm:text-sm font-extrabold shadow-glow-red hover:scale-105 active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-gradient-to-r from-brand-redLight to-brand-red hover:from-brand-red hover:to-brand-redHover text-white text-xs font-bold shadow-glow-red hover:scale-105 active:scale-95 disabled:opacity-50 transition-all cursor-pointer"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-3.5 h-3.5" />
                   <span>
                     {submitting 
                       ? (tr.submittingReview || "Yuborilmoqda...") 

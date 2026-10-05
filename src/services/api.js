@@ -939,9 +939,9 @@ export const apiGetReviews = async () => {
   // 1. Check cloud catalog store
   try {
     const cloud = await cloudGetCatalogData();
-    if (cloud?.reviews && Array.isArray(cloud.reviews) && cloud.reviews.length > 0) {
-      localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(cloud.reviews));
-      return cloud.reviews;
+    if (cloud?.userReviews && Array.isArray(cloud.userReviews)) {
+      localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(cloud.userReviews));
+      return cloud.userReviews;
     }
   } catch {}
 
@@ -950,11 +950,11 @@ export const apiGetReviews = async () => {
     const saved = localStorage.getItem(STORAGE_REVIEWS_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {}
 
-  return null; // Will fallback to translation default reviews
+  return [];
 };
 
 export const apiAddReview = async (reviewData) => {
@@ -971,14 +971,14 @@ export const apiAddReview = async (reviewData) => {
 
   let updated = [];
   try {
-    const current = await apiGetReviews() || [];
-    updated = [newReview, ...current];
+    const current = (await apiGetReviews()) || [];
+    updated = [newReview, ...current.filter(r => r.id !== newReview.id)];
     localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
   } catch {}
 
   // Sync to Cloud Catalog Store
   try {
-    await cloudSaveCatalogData({ reviews: updated });
+    await cloudSaveCatalogData({ userReviews: updated });
   } catch {}
 
   notifyDataChanged();
