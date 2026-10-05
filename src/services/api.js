@@ -936,12 +936,18 @@ export const apiDeleteTeamMember = async (memberId) => {
 
 // --- CUSTOMER REVIEWS API ---
 export const apiGetReviews = async () => {
-  // 1. Check cloud catalog store
+  let backendReviews = [];
+
+  // 1. Fetch from serverless API /api/reviews
   try {
-    const cloud = await cloudGetCatalogData();
-    if (cloud?.userReviews && Array.isArray(cloud.userReviews)) {
-      localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(cloud.userReviews));
-      return cloud.userReviews;
+    const res = await fetch('/api/reviews');
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        backendReviews = data;
+        localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(data));
+        return data;
+      }
     }
   } catch {}
 
@@ -950,11 +956,11 @@ export const apiGetReviews = async () => {
     const saved = localStorage.getItem(STORAGE_REVIEWS_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch {}
 
-  return [];
+  return backendReviews;
 };
 
 export const apiAddReview = async (reviewData) => {
@@ -966,19 +972,25 @@ export const apiAddReview = async (reviewData) => {
     location: reviewData.location?.trim() || "Toshkent shahri",
     rating: Number(reviewData.rating) || 5,
     comment: reviewData.comment?.trim() || "",
-    date: reviewData.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' })
+    date: reviewData.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' }),
+    timestamp: Date.now()
   };
 
+  // 1. Send to serverless API /api/reviews (syncs to Telegram channel and serverless cache)
+  try {
+    fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newReview)
+    }).catch(() => {});
+  } catch {}
+
+  // 2. Save locally immediately
   let updated = [];
   try {
     const current = (await apiGetReviews()) || [];
     updated = [newReview, ...current.filter(r => r.id !== newReview.id)];
     localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ userReviews: updated });
   } catch {}
 
   notifyDataChanged();
@@ -988,14 +1000,9 @@ export const apiAddReview = async (reviewData) => {
 export const apiDeleteReview = async (reviewId) => {
   let updated = [];
   try {
-    const current = await apiGetReviews() || [];
+    const current = (await apiGetReviews()) || [];
     updated = current.filter(r => String(r.id) !== String(reviewId));
     localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ reviews: updated });
   } catch {}
 
   notifyDataChanged();
