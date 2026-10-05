@@ -6,6 +6,7 @@ import {
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
   apiGetAdmins, apiRegister, apiDeleteAdmin, apiUploadFile,
   apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch,
+  apiGetReviews, apiAddReview, apiDeleteReview,
   apiExportAllData, apiImportData
 } from '../../services/api';
 import {
@@ -20,7 +21,8 @@ import {
   ExternalLink, Search, RefreshCw, Shield, AlertCircle,
   Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck,
   Palette, Bot, MessageSquare, Check, Save, Radio,
-  ShieldCheck, Layers, Eye, Filter, TrendingUp, Sparkles
+  ShieldCheck, Layers, Eye, Filter, TrendingUp, Sparkles,
+  Star, MessageSquareQuote
 } from 'lucide-react';
 
 export const AdminDashboard = ({ 
@@ -114,18 +116,34 @@ export const AdminDashboard = ({
   const [adminProductCat, setAdminProductCat] = useState('all');
   const [adminPortfolioCat, setAdminPortfolioCat] = useState('all');
 
+  // Customer Reviews (Sharhlar & Fikrlar) state
+  const [reviewsList, setReviewsList] = useState([]);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [reviewSearch, setReviewSearch] = useState('');
+  const [reviewRatingFilter, setReviewRatingFilter] = useState('all');
+  const [reviewForm, setReviewForm] = useState({
+    name: '',
+    role: 'Mijoz',
+    project: '',
+    location: 'Toshkent shahri',
+    rating: 5,
+    comment: ''
+  });
+
   // Load all initial data
   const loadData = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      const [st, ld, pr, pf, ad, tm, swt] = await Promise.all([
+      const [st, ld, pr, pf, ad, tm, swt, revs] = await Promise.all([
         apiGetStats(),
         apiGetLeads(),
         apiGetProducts(),
         apiGetPortfolio(),
         apiGetAdmins(),
         apiGetTeam(),
-        apiGetSwatches()
+        apiGetSwatches(),
+        apiGetReviews()
       ]);
       setStats(st);
       setLeads(ld);
@@ -135,6 +153,9 @@ export const AdminDashboard = ({
       setTeamList(tm);
       if (swt && Array.isArray(swt)) {
         setSwatchesList(swt);
+      }
+      if (revs && Array.isArray(revs)) {
+        setReviewsList(revs);
       }
       setTelegramConfig(getTelegramConfig());
     } finally {
@@ -644,6 +665,73 @@ export const AdminDashboard = ({
     }
   };
 
+  // --- REVIEWS (MIJOZLAR SHARHLARI) ACTIONS ---
+  const handleOpenReviewCreate = () => {
+    setEditingReview(null);
+    setReviewForm({
+      name: '',
+      role: 'Mijoz',
+      project: '',
+      location: 'Toshkent shahri',
+      rating: 5,
+      comment: ''
+    });
+    setReviewModalOpen(true);
+  };
+
+  const handleOpenReviewEdit = (rev) => {
+    setEditingReview(rev);
+    setReviewForm({
+      name: rev.name || '',
+      role: rev.role || 'Mijoz',
+      project: rev.project || '',
+      location: rev.location || 'Toshkent shahri',
+      rating: rev.rating || 5,
+      comment: rev.comment || ''
+    });
+    setReviewModalOpen(true);
+  };
+
+  const handleSaveReview = async (e) => {
+    e.preventDefault();
+    if (!reviewForm.name.trim() || !reviewForm.comment.trim()) {
+      alert("Iltimos, mijoz ismi va sharh matnini kiriting!");
+      return;
+    }
+
+    const payload = {
+      id: editingReview?.id,
+      name: reviewForm.name.trim(),
+      role: reviewForm.role.trim() || "Mijoz",
+      project: reviewForm.project.trim() || "Fasad yoki naves montaji",
+      location: reviewForm.location.trim() || "Toshkent shahri",
+      rating: Number(reviewForm.rating) || 5,
+      comment: reviewForm.comment.trim(),
+      date: editingReview?.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' })
+    };
+
+    if (editingReview) {
+      await apiDeleteReview(editingReview.id);
+      await apiAddReview(payload);
+      setReviewsList(reviewsList.map(r => r.id === editingReview.id ? { ...r, ...payload } : r));
+    } else {
+      const res = await apiAddReview(payload);
+      if (res?.review) {
+        setReviewsList([res.review, ...reviewsList]);
+      }
+    }
+    setReviewModalOpen(false);
+    notifyChange();
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("Haqiqatan ham ushbu sharhni o'chirmoqchimisiz?")) {
+      await apiDeleteReview(reviewId);
+      setReviewsList(reviewsList.filter(r => String(r.id) !== String(reviewId)));
+      notifyChange();
+    }
+  };
+
   return (
     <div className="dark fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn">
       
@@ -805,6 +893,21 @@ export const AdminDashboard = ({
                 <span>Ranglar & Teksturalar</span>
               </div>
               <span className="text-xs text-slate-400">{swatchesList.length}</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeTab === 'reviews' 
+                  ? 'bg-brand-red text-white shadow-glow-red' 
+                  : 'text-slate-300 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <MessageSquareQuote className="w-4 h-4 text-amber-400" />
+                <span>Mijozlar Fikrlari</span>
+              </div>
+              <span className="text-xs text-slate-400">{reviewsList.length}</span>
             </button>
 
             <button
@@ -2331,6 +2434,168 @@ export const AdminDashboard = ({
             </div>
           )}
 
+          {/* ═══════════════════════════════════════════════════════════
+              TAB: MIJOZLAR SHARHLARI & FIKRLARI (REVIEWS MANAGEMENT)
+              ═══════════════════════════════════════════════════════════ */}
+          {activeTab === 'reviews' && (
+            <div className="space-y-6">
+              
+              {/* Header Bar */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-display font-extrabold text-white flex items-center gap-2">
+                    <MessageSquareQuote className="w-6 h-6 text-amber-400" />
+                    <span>Mijozlar Fikrlari & Sharhlar Boshqaruvi</span>
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                    Saytda mijozlar qoldirgan barcha sharh va fikrlarni ko'rish, tahrirlash, o'chirish yoki yangi sharh qo'shish.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <button
+                    onClick={handleOpenReviewCreate}
+                    className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-glow-red transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Yangi Sharh Qo'shish</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Filters & Search */}
+              <div className="glass-panel p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Mijoz ismi, manzil yoki sharh bo'yicha qidirish..."
+                    value={reviewSearch}
+                    onChange={(e) => setReviewSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                  <span className="text-xs text-slate-400 font-bold shrink-0">Baho:</span>
+                  {['all', '5', '4', '3'].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setReviewRatingFilter(r)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                        reviewRatingFilter === r
+                          ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                          : 'bg-white/5 text-slate-400 hover:text-white border border-white/5'
+                      }`}
+                    >
+                      {r === 'all' ? 'Barchasi' : `${r} ★`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Reviews List */}
+              {(() => {
+                const filtered = reviewsList.filter(rev => {
+                  if (!rev) return false;
+                  const query = reviewSearch.toLowerCase().trim();
+                  const matchesSearch = !query || 
+                    (rev.name && rev.name.toLowerCase().includes(query)) ||
+                    (rev.comment && rev.comment.toLowerCase().includes(query)) ||
+                    (rev.project && rev.project.toLowerCase().includes(query)) ||
+                    (rev.location && rev.location.toLowerCase().includes(query));
+
+                  const matchesRating = reviewRatingFilter === 'all' || 
+                    String(rev.rating) === String(reviewRatingFilter);
+
+                  return matchesSearch && matchesRating;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="glass-panel p-12 text-center rounded-3xl border border-white/10 space-y-3">
+                      <MessageSquareQuote className="w-12 h-12 text-slate-500 mx-auto" />
+                      <h3 className="font-bold text-white text-base">Sharhlar topilmadi</h3>
+                      <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                        Hozircha hech qanday sharh mavjud emas yoki qidiruv so'rovingizga mos kelmadi.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filtered.map((rev) => (
+                      <div
+                        key={rev.id}
+                        className="glass-panel p-5 rounded-2xl border border-white/10 hover:border-amber-400/30 flex flex-col justify-between space-y-4 bg-brand-surface/60 transition-all hover:-translate-y-1"
+                      >
+                        <div>
+                          {/* Top row: Name & Rating */}
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div>
+                              <h4 className="font-bold text-white text-sm sm:text-base flex items-center gap-1.5">
+                                <span>{rev.name}</span>
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              </h4>
+                              <p className="text-[11px] text-slate-400 font-medium">
+                                {rev.role || "Mijoz"} {rev.location ? `• ${rev.location}` : ''}
+                              </p>
+                              {rev.project && (
+                                <p className="text-[10px] text-brand-red font-semibold mt-0.5">
+                                  {rev.project}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1 bg-amber-400/10 px-2 py-1 rounded-lg border border-amber-400/20 shrink-0">
+                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                              <span className="text-xs font-bold text-amber-300">
+                                {Number(rev.rating) || 5}.0
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Review comment */}
+                          <div className="mt-3 p-3 rounded-xl bg-white/5 border border-white/5 text-xs text-slate-300 leading-relaxed italic">
+                            "{rev.comment}"
+                          </div>
+                        </div>
+
+                        {/* Bottom row: Date & Action buttons */}
+                        <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400">
+                            {rev.date || "2026-yil"}
+                          </span>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => handleOpenReviewEdit(rev)}
+                              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition-colors cursor-pointer"
+                              title="Tahrirlash"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteReview(rev.id)}
+                              className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/25 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                              title="O'chirish"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+            </div>
+          )}
+
         </main>
 
         {/* Mobile Bottom Navigation Bar (Visible on mobile/tablet screens only) */}
@@ -2400,6 +2665,16 @@ export const AdminDashboard = ({
           >
             <Palette className="w-5 h-5" />
             <span className="text-[10px] truncate w-full text-center">Ranglar</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reviews')}
+            className={`flex-1 min-w-[42px] flex flex-col items-center gap-0.5 py-1 px-0.5 rounded-xl transition-all ${
+              activeTab === 'reviews' ? 'text-brand-red font-bold' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <MessageSquareQuote className="w-5 h-5 text-amber-400" />
+            <span className="text-[10px] truncate w-full text-center">Fikrlar</span>
           </button>
 
           <button
@@ -3402,6 +3677,168 @@ export const AdminDashboard = ({
                   Qo'shish
                 </button>
               </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- REVIEW CREATE / EDIT MODAL --- */}
+      {reviewModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+          onClick={() => setReviewModalOpen(false)}
+        >
+          <div 
+            className="glass-panel w-full max-w-lg rounded-3xl overflow-hidden border border-white/20 shadow-2xl flex flex-col bg-brand-dark/95 max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between bg-brand-surface/80">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
+                  <MessageSquareQuote className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-display font-extrabold text-lg text-white">
+                    {editingReview ? "Sharhni Tahrirlash" : "Yangi Mijoz Sharhi Qo'shish"}
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Mijoz haqidagi ma'lumotlar va qoldirgan bahosi
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setReviewModalOpen(false)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveReview} className="p-5 sm:p-6 space-y-4 overflow-y-auto">
+              
+              {/* Rating selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  Baho (Yulduzlar):
+                </label>
+                <div className="flex items-center gap-2">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      type="button"
+                      key={num}
+                      onClick={() => setReviewForm({ ...reviewForm, rating: num })}
+                      className="p-1 hover:scale-125 transition-transform cursor-pointer"
+                    >
+                      <Star
+                        className={`w-7 h-7 ${
+                          num <= reviewForm.rating
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-slate-600'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-sm font-bold text-amber-300 ml-2">
+                    {reviewForm.rating} / 5
+                  </span>
+                </div>
+              </div>
+
+              {/* Name & Role */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Mijoz Ismi *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={reviewForm.name}
+                    onChange={(e) => setReviewForm({ ...reviewForm, name: e.target.value })}
+                    placeholder="Masalan: Jasur Aliyev"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-surface border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Mijoz Kasbi / Maqomi
+                  </label>
+                  <input
+                    type="text"
+                    value={reviewForm.role}
+                    onChange={(e) => setReviewForm({ ...reviewForm, role: e.target.value })}
+                    placeholder="Masalan: Tadbirkor, Kottej egasi"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-surface border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              {/* Project & Location */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Obyekt / Bajarilgan Ish
+                  </label>
+                  <input
+                    type="text"
+                    value={reviewForm.project}
+                    onChange={(e) => setReviewForm({ ...reviewForm, project: e.target.value })}
+                    placeholder="Masalan: Hovli navesi (150 m²)"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-surface border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                    Shahar / Manzil
+                  </label>
+                  <input
+                    type="text"
+                    value={reviewForm.location}
+                    onChange={(e) => setReviewForm({ ...reviewForm, location: e.target.value })}
+                    placeholder="Masalan: Toshkent, Yunusobod"
+                    className="w-full px-4 py-2.5 rounded-xl bg-brand-surface border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red"
+                  />
+                </div>
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  Sharh Matni *
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={reviewForm.comment}
+                  onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                  placeholder="Mijoz qoldirgan taassurotlar va baho matni..."
+                  className="w-full p-3 rounded-xl bg-brand-surface border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-brand-red resize-none leading-relaxed"
+                />
+              </div>
+
+              {/* Form Buttons */}
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setReviewModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red transition-all cursor-pointer"
+                >
+                  {editingReview ? "Saqlash" : "Qo'shish"}
+                </button>
+              </div>
+
             </form>
           </div>
         </div>
