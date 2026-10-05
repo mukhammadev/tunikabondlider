@@ -117,10 +117,11 @@ export const BrandIntro = ({ onComplete, t }) => {
         <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-b from-white/12 to-white/5 border border-white/20 p-4 flex items-center justify-center backdrop-blur-2xl shadow-[0_0_50px_rgba(196,0,0,0.45)] overflow-hidden">
           {/* Metallic Specular Shimmer Sweep */}
           <div 
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"
             style={{
               animation: 'specular-sweep 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards',
-              animationDelay: '150ms'
+              animationDelay: '150ms',
+              animationFillMode: 'both'
             }}
           />
           <img
