@@ -7,27 +7,47 @@ import { products as initialProducts } from '../data/products.js';
 import { portfolio as initialPortfolio } from '../data/portfolio.js';
 import { initialTeam } from '../data/team.js';
 import { swatches as initialSwatches } from '../data/swatches.js';
+import { supabase } from './supabase.js';
+
+export const safeStorage = {
+  get: (key) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try { return localStorage.getItem(key); } catch {}
+    }
+    return null;
+  },
+  set: (key, val) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch {}
+    }
+  },
+  remove: (key) => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try { localStorage.removeItem(key); } catch {}
+    }
+  }
+};
 
 const TOKEN_KEY = 'tl_admin_token';
 const USER_KEY = 'tl_admin_user';
 
-export const getAuthToken = () => localStorage.getItem(TOKEN_KEY);
+export const getAuthToken = () => safeStorage.get(TOKEN_KEY);
 export const getStoredUser = () => {
   try {
-    return JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+    return JSON.parse(safeStorage.get(USER_KEY) || 'null');
   } catch {
     return null;
   }
 };
 
 export const setAuthSession = (token, user) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  safeStorage.set(TOKEN_KEY, token);
+  safeStorage.set(USER_KEY, JSON.stringify(user));
 };
 
 export const clearAuthSession = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  safeStorage.remove(TOKEN_KEY);
+  safeStorage.remove(USER_KEY);
 };
 
 export const getApiBase = () => {
@@ -262,6 +282,26 @@ export const CLOUD_LEADS_URL = 'https://api.restful-api.dev/objects/ff808181a09d
 export const CLOUD_CATALOG_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fc1b57946059';
 
 export const cloudPushLead = async (newLead) => {
+  // 1. Primary: Save directly to Supabase leads table
+  try {
+    const supaLead = {
+      id: String(newLead.id || `lead-${Date.now()}`),
+      name: newLead.name || '',
+      phone: newLead.phone || '',
+      service: newLead.service || '',
+      message: newLead.message || '',
+      source: newLead.source || '',
+      status: newLead.status || 'new',
+      calc_data: newLead.calcData || newLead.calc_data || null,
+      photo_url: newLead.photoUrl || newLead.photo_url || null,
+      created_at: newLead.timestamp || newLead.date || new Date().toISOString()
+    };
+    await supabase.from('leads').upsert(supaLead);
+  } catch (e) {
+    console.warn('Supabase push lead error:', e);
+  }
+
+  // 2. Secondary fallback: Cloud leads store
   try {
     let cloudLeads = [];
     try {
@@ -334,9 +374,33 @@ export const cloudSaveCatalogData = async (partialData) => {
 
 // --- LEADS API ---
 export const apiGetLeads = async () => {
-  let backendLeads = [];
+  // 1. Fetch from Supabase leads table
+  let supaLeads = [];
+  try {
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && Array.isArray(data)) {
+      supaLeads = data.map(l => ({
+        id: l.id,
+        name: l.name,
+        phone: l.phone,
+        service: l.service,
+        message: l.message,
+        source: l.source,
+        status: l.status || 'new',
+        calcData: l.calc_data,
+        photoUrl: l.photo_url,
+        timestamp: l.created_at
+      }));
+    }
+  } catch (err) {
+    console.warn('Supabase fetch leads error:', err);
+  }
 
-  // 1. Fetch from serverless API /api/leads or /api/leads/
+  let backendLeads = [];
+  // 2. Fetch from serverless API /api/leads or /api/leads/
   try {
     let res = await fetch('/api/leads');
     if (!res.ok) {
@@ -350,7 +414,7 @@ export const apiGetLeads = async () => {
     }
   } catch {}
 
-  // 2. Direct client-side fetch from Telegram Bot getUpdates (works on any client without server)
+  // 3. Direct client-side fetch from Telegram Bot getUpdates (works on any client without server)
   let telegramBotLeads = [];
   try {
     const BOT_TOKEN = "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
@@ -388,7 +452,7 @@ export const apiGetLeads = async () => {
     localLeads = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
   } catch {}
 
-  // 3. Fetch from Cloud Leads Store if accessible
+  // 4. Fetch from Cloud Leads Store if accessible
   let cloudLeads = [];
   try {
     const cRes = await fetch(CLOUD_LEADS_URL);
@@ -419,7 +483,7 @@ export const apiGetLeads = async () => {
   } catch {}
 
   const map = new Map();
-  [...backendLeads, ...cloudLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
+  [...supaLeads, ...backendLeads, ...cloudLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
     if (l && (l.id || l.phone)) {
       if (l.id && deletedSet.has(String(l.id))) {
         return;
@@ -464,6 +528,19 @@ export const apiGetLeads = async () => {
 };
 
 export const apiUpdateLead = async (leadId, patchData) => {
+  // 1. Update in Supabase
+  try {
+    const supaPatch = { ...patchData };
+    if (patchData.calcData) supaPatch.calc_data = patchData.calcData;
+    if (patchData.photoUrl) supaPatch.photo_url = patchData.photoUrl;
+    delete supaPatch.calcData;
+    delete supaPatch.photoUrl;
+    await supabase.from('leads').update(supaPatch).eq('id', String(leadId));
+  } catch (err) {
+    console.warn('Supabase update lead error:', err);
+  }
+
+  // 2. Update via serverless API
   try {
     await apiFetch(`/api/leads/${leadId}`, {
       method: 'PATCH',
@@ -502,6 +579,13 @@ export const apiUpdateLead = async (leadId, patchData) => {
 };
 
 export const apiDeleteLead = async (leadId) => {
+  // 1. Delete from Supabase
+  try {
+    await supabase.from('leads').delete().eq('id', String(leadId));
+  } catch (err) {
+    console.warn('Supabase delete lead error:', err);
+  }
+
   try {
     await apiFetch(`/api/leads/${leadId}`, {
       method: 'DELETE',
@@ -596,6 +680,24 @@ export const compressImageFile = (file, maxWidth = 1000, maxHeight = 1000, quali
 
 // --- PRODUCTS API ---
 export const apiGetProducts = async () => {
+  // 1. Fetch from Supabase products table
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const formatted = data.map(p => ({
+        ...p,
+        isActive: p.is_active !== false
+      }));
+      safeStorage.set(STORAGE_PRODUCTS_KEY, formatted);
+      return formatted;
+    }
+  } catch (e) {
+    console.warn('Supabase get products error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/products/');
     if (res.ok) {
@@ -604,7 +706,7 @@ export const apiGetProducts = async () => {
     }
   } catch {}
 
-  // Cloud store sync (enables instant cross-device updates for all visitors)
+  // Cloud store sync fallback
   try {
     const cData = await cloudGetCatalogData();
     if (cData?.products && Array.isArray(cData.products) && cData.products.length > 0) {
@@ -628,6 +730,26 @@ export const apiGetProducts = async () => {
 
 export const apiCreateProduct = async (productData) => {
   const newProduct = { ...productData, id: productData.id || `prod-${Date.now()}` };
+
+  // 1. Save to Supabase
+  try {
+    await supabase.from('products').upsert({
+      id: String(newProduct.id),
+      name: newProduct.name,
+      category: newProduct.category || '',
+      price: newProduct.price || '',
+      thickness: newProduct.thickness || '',
+      coating: newProduct.coating || '',
+      warranty: newProduct.warranty || '',
+      image: newProduct.image || '',
+      specs: newProduct.specs || {},
+      badge: newProduct.badge || null,
+      is_active: newProduct.isActive !== false
+    });
+  } catch (e) {
+    console.warn('Supabase create product error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/products/', {
       method: 'POST',
@@ -658,6 +780,18 @@ export const apiCreateProduct = async (productData) => {
 };
 
 export const apiUpdateProduct = async (productId, productData) => {
+  // 1. Update in Supabase
+  try {
+    const supaPayload = { ...productData };
+    if (productData.isActive !== undefined) {
+      supaPayload.is_active = productData.isActive;
+      delete supaPayload.isActive;
+    }
+    await supabase.from('products').update(supaPayload).eq('id', String(productId));
+  } catch (e) {
+    console.warn('Supabase update product error:', e);
+  }
+
   try {
     await apiFetch(`/api/products/${productId}`, {
       method: 'PUT',
@@ -684,6 +818,13 @@ export const apiUpdateProduct = async (productId, productData) => {
 };
 
 export const apiDeleteProduct = async (productId) => {
+  // 1. Delete from Supabase
+  try {
+    await supabase.from('products').delete().eq('id', String(productId));
+  } catch (e) {
+    console.warn('Supabase delete product error:', e);
+  }
+
   try {
     await apiFetch(`/api/products/${productId}`, {
       method: 'DELETE',
@@ -710,6 +851,25 @@ export const apiDeleteProduct = async (productId) => {
 
 // --- PORTFOLIO API ---
 export const apiGetPortfolio = async () => {
+  // 1. Fetch from Supabase portfolio table
+  try {
+    const { data, error } = await supabase
+      .from('portfolio')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const formatted = data.map(item => ({
+        ...item,
+        masterId: item.master_id || item.masterId,
+        desc: item.description || item.desc || {}
+      }));
+      safeStorage.set(STORAGE_PORTFOLIO_KEY, formatted);
+      return formatted;
+    }
+  } catch (e) {
+    console.warn('Supabase get portfolio error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/portfolio/');
     if (res.ok) {
@@ -718,7 +878,7 @@ export const apiGetPortfolio = async () => {
     }
   } catch {}
 
-  // Cloud store sync (enables instant cross-device updates for all visitors)
+  // Cloud store sync fallback
   try {
     const cData = await cloudGetCatalogData();
     if (cData?.portfolio && Array.isArray(cData.portfolio) && cData.portfolio.length > 0) {
@@ -742,6 +902,23 @@ export const apiGetPortfolio = async () => {
 
 export const apiCreatePortfolio = async (itemData) => {
   const newItem = { ...itemData, id: itemData.id || `port-${Date.now()}` };
+
+  // 1. Save to Supabase
+  try {
+    await supabase.from('portfolio').upsert({
+      id: String(newItem.id),
+      title: newItem.title,
+      category: newItem.category || '',
+      image: newItem.image || '',
+      master_id: newItem.masterId || newItem.master_id || null,
+      duration: newItem.duration || '',
+      location: newItem.location || '',
+      description: newItem.desc || newItem.description || {}
+    });
+  } catch (e) {
+    console.warn('Supabase create portfolio error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/portfolio/', {
       method: 'POST',
@@ -772,6 +949,18 @@ export const apiCreatePortfolio = async (itemData) => {
 };
 
 export const apiUpdatePortfolio = async (itemId, itemData) => {
+  // 1. Update in Supabase
+  try {
+    const supaPayload = { ...itemData };
+    if (itemData.desc) supaPayload.description = itemData.desc;
+    if (itemData.masterId) supaPayload.master_id = itemData.masterId;
+    delete supaPayload.desc;
+    delete supaPayload.masterId;
+    await supabase.from('portfolio').update(supaPayload).eq('id', String(itemId));
+  } catch (e) {
+    console.warn('Supabase update portfolio error:', e);
+  }
+
   try {
     await apiFetch(`/api/portfolio/${itemId}`, {
       method: 'PUT',
@@ -798,6 +987,13 @@ export const apiUpdatePortfolio = async (itemId, itemData) => {
 };
 
 export const apiDeletePortfolio = async (itemId) => {
+  // 1. Delete from Supabase
+  try {
+    await supabase.from('portfolio').delete().eq('id', String(itemId));
+  } catch (e) {
+    console.warn('Supabase delete portfolio error:', e);
+  }
+
   try {
     await apiFetch(`/api/portfolio/${itemId}`, {
       method: 'DELETE',
@@ -824,6 +1020,25 @@ export const apiDeletePortfolio = async (itemId) => {
 
 // --- TEAM & MASTERS API ---
 export const apiGetTeam = async () => {
+  // 1. Fetch from Supabase team table
+  try {
+    const { data, error } = await supabase
+      .from('team')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const formatted = data.map(m => ({
+        ...m,
+        completedProjects: m.completed_projects || m.completedProjects,
+        isLeader: m.is_leader || m.isLeader || false
+      }));
+      safeStorage.set(STORAGE_TEAM_KEY, formatted);
+      return formatted;
+    }
+  } catch (e) {
+    console.warn('Supabase get team error:', e);
+  }
+
   let list = null;
   try {
     const res = await apiFetch('/api/team/');
@@ -870,6 +1085,26 @@ export const apiGetTeam = async () => {
 
 export const apiCreateTeamMember = async (memberData) => {
   const newMember = { ...memberData, id: memberData.id || `team-${Date.now()}` };
+
+  // 1. Save to Supabase
+  try {
+    await supabase.from('team').upsert({
+      id: String(newMember.id),
+      name: newMember.name,
+      role: newMember.role || '',
+      label: newMember.label || '',
+      phone: newMember.phone || '',
+      photo: newMember.photo || '',
+      experience: newMember.experience || '',
+      completed_projects: newMember.completedProjects || newMember.completed_projects || '',
+      bio: newMember.bio || '',
+      works: newMember.works || [],
+      is_leader: newMember.isLeader || newMember.is_leader || false
+    });
+  } catch (e) {
+    console.warn('Supabase create team member error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/team/', {
       method: 'POST',
@@ -894,6 +1129,18 @@ export const apiCreateTeamMember = async (memberData) => {
 };
 
 export const apiUpdateTeamMember = async (memberId, memberData) => {
+  // 1. Update in Supabase
+  try {
+    const supaPayload = { ...memberData };
+    if (memberData.completedProjects) supaPayload.completed_projects = memberData.completedProjects;
+    if (memberData.isLeader !== undefined) supaPayload.is_leader = memberData.isLeader;
+    delete supaPayload.completedProjects;
+    delete supaPayload.isLeader;
+    await supabase.from('team').update(supaPayload).eq('id', String(memberId));
+  } catch (e) {
+    console.warn('Supabase update team error:', e);
+  }
+
   try {
     const res = await apiFetch(`/api/team/${memberId}`, {
       method: 'PUT',
@@ -915,6 +1162,13 @@ export const apiUpdateTeamMember = async (memberId, memberData) => {
 };
 
 export const apiDeleteTeamMember = async (memberId) => {
+  // 1. Delete from Supabase
+  try {
+    await supabase.from('team').delete().eq('id', String(memberId));
+  } catch (e) {
+    console.warn('Supabase delete team error:', e);
+  }
+
   try {
     const res = await apiFetch(`/api/team/${memberId}`, {
       method: 'DELETE',
@@ -936,22 +1190,33 @@ export const apiDeleteTeamMember = async (memberId) => {
 
 // --- CUSTOMER REVIEWS API ---
 export const apiGetReviews = async () => {
-  let backendReviews = [];
+  // 1. Fetch from Supabase (Persistent multi-user cross-device database)
+  try {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && Array.isArray(data) && data.length > 0) {
+      safeStorage.set(STORAGE_REVIEWS_KEY, data);
+      return data;
+    }
+  } catch (err) {
+    console.warn('Supabase fetch reviews error:', err);
+  }
 
-  // 1. Fetch from serverless API /api/reviews
+  // 2. Fetch from serverless API /api/reviews
   try {
     const res = await fetch('/api/reviews');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        backendReviews = data;
         localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(data));
         return data;
       }
     }
   } catch {}
 
-  // 2. Check local storage
+  // 3. Check local storage
   try {
     const saved = localStorage.getItem(STORAGE_REVIEWS_KEY);
     if (saved) {
@@ -960,7 +1225,7 @@ export const apiGetReviews = async () => {
     }
   } catch {}
 
-  return backendReviews;
+  return [];
 };
 
 export const apiAddReview = async (reviewData) => {
@@ -972,11 +1237,27 @@ export const apiAddReview = async (reviewData) => {
     location: reviewData.location?.trim() || "Toshkent shahri",
     rating: Number(reviewData.rating) || 5,
     comment: reviewData.comment?.trim() || "",
-    date: reviewData.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' }),
-    timestamp: Date.now()
+    date: reviewData.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' })
   };
 
-  // 1. Send to serverless API /api/reviews (syncs to Telegram channel and serverless cache)
+  // 1. Save directly to Supabase reviews table (Instant & permanent for all users!)
+  try {
+    await supabase.from('reviews').upsert({
+      id: String(newReview.id),
+      name: newReview.name,
+      role: newReview.role,
+      project: newReview.project,
+      location: newReview.location,
+      rating: newReview.rating,
+      comment: newReview.comment,
+      date: newReview.date,
+      created_at: new Date().toISOString()
+    });
+  } catch (e) {
+    console.warn('Supabase upsert review error:', e);
+  }
+
+  // 2. Forward to serverless API /api/reviews for Telegram notification
   try {
     fetch('/api/reviews', {
       method: 'POST',
@@ -985,7 +1266,7 @@ export const apiAddReview = async (reviewData) => {
     }).catch(() => {});
   } catch {}
 
-  // 2. Save locally immediately
+  // 3. Save locally immediately
   let updated = [];
   try {
     const current = (await apiGetReviews()) || [];
@@ -998,6 +1279,14 @@ export const apiAddReview = async (reviewData) => {
 };
 
 export const apiDeleteReview = async (reviewId) => {
+  // 1. Delete from Supabase
+  try {
+    await supabase.from('reviews').delete().eq('id', String(reviewId));
+  } catch (e) {
+    console.warn('Supabase delete review error:', e);
+  }
+
+  // 2. Local update
   let updated = [];
   try {
     const current = (await apiGetReviews()) || [];
@@ -1149,6 +1438,25 @@ export const apiUpdateCalcSettings = async (settings) => {
 
 // --- SWATCHES (RANGLAR VA TEKSTURALAR) API ---
 export const apiGetSwatches = async () => {
+  // 1. Fetch from Supabase swatches table
+  try {
+    const { data, error } = await supabase
+      .from('swatches')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const formatted = data.map(s => ({
+        ...s,
+        colorHex: s.color_hex || s.colorHex,
+        bgGradient: s.bg_gradient || s.bgGradient
+      }));
+      safeStorage.set(STORAGE_SWATCHES_KEY, formatted);
+      return formatted;
+    }
+  } catch (e) {
+    console.warn('Supabase get swatches error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/swatches/');
     if (res.ok) {
@@ -1157,7 +1465,7 @@ export const apiGetSwatches = async () => {
     }
   } catch {}
 
-  // Cloud sync
+  // Cloud sync fallback
   try {
     const cData = await cloudGetCatalogData();
     if (cData?.swatches && Array.isArray(cData.swatches) && cData.swatches.length > 0) {
@@ -1184,6 +1492,26 @@ export const apiCreateSwatch = async (swatchData) => {
     ...swatchData,
     id: swatchData.id || `swatch-${Date.now()}`
   };
+
+  // 1. Save to Supabase
+  try {
+    await supabase.from('swatches').upsert({
+      id: String(newSwatch.id),
+      name: newSwatch.name,
+      category: newSwatch.category || '',
+      code: newSwatch.code || '',
+      color_hex: newSwatch.colorHex || newSwatch.color_hex || '',
+      bg_gradient: newSwatch.bgGradient || newSwatch.bg_gradient || '',
+      image: newSwatch.image || '',
+      texture: newSwatch.texture || '',
+      finish: newSwatch.finish || '',
+      coating: newSwatch.coating || '',
+      application: newSwatch.application || ''
+    });
+  } catch (e) {
+    console.warn('Supabase create swatch error:', e);
+  }
+
   try {
     const res = await apiFetch('/api/swatches/', {
       method: 'POST',
@@ -1204,6 +1532,7 @@ export const apiCreateSwatch = async (swatchData) => {
     localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
+  // Sync to Cloud Catalog Store
   try {
     await cloudSaveCatalogData({ swatches: updated });
   } catch {}
@@ -1213,6 +1542,18 @@ export const apiCreateSwatch = async (swatchData) => {
 };
 
 export const apiUpdateSwatch = async (swatchId, swatchData) => {
+  // 1. Update in Supabase
+  try {
+    const supaPayload = { ...swatchData };
+    if (swatchData.colorHex) supaPayload.color_hex = swatchData.colorHex;
+    if (swatchData.bgGradient) supaPayload.bg_gradient = swatchData.bgGradient;
+    delete supaPayload.colorHex;
+    delete supaPayload.bgGradient;
+    await supabase.from('swatches').update(supaPayload).eq('id', String(swatchId));
+  } catch (e) {
+    console.warn('Supabase update swatch error:', e);
+  }
+
   try {
     await apiFetch(`/api/swatches/${swatchId}`, {
       method: 'PUT',
@@ -1229,6 +1570,7 @@ export const apiUpdateSwatch = async (swatchId, swatchData) => {
     localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
+  // Sync to Cloud Catalog Store
   try {
     await cloudSaveCatalogData({ swatches: updated });
   } catch {}
@@ -1238,6 +1580,13 @@ export const apiUpdateSwatch = async (swatchId, swatchData) => {
 };
 
 export const apiDeleteSwatch = async (swatchId) => {
+  // 1. Delete from Supabase
+  try {
+    await supabase.from('swatches').delete().eq('id', String(swatchId));
+  } catch (e) {
+    console.warn('Supabase delete swatch error:', e);
+  }
+
   try {
     await apiFetch(`/api/swatches/${swatchId}`, {
       method: 'DELETE',
@@ -1253,6 +1602,7 @@ export const apiDeleteSwatch = async (swatchId) => {
     localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
+  // Sync to Cloud Catalog Store
   try {
     await cloudSaveCatalogData({ swatches: updated });
   } catch {}
