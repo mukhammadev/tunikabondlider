@@ -39,21 +39,12 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   // Load reviews on mount and when changed
   const loadReviews = async () => {
     try {
-      const storedUserReviews = await apiGetReviews();
-      const userList = Array.isArray(storedUserReviews) ? storedUserReviews : [];
-      // Combine user submitted reviews at the top, followed by default reviews
-      // Ensure no duplicates by ID or name+comment
-      const combined = [...userList];
-      const seen = new Set(userList.map(r => r.id || `${r.name}_${r.comment}`));
-
-      defaultReviews.forEach((dr, idx) => {
-        const key = dr.id || `default-${idx}-${dr.name}`;
-        if (!seen.has(key) && !seen.has(`${dr.name}_${dr.comment}`)) {
-          combined.push({ ...dr, id: key });
-        }
-      });
-
-      setAllReviews(combined.length > 0 ? combined : defaultReviews);
+      const storedReviews = await apiGetReviews();
+      if (Array.isArray(storedReviews) && storedReviews.length > 0) {
+        setAllReviews(storedReviews);
+        return;
+      }
+      setAllReviews(defaultReviews);
     } catch {
       setAllReviews(defaultReviews);
     }

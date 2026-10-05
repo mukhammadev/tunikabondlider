@@ -7,10 +7,11 @@
  */
 
 const inMemoryReviews = [];
+const deletedReviewIds = new Set();
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -19,6 +20,17 @@ export default async function handler(req, res) {
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
+
+  // DELETE: Remove review
+  if (req.method === 'DELETE') {
+    const targetId = String(req.query?.id || req.body?.id || '');
+    if (targetId) {
+      deletedReviewIds.add(targetId);
+      const idx = inMemoryReviews.findIndex(r => String(r.id) === targetId);
+      if (idx >= 0) inMemoryReviews.splice(idx, 1);
+    }
+    return res.status(200).json({ success: true });
+  }
 
   // POST: Receive new customer review
   if (req.method === 'POST') {
@@ -83,7 +95,7 @@ export default async function handler(req, res) {
 
   // GET: Fetch all reviews
   if (req.method === 'GET') {
-    const list = [...inMemoryReviews];
+    const list = inMemoryReviews.filter(r => !deletedReviewIds.has(String(r.id)));
     const seenIds = new Set(list.map(r => String(r.id)));
 
     // Sync from Telegram channel feed (#REV_DATA)
@@ -93,7 +105,6 @@ export default async function handler(req, res) {
       });
       if (feedRes.ok) {
         const html = await feedRes.text();
-        // Extract raw JSON code blocks or escaped strings
         const codeRegex = /<code[^>]*>(.*?)<\/code>/gis;
         let match;
         while ((match = codeRegex.exec(html)) !== null) {
@@ -105,7 +116,7 @@ export default async function handler(req, res) {
               .replace(/&gt;/g, '>')
               .replace(/&#39;/g, "'");
             const parsed = JSON.parse(raw);
-            if (parsed && parsed.id && parsed.comment && !seenIds.has(String(parsed.id))) {
+            if (parsed && parsed.id && parsed.comment && !seenIds.has(String(parsed.id)) && !deletedReviewIds.has(String(parsed.id))) {
               seenIds.add(String(parsed.id));
               list.push(parsed);
               inMemoryReviews.push(parsed);

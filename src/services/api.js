@@ -95,6 +95,7 @@ export const STORAGE_LEADS_KEY = 'tunikabond_leads';
 export const STORAGE_DELETED_LEADS_KEY = 'tunikabond_deleted_leads_v1';
 export const STORAGE_ADMINS_KEY = 'tunikabond_custom_admins';
 export const STORAGE_REVIEWS_KEY = 'tunikabond_reviews_v1';
+export const STORAGE_DELETED_REVIEWS_KEY = 'tunikabond_deleted_reviews_v1';
 
 export const notifyDataChanged = () => {
   if (typeof window !== 'undefined') {
@@ -1190,38 +1191,49 @@ export const apiDeleteTeamMember = async (memberId) => {
 
 // --- CUSTOMER REVIEWS API ---
 export const apiGetReviews = async () => {
+  // Tombstone filter: avoid resurrecting reviews that were deleted by admin
+  let deletedSet = new Set();
+  try {
+    const rawDeleted = JSON.parse(safeStorage.get(STORAGE_DELETED_REVIEWS_KEY) || '[]');
+    deletedSet = new Set(rawDeleted.map(String));
+  } catch {}
+
   // 1. Fetch from Supabase (Persistent multi-user cross-device database)
   try {
     const { data, error } = await supabase
       .from('reviews')
       .select('*')
       .order('created_at', { ascending: false });
-    if (!error && Array.isArray(data) && data.length > 0) {
-      safeStorage.set(STORAGE_REVIEWS_KEY, data);
-      return data;
+    if (!error && Array.isArray(data)) {
+      const filtered = data.filter(r => r && r.id && !deletedSet.has(String(r.id)));
+      safeStorage.set(STORAGE_REVIEWS_KEY, filtered);
+      return filtered;
     }
   } catch (err) {
     console.warn('Supabase fetch reviews error:', err);
   }
 
-  // 2. Fetch from serverless API /api/reviews
+  // 2. Fetch from serverless API /api/reviews fallback
   try {
     const res = await fetch('/api/reviews');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(data));
-        return data;
+        const filtered = data.filter(r => r && r.id && !deletedSet.has(String(r.id)));
+        safeStorage.set(STORAGE_REVIEWS_KEY, filtered);
+        return filtered;
       }
     }
   } catch {}
 
   // 3. Check local storage
   try {
-    const saved = localStorage.getItem(STORAGE_REVIEWS_KEY);
+    const saved = safeStorage.get(STORAGE_REVIEWS_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      const parsed = typeof saved === 'string' ? JSON.parse(saved) : saved;
+      if (Array.isArray(parsed)) {
+        return parsed.filter(r => r && r.id && !deletedSet.has(String(r.id)));
+      }
     }
   } catch {}
 
@@ -1267,11 +1279,11 @@ export const apiAddReview = async (reviewData) => {
   } catch {}
 
   // 3. Save locally immediately
-  let updated = [];
   try {
-    const current = (await apiGetReviews()) || [];
-    updated = [newReview, ...current.filter(r => r.id !== newReview.id)];
-    localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+    const raw = safeStorage.get(STORAGE_REVIEWS_KEY);
+    const current = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : [];
+    const updated = [newReview, ...current.filter(r => String(r.id) !== String(newReview.id))];
+    safeStorage.set(STORAGE_REVIEWS_KEY, updated);
   } catch {}
 
   notifyDataChanged();
@@ -1279,19 +1291,37 @@ export const apiAddReview = async (reviewData) => {
 };
 
 export const apiDeleteReview = async (reviewId) => {
-  // 1. Delete from Supabase
+  const strId = String(reviewId);
+
+  // 1. Mark in tombstone set so it can NEVER be revived
   try {
-    await supabase.from('reviews').delete().eq('id', String(reviewId));
+    const deletedList = JSON.parse(safeStorage.get(STORAGE_DELETED_REVIEWS_KEY) || '[]');
+    if (!deletedList.includes(strId)) {
+      deletedList.push(strId);
+      safeStorage.set(STORAGE_DELETED_REVIEWS_KEY, JSON.stringify(deletedList.slice(-500)));
+    }
+  } catch {}
+
+  // 2. Delete from Supabase
+  try {
+    await supabase.from('reviews').delete().eq('id', strId);
   } catch (e) {
     console.warn('Supabase delete review error:', e);
   }
 
-  // 2. Local update
-  let updated = [];
+  // 3. Delete via serverless API
   try {
-    const current = (await apiGetReviews()) || [];
-    updated = current.filter(r => String(r.id) !== String(reviewId));
-    localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+    fetch('/api/reviews?id=' + encodeURIComponent(strId), { method: 'DELETE' }).catch(() => {});
+  } catch {}
+
+  // 4. Immediately clean local cache
+  try {
+    const raw = safeStorage.get(STORAGE_REVIEWS_KEY);
+    const existing = raw ? (typeof raw === 'string' ? JSON.parse(raw) : raw) : [];
+    if (Array.isArray(existing)) {
+      const updated = existing.filter(r => String(r.id) !== strId);
+      safeStorage.set(STORAGE_REVIEWS_KEY, updated);
+    }
   } catch {}
 
   notifyDataChanged();
