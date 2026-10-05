@@ -74,6 +74,7 @@ export const STORAGE_CALC_KEY = 'tl_dynamic_calc_settings';
 export const STORAGE_LEADS_KEY = 'tunikabond_leads';
 export const STORAGE_DELETED_LEADS_KEY = 'tunikabond_deleted_leads_v1';
 export const STORAGE_ADMINS_KEY = 'tunikabond_custom_admins';
+export const STORAGE_REVIEWS_KEY = 'tunikabond_reviews_v1';
 
 export const notifyDataChanged = () => {
   if (typeof window !== 'undefined') {
@@ -927,6 +928,74 @@ export const apiDeleteTeamMember = async (memberId) => {
     const updated = current.filter(m => m.id !== memberId);
     localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
+  } catch {}
+
+  notifyDataChanged();
+  return true;
+};
+
+// --- CUSTOMER REVIEWS API ---
+export const apiGetReviews = async () => {
+  // 1. Check cloud catalog store
+  try {
+    const cloud = await cloudGetCatalogData();
+    if (cloud?.reviews && Array.isArray(cloud.reviews) && cloud.reviews.length > 0) {
+      localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(cloud.reviews));
+      return cloud.reviews;
+    }
+  } catch {}
+
+  // 2. Check local storage
+  try {
+    const saved = localStorage.getItem(STORAGE_REVIEWS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+
+  return null; // Will fallback to translation default reviews
+};
+
+export const apiAddReview = async (reviewData) => {
+  const newReview = {
+    id: reviewData.id || `rev-${Date.now()}`,
+    name: reviewData.name?.trim() || "Mijoz",
+    role: reviewData.role?.trim() || "Buyurtmachi",
+    project: reviewData.project?.trim() || "Fasad yoki naves montaji",
+    location: reviewData.location?.trim() || "Toshkent shahri",
+    rating: Number(reviewData.rating) || 5,
+    comment: reviewData.comment?.trim() || "",
+    date: reviewData.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' })
+  };
+
+  let updated = [];
+  try {
+    const current = await apiGetReviews() || [];
+    updated = [newReview, ...current];
+    localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ reviews: updated });
+  } catch {}
+
+  notifyDataChanged();
+  return { success: true, review: newReview };
+};
+
+export const apiDeleteReview = async (reviewId) => {
+  let updated = [];
+  try {
+    const current = await apiGetReviews() || [];
+    updated = current.filter(r => String(r.id) !== String(reviewId));
+    localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  // Sync to Cloud Catalog Store
+  try {
+    await cloudSaveCatalogData({ reviews: updated });
   } catch {}
 
   notifyDataChanged();
