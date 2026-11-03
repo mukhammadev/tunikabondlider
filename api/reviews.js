@@ -1,13 +1,17 @@
 /**
  * Vercel Serverless Function: /api/reviews
- * Real-time cross-device synchronization of Customer Reviews
- * - Stores reviews in serverless memory cache
- * - Dispatches reviews to Telegram channel with structured #REV_DATA tag
- * - Reads from Telegram channel feed for zero-quota permanent cross-device sync
+ * Real-time cross-device synchronization of Customer Reviews via Supabase
+ * - GET: Fetches from Supabase first, falls back to Telegram feed
+ * - POST: Saves to Supabase + sends Telegram notification
+ * - DELETE: Deletes from Supabase permanently
  */
 
-const inMemoryReviews = [];
-const deletedReviewIds = new Set();
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = 'https://iimajjknpugrmndnidte.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbWFqamtucHVncm1uZG5pZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMTc1NDUsImV4cCI6MjEwNjc5MzU0NX0.oXpDF5pSqGfBUg20V93tzzGwsVliJcm9w4ymuuyoyTQ';
+
+const getSupabase = () => createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -21,14 +25,33 @@ export default async function handler(req, res) {
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
 
-  // DELETE: Remove review
+  // DELETE: Remove review permanently from Supabase
   if (req.method === 'DELETE') {
     const targetId = String(req.query?.id || req.body?.id || '');
-    if (targetId) {
-      deletedReviewIds.add(targetId);
-      const idx = inMemoryReviews.findIndex(r => String(r.id) === targetId);
-      if (idx >= 0) inMemoryReviews.splice(idx, 1);
+    if (!targetId) {
+      return res.status(400).json({ error: "ID talab qilinadi" });
     }
+
+    try {
+      const supabase = getSupabase();
+      // Try deleting by string id first, then by numeric id
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', targetId);
+
+      if (error) {
+        console.warn('Supabase delete error:', error);
+        // Try as integer fallback
+        const numId = parseInt(targetId, 10);
+        if (!isNaN(numId)) {
+          await supabase.from('reviews').delete().eq('id', numId);
+        }
+      }
+    } catch (e) {
+      console.warn('Supabase delete exception:', e);
+    }
+
     return res.status(200).json({ success: true });
   }
 
@@ -53,18 +76,28 @@ export default async function handler(req, res) {
       timestamp: Date.now()
     };
 
-    // 1. Cache in memory
-    const existingIdx = inMemoryReviews.findIndex(r => String(r.id) === String(reviewRecord.id));
-    if (existingIdx >= 0) {
-      inMemoryReviews[existingIdx] = reviewRecord;
-    } else {
-      inMemoryReviews.unshift(reviewRecord);
+    // 1. Save to Supabase
+    try {
+      const supabase = getSupabase();
+      await supabase.from('reviews').upsert({
+        id: String(reviewRecord.id),
+        name: reviewRecord.name,
+        role: reviewRecord.role,
+        project: reviewRecord.project,
+        location: reviewRecord.location,
+        rating: reviewRecord.rating,
+        comment: reviewRecord.comment,
+        date: reviewRecord.date,
+        created_at: new Date().toISOString()
+      });
+    } catch (e) {
+      console.warn('Supabase upsert error:', e);
     }
 
     // 2. Broadcast to Telegram channel with #REV_DATA tag
     try {
       const escapedJson = JSON.stringify(reviewRecord);
-      const text = 
+      const text =
         `#REV_DATA\n\n` +
         `⭐ <b>YANGI MIJOZ SHARHI (${reviewRecord.rating}/5)</b>\n\n` +
         `👤 <b>Ism:</b> ${reviewRecord.name}\n` +
@@ -95,10 +128,24 @@ export default async function handler(req, res) {
 
   // GET: Fetch all reviews
   if (req.method === 'GET') {
-    const list = inMemoryReviews.filter(r => !deletedReviewIds.has(String(r.id)));
-    const seenIds = new Set(list.map(r => String(r.id)));
+    // Primary: Fetch from Supabase
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    // Sync from Telegram channel feed (#REV_DATA)
+      if (!error && Array.isArray(data) && data.length >= 0) {
+        return res.status(200).json(data);
+      }
+    } catch (e) {
+      console.warn('Supabase GET reviews error:', e);
+    }
+
+    // Fallback: Sync from Telegram channel feed (#REV_DATA)
+    const list = [];
+    const seenIds = new Set();
     try {
       const feedRes = await fetch('https://t.me/s/tunikabondlider_uz?q=%23REV_DATA', {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
@@ -116,10 +163,9 @@ export default async function handler(req, res) {
               .replace(/&gt;/g, '>')
               .replace(/&#39;/g, "'");
             const parsed = JSON.parse(raw);
-            if (parsed && parsed.id && parsed.comment && !seenIds.has(String(parsed.id)) && !deletedReviewIds.has(String(parsed.id))) {
+            if (parsed && parsed.id && parsed.comment && !seenIds.has(String(parsed.id))) {
               seenIds.add(String(parsed.id));
               list.push(parsed);
-              inMemoryReviews.push(parsed);
             }
           } catch {}
         }
@@ -128,9 +174,7 @@ export default async function handler(req, res) {
       console.warn("Feed fetch error:", e);
     }
 
-    // Sort newest first
     list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
     return res.status(200).json(list);
   }
 

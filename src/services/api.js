@@ -1354,8 +1354,9 @@ export const apiAddReview = async (reviewData) => {
 
 export const apiDeleteReview = async (reviewId) => {
   const strId = String(reviewId);
+  const numId = parseInt(strId, 10);
 
-  // 1. Mark in tombstone set so it can NEVER be revived
+  // 1. Mark in tombstone set so it can NEVER be revived locally
   try {
     const deletedList = JSON.parse(safeStorage.get(STORAGE_DELETED_REVIEWS_KEY) || '[]');
     if (!deletedList.includes(strId)) {
@@ -1364,14 +1365,25 @@ export const apiDeleteReview = async (reviewId) => {
     }
   } catch {}
 
-  // 2. Delete from Supabase
+  // 2. Delete from Supabase — try both string and numeric ID forms
   try {
-    await supabase.from('reviews').delete().eq('id', strId);
+    // Try string id first
+    const { error } = await supabase.from('reviews').delete().eq('id', strId);
+    // If that fails or no rows affected, try numeric id
+    if (error && !isNaN(numId)) {
+      await supabase.from('reviews').delete().eq('id', numId);
+    }
   } catch (e) {
     console.warn('Supabase delete review error:', e);
+    // Try numeric fallback on exception
+    try {
+      if (!isNaN(numId)) {
+        await supabase.from('reviews').delete().eq('id', numId);
+      }
+    } catch {}
   }
 
-  // 3. Delete via serverless API
+  // 3. Delete via serverless API (also deletes from Supabase on server-side)
   try {
     fetch('/api/reviews?id=' + encodeURIComponent(strId), { method: 'DELETE' }).catch(() => {});
   } catch {}
