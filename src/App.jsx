@@ -18,13 +18,19 @@ import { TeamSection } from './components/TeamSection';
 import { BrandIntro } from './components/BrandIntro';
 import { HomeNavigationBento } from './components/HomeNavigationBento';
 import { PageBanner } from './components/PageBanner';
-import { AdminAuthModal } from './components/admin/AdminAuthModal';
-import { AdminDashboard } from './components/admin/AdminDashboard';
 import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetSwatches } from './services/api';
 
 const VALID_PAGES = ['home', 'products', 'portfolio', 'about', 'contact'];
 
 export function App() {
+  useEffect(() => {
+    const p = window.location.pathname.toLowerCase();
+    if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/')) {
+      window.location.replace('/admin.html');
+      return;
+    }
+  }, []);
+
   const getPageFromHash = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
     if (hash === 'admin') {
@@ -101,10 +107,8 @@ export function App() {
   const [leadModalData, setLeadModalData] = useState(null);
   const [activeMasterId, setActiveMasterId] = useState(null);
 
-  // Admin CMS state
+  // Admin state
   const [currentUser, setCurrentUser] = useState(() => getStoredUser());
-  const [adminAuthModalOpen, setAdminAuthModalOpen] = useState(false);
-  const [adminDashboardOpen, setAdminDashboardOpen] = useState(false);
 
   const t = translations[currentLang] || translations.uz;
 
@@ -159,24 +163,9 @@ export function App() {
     };
   }, []);
 
-  // Admin handlers
+  // Admin handler - navigates to dedicated /admin page
   const handleOpenAdmin = () => {
-    if (currentUser) {
-      setAdminDashboardOpen(true);
-    } else {
-      setAdminAuthModalOpen(true);
-    }
-  };
-
-  const handleLoginSuccess = (user) => {
-    setCurrentUser(user);
-    setAdminDashboardOpen(true);
-  };
-
-  const handleLogout = () => {
-    clearAuthSession();
-    setCurrentUser(null);
-    setAdminDashboardOpen(false);
+    window.location.href = '/admin.html';
   };
 
   // Modals handlers
@@ -405,24 +394,6 @@ export function App() {
       <QuickActions
         onOpenLeadModal={handleOpenLeadModal}
       />
-
-      {/* Admin Auth Modal (Login / Register) */}
-      <AdminAuthModal
-        isOpen={adminAuthModalOpen}
-        onClose={() => setAdminAuthModalOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-
-      {/* Admin CMS Dashboard */}
-      {adminDashboardOpen && (
-        <AdminDashboard
-          currentUser={currentUser}
-          onLogout={handleLogout}
-          onClose={() => setAdminDashboardOpen(false)}
-          onDataChanged={loadDynamicData}
-          swatchesList={swatchesList}
-        />
-      )}
 
     </div>
   );

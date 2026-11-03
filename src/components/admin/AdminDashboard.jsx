@@ -4,7 +4,7 @@ import {
   apiGetProducts, apiCreateProduct, apiUpdateProduct, apiDeleteProduct,
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
-  apiGetAdmins, apiRegister, apiDeleteAdmin, apiUploadFile,
+  apiGetAdmins, apiRegister, apiDeleteAdmin, apiUpdateAdminPassword, apiUploadFile,
   apiGetSwatches, apiCreateSwatch, apiUpdateSwatch, apiDeleteSwatch,
   apiGetReviews, apiAddReview, apiDeleteReview,
   apiExportAllData, apiImportData
@@ -22,7 +22,7 @@ import {
   Upload, Download, FileText, Image as ImageIcon, Hammer, UserCheck,
   Palette, Bot, MessageSquare, Check, Save, Radio,
   ShieldCheck, Layers, Eye, Filter, TrendingUp, Sparkles,
-  Star, MessageSquareQuote
+  Star, MessageSquareQuote, KeyRound, Lock
 } from 'lucide-react';
 
 export const AdminDashboard = ({ 
@@ -112,6 +112,13 @@ export const AdminDashboard = ({
     password: '',
     role: 'Admin'
   });
+
+  // Password change state
+  const [passwordChangeOpen, setPasswordChangeOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   const [adminProductCat, setAdminProductCat] = useState('all');
   const [adminPortfolioCat, setAdminPortfolioCat] = useState('all');
@@ -562,13 +569,48 @@ export const AdminDashboard = ({
 
   const handleDeleteAdmin = async (adminId) => {
     if (window.confirm("Haqiqatan ham ushbu adminni tizimdan o'chirmoqchimisiz?")) {
-      const res = await apiDeleteAdmin(adminId);
+      const res = await apiDeleteAdmin(adminId, currentUser?.id || currentUser?.username);
       if (res.success) {
         setAdminsList(adminsList.filter(a => String(a.id) !== String(adminId) && a.username !== adminId));
         notifyChange();
       } else {
         alert(res.error || "Adminni o'chirishda xatolik yuz berdi");
       }
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (!passwordForm.newPassword || passwordForm.newPassword.length < 4) {
+      setPasswordError("Yangi parol kamida 4 ta belgidan iborat bo'lishi kerak.");
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError("Yangi parollar bir-biriga mos kelmadi.");
+      return;
+    }
+
+    setPasswordLoading(true);
+    const res = await apiUpdateAdminPassword(
+      currentUser?.username, 
+      passwordForm.currentPassword, 
+      passwordForm.newPassword
+    );
+    setPasswordLoading(false);
+
+    if (res.success) {
+      setPasswordSuccess("Maxfiy parolingiz muvaffaqiyatli yangilandi!");
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => {
+        setPasswordChangeOpen(false);
+        setPasswordSuccess('');
+      }, 2500);
+    } else {
+      setPasswordError(res.error || "Parolni o'zgartirishda xatolik yuz berdi");
     }
   };
 
@@ -2038,14 +2080,133 @@ export const AdminDashboard = ({
                   </p>
                 </div>
 
-                <button
-                  onClick={() => setAdminModalOpen(true)}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Yangi admin qo'shish</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPasswordChangeOpen(!passwordChangeOpen)}
+                    className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer border border-white/10"
+                  >
+                    <KeyRound className="w-4 h-4 text-amber-400" />
+                    <span>Parolni o'zgartirish</span>
+                  </button>
+
+                  <button
+                    onClick={() => setAdminModalOpen(true)}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-red to-brand-redHover text-white text-xs sm:text-sm font-bold shadow-glow-red flex items-center gap-2 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Yangi admin qo'shish</span>
+                  </button>
+                </div>
               </div>
+
+              {/* CHANGE PASSWORD CARD */}
+              {passwordChangeOpen && (
+                <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-amber-400/30 bg-amber-500/5 space-y-4 animate-fadeIn">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-400/20 text-amber-400 flex items-center justify-center">
+                        <KeyRound className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-sm">
+                          Administrator Maxfiy Parolini O'zgartirish
+                        </h3>
+                        <p className="text-xs text-slate-400">
+                          Hozirgi hisobingiz: <strong className="text-white font-mono">@{currentUser?.username}</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { setPasswordChangeOpen(false); setPasswordError(''); setPasswordSuccess(''); }}
+                      className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-400 hover:text-white"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {passwordError && (
+                    <div className="p-3 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                      <span>{passwordError}</span>
+                    </div>
+                  )}
+
+                  {passwordSuccess && (
+                    <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                      <span>{passwordSuccess}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleChangePassword} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-300 uppercase mb-1">
+                        Joriy parol
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={passwordForm.currentPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                        placeholder="Amaldagi parolingiz"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-brand-dark border border-white/15 text-white text-xs focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-300 uppercase mb-1">
+                        Yangi parol
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                        placeholder="Yangi maxfiy parol"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-brand-dark border border-white/15 text-white text-xs focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-300 uppercase mb-1">
+                        Yangi parolni tasdiqlang
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={passwordForm.confirmPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                        placeholder="Parolni qayta tering"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-brand-dark border border-white/15 text-white text-xs focus:outline-none focus:border-amber-400"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3 flex justify-end gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => { setPasswordChangeOpen(false); setPasswordError(''); setPasswordSuccess(''); }}
+                        className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs text-slate-300 hover:text-white font-bold"
+                      >
+                        Bekor qilish
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={passwordLoading}
+                        className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5"
+                      >
+                        {passwordLoading ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <>
+                            <Save className="w-3.5 h-3.5" />
+                            <span>Yangi parolni saqlash</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
 
               <div className="rounded-2xl border border-white/10 bg-brand-surface/70 overflow-hidden divide-y divide-white/10">
                 {adminsList.map((a) => (
@@ -2069,13 +2230,12 @@ export const AdminDashboard = ({
                       <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
                         Faol
                       </span>
-                      {a.username?.toLowerCase() !== 'muhammadazez' && 
-                       a.username?.toLowerCase() !== 'admin' && 
-                       a.username?.toLowerCase() !== (currentUser?.username || '').toLowerCase() && (
+                      {a.username?.toLowerCase() !== (currentUser?.username || '').toLowerCase() && 
+                       String(a.id) !== String(currentUser?.id) && (
                         <button
                           type="button"
                           onClick={() => handleDeleteAdmin(a.id)}
-                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                           title="Adminni o'chirish"
                         >
                           <Trash2 className="w-4 h-4" />

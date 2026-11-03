@@ -9,22 +9,30 @@ import { initialTeam } from '../data/team.js';
 import { swatches as initialSwatches } from '../data/swatches.js';
 import { supabase } from './supabase.js';
 
+const memoryStore = new Map();
+
 export const safeStorage = {
   get: (key) => {
     if (typeof window !== 'undefined' && window.localStorage) {
-      try { return localStorage.getItem(key); } catch {}
+      try { 
+        const val = localStorage.getItem(key);
+        if (val !== null) return val;
+      } catch {}
     }
-    return null;
+    return memoryStore.get(key) || null;
   },
   set: (key, val) => {
+    const str = typeof val === 'string' ? val : JSON.stringify(val);
     if (typeof window !== 'undefined' && window.localStorage) {
-      try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch {}
+      try { localStorage.setItem(key, str); } catch {}
     }
+    memoryStore.set(key, str);
   },
   remove: (key) => {
     if (typeof window !== 'undefined' && window.localStorage) {
       try { localStorage.removeItem(key); } catch {}
     }
+    memoryStore.delete(key);
   }
 };
 
@@ -106,23 +114,21 @@ export const notifyDataChanged = () => {
 };
 
 export const getStoredAdmins = () => {
-  const defaults = [
-    { id: 'admin-1', username: 'Muhammadazez', fullName: 'Muhammad Aziz', role: 'Super Admin', password: 'admin123' },
-    { id: 'admin-2', username: 'admin', fullName: 'Bosh Administrator', role: 'Super Admin', password: 'admin123' }
-  ];
   try {
-    const custom = JSON.parse(localStorage.getItem(STORAGE_ADMINS_KEY) || '[]');
-    const map = new Map();
-    defaults.forEach(a => map.set(a.username.toLowerCase(), a));
+    const raw = safeStorage.get(STORAGE_ADMINS_KEY);
+    if (!raw) return [];
+    const custom = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (Array.isArray(custom)) {
-      custom.forEach(a => {
-        if (a && a.username) map.set(a.username.toLowerCase(), a);
-      });
+      return custom.filter(a => a && a.username);
     }
-    return Array.from(map.values());
+    return [];
   } catch {
-    return defaults;
+    return [];
   }
+};
+
+export const apiHasAdmins = () => {
+  return getStoredAdmins().length > 0;
 };
 
 // --- AUTH API ---
@@ -130,6 +136,10 @@ export const apiLogin = async (username, password) => {
   const cleanUser = (username || '').trim();
   const cleanPass = (password || '').trim();
   const lowerUser = cleanUser.toLowerCase();
+
+  if (!cleanUser || !cleanPass) {
+    return { success: false, error: "Login va parolni kiriting." };
+  }
 
   // 1. Try remote backend if reachable
   try {
@@ -149,27 +159,30 @@ export const apiLogin = async (username, password) => {
       }
     }
   } catch (err) {
-    // Backend offline or 404 on Vercel -> proceed to local check
+    // Backend offline -> proceed to local check
   }
 
-  // 2. Client-side local check (case-insensitive, trims spaces, handles Uzbek spelling)
+  // 2. Client-side local check
   const admins = getStoredAdmins();
-  const matched = admins.find(a => {
-    const u = (a.username || '').toLowerCase();
-    return u === lowerUser ||
-      (lowerUser === 'muhammadaziz' && u === 'muhammadazez') ||
-      (lowerUser === 'muhammad' && u === 'muhammadazez');
-  });
+  if (admins.length === 0) {
+    return { 
+      success: false, 
+      isUninitialized: true,
+      error: "Tizimda administrator hisobi mavjud emas. Iltimos, o'zingiz yangi login va parol yarating." 
+    };
+  }
+
+  const matched = admins.find(a => (a.username || '').toLowerCase() === lowerUser);
 
   if (matched) {
-    if (matched.password === cleanPass || cleanPass === 'admin123') {
+    if (matched.password === cleanPass) {
       const safeUser = {
-        id: matched.id || 'admin-1',
+        id: matched.id || `admin-${Date.now()}`,
         username: matched.username,
         fullName: matched.fullName || matched.username,
         role: matched.role || 'Super Admin'
       };
-      setAuthSession(`mock-token-${Date.now()}`, safeUser);
+      setAuthSession(`tl-token-${Date.now()}`, safeUser);
       return { success: true, user: safeUser };
     }
     return { success: false, error: "Kiritilgan parol noto'g'ri. Iltimos, qayta tekshiring." };
@@ -177,7 +190,7 @@ export const apiLogin = async (username, password) => {
 
   return { 
     success: false, 
-    error: "Bunday foydalanuvchi topilmadi. (Standart login: Muhammadazez yoki admin, parol: admin123)" 
+    error: "Bunday loginli administrator topilmadi." 
   };
 };
 
@@ -186,19 +199,36 @@ export const apiRegister = async (username, password, fullName, role = 'Admin') 
   const cleanPass = (password || '').trim();
   const cleanName = (fullName || '').trim() || cleanUser;
 
+  if (!cleanUser || !cleanPass) {
+    return { success: false, error: "Login va maxfiy parol kiritilishi shart." };
+  }
+
+  if (cleanPass.length < 4) {
+    return { success: false, error: "Parol kamida 4 ta belgidan iborat bo'lishi kerak." };
+  }
+
+  const existing = getStoredAdmins();
+  const alreadyExists = existing.some(a => (a.username || '').toLowerCase() === cleanUser.toLowerCase());
+  if (alreadyExists) {
+    return { success: false, error: "Bu logindagi administrator allaqachon mavjud. Iltimos, boshqa login tanlang." };
+  }
+
+  const isFirstAdmin = existing.length === 0;
+
   const newAdmin = {
     id: `admin-${Date.now()}`,
     username: cleanUser,
     fullName: cleanName,
-    role: role || 'Admin',
-    password: cleanPass
+    role: isFirstAdmin ? 'Super Admin' : (role || 'Admin'),
+    password: cleanPass,
+    createdAt: new Date().toISOString()
   };
 
   try {
     const res = await apiFetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: cleanUser, password: cleanPass, fullName: cleanName, role })
+      body: JSON.stringify({ username: cleanUser, password: cleanPass, fullName: cleanName, role: newAdmin.role })
     });
     if (res.ok) {
       const data = await res.json();
@@ -208,16 +238,45 @@ export const apiRegister = async (username, password, fullName, role = 'Admin') 
     }
   } catch (err) {}
 
-  // Always save locally to ensure offline & Vercel persistence
+  // Save to persistent storage
   try {
-    const existing = JSON.parse(localStorage.getItem(STORAGE_ADMINS_KEY) || '[]');
     const filtered = existing.filter(a => (a.username || '').toLowerCase() !== cleanUser.toLowerCase());
     const updated = [...filtered, newAdmin];
-    localStorage.setItem(STORAGE_ADMINS_KEY, JSON.stringify(updated));
+    safeStorage.set(STORAGE_ADMINS_KEY, updated);
   } catch {}
 
   notifyDataChanged();
   return { success: true, user: newAdmin };
+};
+
+export const apiUpdateAdminPassword = async (username, currentPassword, newPassword) => {
+  const cleanUser = (username || '').trim().toLowerCase();
+  const cleanCurr = (currentPassword || '').trim();
+  const cleanNew = (newPassword || '').trim();
+
+  if (!cleanNew || cleanNew.length < 4) {
+    return { success: false, error: "Yangi parol kamida 4 ta belgidan iborat bo'lishi kerak." };
+  }
+
+  const existing = getStoredAdmins();
+  const target = existing.find(a => (a.username || '').toLowerCase() === cleanUser);
+  if (!target) {
+    return { success: false, error: "Administrator topilmadi." };
+  }
+
+  if (target.password !== cleanCurr) {
+    return { success: false, error: "Joriy parol noto'g'ri kiritildi." };
+  }
+
+  target.password = cleanNew;
+  target.updatedAt = new Date().toISOString();
+
+  try {
+    safeStorage.set(STORAGE_ADMINS_KEY, existing);
+  } catch {}
+
+  notifyDataChanged();
+  return { success: true };
 };
 
 export const apiGetAdmins = async () => {
@@ -233,15 +292,18 @@ export const apiGetAdmins = async () => {
   return getStoredAdmins().map(({ password, ...rest }) => rest);
 };
 
-export const apiDeleteAdmin = async (adminId) => {
+export const apiDeleteAdmin = async (adminId, currentUserId = null) => {
   try {
-    const existing = JSON.parse(localStorage.getItem(STORAGE_ADMINS_KEY) || '[]');
+    const existing = getStoredAdmins();
     const target = existing.find(a => String(a.id) === String(adminId) || a.username === adminId);
-    if (target && (target.username.toLowerCase() === 'muhammadazez' || target.username.toLowerCase() === 'admin')) {
-      return { success: false, error: "Asosiy administratorni o'chirib bo'lmaydi" };
+    if (!target) {
+      return { success: false, error: "Admin topilmadi." };
+    }
+    if (currentUserId && (String(target.id) === String(currentUserId) || target.username === currentUserId)) {
+      return { success: false, error: "O'zingiz kirib turgan hisobni o'chira olmaysiz." };
     }
     const updated = existing.filter(a => String(a.id) !== String(adminId) && a.username !== adminId);
-    localStorage.setItem(STORAGE_ADMINS_KEY, JSON.stringify(updated));
+    safeStorage.set(STORAGE_ADMINS_KEY, updated);
     notifyDataChanged();
     return { success: true };
   } catch (err) {

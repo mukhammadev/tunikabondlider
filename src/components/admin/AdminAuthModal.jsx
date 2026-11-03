@@ -6,8 +6,8 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   if (!isOpen) return null;
 
   const [isRegisterTab, setIsRegisterTab] = useState(false);
-  const [username, setUsername] = useState('Muhammadazez');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -172,7 +172,7 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
           {/* Quick helper tip */}
           {!isRegisterTab && (
             <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[11px] text-slate-600 dark:text-slate-400">
-              <span className="font-bold text-brand-red">Standart Super Admin:</span> Login: <code className="text-slate-900 dark:text-white font-mono">Muhammadazez</code> | Parol: <code className="text-slate-900 dark:text-white font-mono">admin123</code>
+              <span className="font-bold text-brand-red">Xavfsizlik:</span> Faqat korxona xodimlari va administratorlar uchun mo'ljallangan.
             </div>
           )}
 
