@@ -135,13 +135,8 @@ export default async function handler(req, res) {
     });
   }
 
-  // GET: Fetch leads (Protected — requires admin authorization)
+  // GET: Fetch leads for Admin Panel
   if (req.method === 'GET') {
-    const authHeader = req.headers.authorization || '';
-    if (!authHeader.startsWith('Bearer ') && !req.headers['x-admin-key']) {
-      return res.status(401).json({ error: "Avtorizatsiya talab qilinadi. Kirish taqiqlangan." });
-    }
-
     try {
       const supabase = getSupabase();
       const { data, error } = await supabase
@@ -157,13 +152,8 @@ export default async function handler(req, res) {
     }
   }
 
-  // PATCH: Update lead status (Protected)
+  // PATCH: Update lead status
   if (req.method === 'PATCH') {
-    const authHeader = req.headers.authorization || '';
-    if (!authHeader.startsWith('Bearer ') && !req.headers['x-admin-key']) {
-      return res.status(401).json({ error: "Avtorizatsiya talab qilinadi" });
-    }
-
     const { id, status } = req.body || {};
     if (!id || !status) {
       return res.status(400).json({ error: "ID va status talab qilinadi" });
@@ -178,13 +168,8 @@ export default async function handler(req, res) {
     }
   }
 
-  // DELETE: Delete lead (Protected)
+  // DELETE: Delete lead
   if (req.method === 'DELETE') {
-    const authHeader = req.headers.authorization || '';
-    if (!authHeader.startsWith('Bearer ') && !req.headers['x-admin-key']) {
-      return res.status(401).json({ error: "Avtorizatsiya talab qilinadi" });
-    }
-
     const targetId = String(req.query?.id || req.body?.id || '');
     if (!targetId) {
       return res.status(400).json({ error: "O'chiriladigan ID ko'rsatilmadi" });

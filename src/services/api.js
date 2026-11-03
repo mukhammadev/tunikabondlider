@@ -397,9 +397,9 @@ export const apiGetLeads = async () => {
   let backendLeads = [];
   // 2. Fetch from serverless API /api/leads or /api/leads/
   try {
-    let res = await fetch('/api/leads');
+    let res = await fetch('/api/leads', { headers: getHeaders() });
     if (!res.ok) {
-      res = await apiFetch('/api/leads/');
+      res = await apiFetch('/api/leads/', { headers: getHeaders() });
     }
     if (res.ok) {
       const data = await res.json();

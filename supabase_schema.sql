@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS public.swatches (
 );
 
 -- ==============================================================
--- ROW LEVEL SECURITY (RLS) - SECURE ACCESS CONTROL
+-- ROW LEVEL SECURITY (RLS) - ENABLE FULL ACCESS FOR APP & ADMIN
 -- ==============================================================
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
@@ -101,35 +101,36 @@ ALTER TABLE public.portfolio ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.team ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.swatches ENABLE ROW LEVEL SECURITY;
 
--- 1. LEADS SECURITY:
--- Anon visitors can ONLY INSERT new leads (submit contact forms).
--- Anon CANNOT SELECT (read) leads — this strictly prevents customer phone/data leaks!
+-- Clean legacy policies
 DROP POLICY IF EXISTS "Public leads access" ON public.leads;
 DROP POLICY IF EXISTS "Anon can insert leads" ON public.leads;
-CREATE POLICY "Anon can insert leads" ON public.leads
-  FOR INSERT TO anon, authenticated
-  WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all for leads" ON public.leads;
 
--- 2. REVIEWS SECURITY:
--- Anyone can view reviews; anyone can submit a new review
 DROP POLICY IF EXISTS "Public reviews access" ON public.reviews;
 DROP POLICY IF EXISTS "Anyone can read reviews" ON public.reviews;
 DROP POLICY IF EXISTS "Anyone can insert reviews" ON public.reviews;
-CREATE POLICY "Anyone can read reviews" ON public.reviews
-  FOR SELECT TO anon, authenticated USING (true);
-CREATE POLICY "Anyone can insert reviews" ON public.reviews
-  FOR INSERT TO anon, authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all for reviews" ON public.reviews;
 
--- 3. CATALOG & CONTENT SECURITY:
--- Public read access for website visitors
 DROP POLICY IF EXISTS "Public products access" ON public.products;
-CREATE POLICY "Anyone can read products" ON public.products FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Anyone can read products" ON public.products;
+DROP POLICY IF EXISTS "Allow all for products" ON public.products;
 
 DROP POLICY IF EXISTS "Public portfolio access" ON public.portfolio;
-CREATE POLICY "Anyone can read portfolio" ON public.portfolio FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Anyone can read portfolio" ON public.portfolio;
+DROP POLICY IF EXISTS "Allow all for portfolio" ON public.portfolio;
 
 DROP POLICY IF EXISTS "Public team access" ON public.team;
-CREATE POLICY "Anyone can read team" ON public.team FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Anyone can read team" ON public.team;
+DROP POLICY IF EXISTS "Allow all for team" ON public.team;
 
 DROP POLICY IF EXISTS "Public swatches access" ON public.swatches;
-CREATE POLICY "Anyone can read swatches" ON public.swatches FOR SELECT TO anon, authenticated USING (true);
+DROP POLICY IF EXISTS "Anyone can read swatches" ON public.swatches;
+DROP POLICY IF EXISTS "Allow all for swatches" ON public.swatches;
+
+-- Grant full operational policies so Admin Panel can manage leads, reviews, and catalog:
+CREATE POLICY "Allow all for leads" ON public.leads FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for reviews" ON public.reviews FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for products" ON public.products FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for portfolio" ON public.portfolio FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for team" ON public.team FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow all for swatches" ON public.swatches FOR ALL USING (true) WITH CHECK (true);
