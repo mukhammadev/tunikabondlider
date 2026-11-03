@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS public.swatches (
 );
 
 -- ==============================================================
--- ROW LEVEL SECURITY (RLS) - Allow public read and write for app
+-- ROW LEVEL SECURITY (RLS) - SECURE ACCESS CONTROL
 -- ==============================================================
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
@@ -101,9 +101,35 @@ ALTER TABLE public.portfolio ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.team ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.swatches ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public leads access" ON public.leads FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public reviews access" ON public.reviews FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public products access" ON public.products FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public portfolio access" ON public.portfolio FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public team access" ON public.team FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public swatches access" ON public.swatches FOR ALL USING (true) WITH CHECK (true);
+-- 1. LEADS SECURITY:
+-- Anon visitors can ONLY INSERT new leads (submit contact forms).
+-- Anon CANNOT SELECT (read) leads — this strictly prevents customer phone/data leaks!
+DROP POLICY IF EXISTS "Public leads access" ON public.leads;
+DROP POLICY IF EXISTS "Anon can insert leads" ON public.leads;
+CREATE POLICY "Anon can insert leads" ON public.leads
+  FOR INSERT TO anon, authenticated
+  WITH CHECK (true);
+
+-- 2. REVIEWS SECURITY:
+-- Anyone can view reviews; anyone can submit a new review
+DROP POLICY IF EXISTS "Public reviews access" ON public.reviews;
+DROP POLICY IF EXISTS "Anyone can read reviews" ON public.reviews;
+DROP POLICY IF EXISTS "Anyone can insert reviews" ON public.reviews;
+CREATE POLICY "Anyone can read reviews" ON public.reviews
+  FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Anyone can insert reviews" ON public.reviews
+  FOR INSERT TO anon, authenticated WITH CHECK (true);
+
+-- 3. CATALOG & CONTENT SECURITY:
+-- Public read access for website visitors
+DROP POLICY IF EXISTS "Public products access" ON public.products;
+CREATE POLICY "Anyone can read products" ON public.products FOR SELECT TO anon, authenticated USING (true);
+
+DROP POLICY IF EXISTS "Public portfolio access" ON public.portfolio;
+CREATE POLICY "Anyone can read portfolio" ON public.portfolio FOR SELECT TO anon, authenticated USING (true);
+
+DROP POLICY IF EXISTS "Public team access" ON public.team;
+CREATE POLICY "Anyone can read team" ON public.team FOR SELECT TO anon, authenticated USING (true);
+
+DROP POLICY IF EXISTS "Public swatches access" ON public.swatches;
+CREATE POLICY "Anyone can read swatches" ON public.swatches FOR SELECT TO anon, authenticated USING (true);

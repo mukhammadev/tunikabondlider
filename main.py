@@ -29,8 +29,8 @@ TEAM_FILE = os.path.join(DATA_DIR, "team.json")
 CALC_FILE = os.path.join(DATA_DIR, "calculator.json")
 SWATCHES_FILE = os.path.join(DATA_DIR, "swatches.json")
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "-1004415750690")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 ACTIVE_TOKENS = {}  # token -> admin_info
 

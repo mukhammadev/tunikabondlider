@@ -341,11 +341,8 @@ export const apiGetStats = async () => {
   };
 };
 
-export const CLOUD_LEADS_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fc19c245604c';
-export const CLOUD_CATALOG_URL = 'https://api.restful-api.dev/objects/ff808181a09d98f701a0fc1b57946059';
-
 export const cloudPushLead = async (newLead) => {
-  // 1. Primary: Save directly to Supabase leads table
+  // Primary: Save directly to Supabase leads table
   try {
     const supaLead = {
       id: String(newLead.id || `lead-${Date.now()}`),
@@ -360,80 +357,15 @@ export const cloudPushLead = async (newLead) => {
       created_at: newLead.timestamp || newLead.date || new Date().toISOString()
     };
     await supabase.from('leads').upsert(supaLead);
+    return true;
   } catch (e) {
     console.warn('Supabase push lead error:', e);
-  }
-
-  // 2. Secondary fallback: Cloud leads store
-  try {
-    let cloudLeads = [];
-    try {
-      const res = await fetch(CLOUD_LEADS_URL);
-      if (res.ok) {
-        const json = await res.json();
-        if (json?.data?.leads && Array.isArray(json.data.leads)) {
-          cloudLeads = json.data.leads;
-        }
-      }
-    } catch {}
-
-    const filtered = cloudLeads.filter(l => String(l.id) !== String(newLead.id));
-    const updated = [newLead, ...filtered].slice(0, 100);
-
-    await fetch(CLOUD_LEADS_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'tunikabond_leads_v2',
-        data: { leads: updated }
-      })
-    });
-    return true;
-  } catch (e) {
-    console.warn('cloudPushLead error:', e);
     return false;
   }
 };
 
-export const cloudGetCatalogData = async () => {
-  try {
-    const res = await fetch(CLOUD_CATALOG_URL);
-    if (res.ok) {
-      const json = await res.json();
-      return json?.data || null;
-    }
-  } catch (e) {
-    console.warn('cloudGetCatalogData error:', e);
-  }
-  return null;
-};
-
-export const cloudSaveCatalogData = async (partialData) => {
-  try {
-    let existing = {};
-    try {
-      const res = await fetch(CLOUD_CATALOG_URL);
-      if (res.ok) {
-        const json = await res.json();
-        existing = json?.data || {};
-      }
-    } catch {}
-
-    const merged = { ...existing, ...partialData };
-    await fetch(CLOUD_CATALOG_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'tunikabond_catalog_store',
-        data: merged
-      })
-    });
-    return true;
-  } catch (e) {
-    console.warn('cloudSaveCatalogData error:', e);
-    return false;
-  }
-};
+export const cloudGetCatalogData = async () => null;
+export const cloudSaveCatalogData = async () => true;
 
 // --- LEADS API ---
 export const apiGetLeads = async () => {
@@ -477,54 +409,9 @@ export const apiGetLeads = async () => {
     }
   } catch {}
 
-  // 3. Direct client-side fetch from Telegram Bot getUpdates (works on any client without server)
-  let telegramBotLeads = [];
-  try {
-    const BOT_TOKEN = "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
-    const uRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?limit=50`);
-    if (uRes.ok) {
-      const uJson = await uRes.json();
-      if (uJson.ok && Array.isArray(uJson.result)) {
-        uJson.result.forEach(u => {
-          const m = u.message;
-          if (m && m.from && !m.from.is_bot) {
-            const fromName = `${m.from.first_name || ''} ${m.from.last_name || ''}`.trim() || m.from.username || 'Telegram Mijoz';
-            const text = (m.text || '').trim();
-            const contactPhone = m.contact?.phone_number || '';
-            const phoneMatch = text.match(/\+?998\s*\d{2}\s*\d{3}\s*\d{2}\s*\d{2}|\b\d{9}\b/);
-            const phone = contactPhone || (phoneMatch ? phoneMatch[0] : (m.from.username ? `@${m.from.username}` : `ID: ${m.from.id}`));
-
-            telegramBotLeads.push({
-              id: `tg-direct-${m.message_id}-${m.date}`,
-              name: fromName,
-              phone: phone,
-              service: "Telegram Bot Murojaati",
-              message: text !== '/start' ? text : "Botga /start bosdi",
-              source: m.from.username ? `Telegram Bot (@${m.from.username})` : `Telegram Bot (${m.from.id})`,
-              timestamp: new Date(m.date * 1000).toISOString(),
-              status: "new"
-            });
-          }
-        });
-      }
-    }
-  } catch {}
-
   let localLeads = [];
   try {
     localLeads = JSON.parse(localStorage.getItem(STORAGE_LEADS_KEY) || '[]');
-  } catch {}
-
-  // 4. Fetch from Cloud Leads Store if accessible
-  let cloudLeads = [];
-  try {
-    const cRes = await fetch(CLOUD_LEADS_URL);
-    if (cRes.ok) {
-      const cJson = await cRes.json();
-      if (cJson?.data?.leads && Array.isArray(cJson.data.leads)) {
-        cloudLeads = cJson.data.leads;
-      }
-    }
   } catch {}
 
   // Local statuses map so admin status changes are preserved
@@ -546,7 +433,7 @@ export const apiGetLeads = async () => {
   } catch {}
 
   const map = new Map();
-  [...supaLeads, ...backendLeads, ...cloudLeads, ...telegramBotLeads, ...localLeads].forEach(l => {
+  [...supaLeads, ...backendLeads, ...localLeads].forEach(l => {
     if (l && (l.id || l.phone)) {
       if (l.id && deletedSet.has(String(l.id))) {
         return;

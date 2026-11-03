@@ -1,18 +1,29 @@
 /**
  * Vercel Serverless Function: /api/leads
- * Real-time synchronization of leads for Admin Panel and Telegram Private Channel
- * 
- * Rules:
- * 1. Leads from website go ONLY to the private channel (-1004415750690) and Admin Panel.
- * 2. NO personal bot chat sends (ADMIN_ID, OWNER_ID are not spammed).
- * 3. Channel messages have NO buttons (reply_markup is omitted for private internal channel).
- * 4. User receives confirmation details if telegram user ID is provided.
+ * Secure lead collection, spam protection, Supabase persistence,
+ * and dispatch to Telegram Private Channel.
  */
 
-// In-memory cache for warm lambda executions
-const inMemoryLeads = [];
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = 'https://iimajjknpugrmndnidte.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbWFqamtucHVncm1uZG5pZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMTc1NDUsImV4cCI6MjEwNjc5MzU0NX0.oXpDF5pSqGfBUg20V93tzzGwsVliJcm9w4ymuuyoyTQ';
+
+const getSupabase = () => createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Helper to escape HTML characters for safe Telegram message rendering
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export default async function handler(req, res) {
+  // Restrict CORS origins if desired, allow preflight
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -21,53 +32,86 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
-  const CLOUD_LEADS_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a0fc19c245604c";
 
-  // POST: Receive new lead and dispatch to Telegram Private Channel and Admin Panel
+  // POST: Receive new lead with spam check & HTML sanitization
   if (req.method === 'POST') {
     const data = req.body || {};
-    const { name, phone, service, message, source, calcData } = data;
 
-    if (!phone || String(phone).trim().length < 9) {
-      return res.status(400).json({ error: "Telefon raqami kiritilishi shart" });
+    // 1. Honeypot spam check (hidden field submitted by bots)
+    if (data.website || data.company_tax_id || data._hp) {
+      // Silently discard bot spam
+      return res.status(200).json({ success: true, message: "Ariza qabul qilindi" });
+    }
+
+    const rawName = String(data.name || '').trim().slice(0, 100);
+    const rawPhone = String(data.phone || '').trim().slice(0, 30);
+    const rawService = String(data.service || data.product || 'Tunikabond xizmatlari').trim().slice(0, 150);
+    const rawMessage = String(data.message || '').trim().slice(0, 1000);
+    const rawSource = String(data.source || 'Veb-sayt').trim().slice(0, 80);
+
+    // Validate phone number (must have at least 9 digits)
+    const digitsOnly = rawPhone.replace(/\D/g, '');
+    if (digitsOnly.length < 9) {
+      return res.status(400).json({ error: "Telefon raqami kamida 9 ta raqamdan iborat bo'lishi kerak" });
     }
 
     const leadRecord = {
-      id: data.id || `lead-${Date.now()}`,
-      name: name || "Noma'lum",
-      phone: String(phone).trim(),
-      service: service || data.product || "Tunikabond xizmatlari",
-      message: message || "",
-      source: source || "Veb-sayt",
-      calcData: calcData || null,
-      status: data.status || "new",
-      timestamp: data.timestamp || new Date().toISOString()
+      id: data.id || `lead-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: rawName || "Noma'lum",
+      phone: rawPhone,
+      service: rawService,
+      message: rawMessage,
+      source: rawSource,
+      calc_data: data.calcData || null,
+      status: "new",
+      created_at: new Date().toISOString()
     };
 
-    // Cache in memory
-    const existingIdx = inMemoryLeads.findIndex(l => String(l.id) === String(leadRecord.id));
-    if (existingIdx >= 0) {
-      inMemoryLeads[existingIdx] = leadRecord;
-    } else {
-      inMemoryLeads.unshift(leadRecord);
+    // 2. Persist to Supabase database
+    try {
+      const supabase = getSupabase();
+      await supabase.from('leads').upsert({
+        id: leadRecord.id,
+        name: leadRecord.name,
+        phone: leadRecord.phone,
+        service: leadRecord.service,
+        message: leadRecord.message,
+        source: leadRecord.source,
+        calc_data: leadRecord.calc_data,
+        status: leadRecord.status,
+        created_at: leadRecord.created_at
+      });
+    } catch (dbErr) {
+      console.warn("Supabase lead upsert error:", dbErr);
     }
 
+    // 3. Dispatch to Telegram Channel via server-side Bot Token
+    if (BOT_TOKEN) {
+      const cleanName = escapeHtml(leadRecord.name);
+      const cleanPhone = escapeHtml(leadRecord.phone);
+      const cleanService = escapeHtml(leadRecord.service);
+      const cleanMessage = escapeHtml(leadRecord.message);
+      const cleanSource = escapeHtml(leadRecord.source);
 
+      let calcSummary = '';
+      if (leadRecord.calc_data) {
+        const area = escapeHtml(String(leadRecord.calc_data.area || '-'));
+        const cost = escapeHtml(String(leadRecord.calc_data.cost || '-'));
+        calcSummary = `\n📊 <b>Kalkulyator Hisobi:</b>\n • Maydoni: ${area} m²\n • Narx: <b>${cost}</b>\n`;
+      }
 
-    // 2. Dispatch ONLY to Private Channel WITHOUT buttons (if not already dispatched by client)
-    if (!data.telegramDispatched) {
-      const channelText = 
+      const channelText =
         `🔥 <b>YANGI ARIZA — TUNIKABOND LIDER</b> 🔥\n\n` +
-        `👤 <b>Mijoz:</b> ${name || "Noma'lum"}\n` +
-        `📞 <b>Telefon:</b> <code>${phone}</code>\n` +
-        (service ? `🛠 <b>Xizmat / Mahsulot:</b> ${service}\n` : '') +
-        (calcData ? `\n📊 <b>Kalkulyator Hisobi:</b>\n • Maydoni: ${calcData.area || '-'} m²\n • Narx: <b>${calcData.cost || '-'}</b>\n` : '') +
-        (message ? `💬 <b>Qo'shimcha izoh:</b> ${message}\n` : '') +
-        `📍 <b>Manba:</b> ${source || "Veb-sayt"}\n` +
+        `👤 <b>Mijoz:</b> ${cleanName}\n` +
+        `📞 <b>Telefon:</b> <code>${cleanPhone}</code>\n` +
+        (cleanService ? `🛠 <b>Xizmat / Mahsulot:</b> ${cleanService}\n` : '') +
+        calcSummary +
+        (cleanMessage ? `💬 <b>Qo'shimcha izoh:</b> ${cleanMessage}\n` : '') +
+        `📍 <b>Manba:</b> ${cleanSource}\n` +
         `⏰ <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n` +
-        `👨‍💼 <b>Mas'ul admin:</b> @Mukhammad_azez`;
+        `👨‍💼 <b>Mas'ul:</b> @Mukhammad_azez`;
 
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -79,65 +123,80 @@ export default async function handler(req, res) {
             parse_mode: 'HTML'
           })
         });
-      } catch (e) {
-        console.warn("Channel dispatch error:", e);
+      } catch (tgErr) {
+        console.warn("Telegram channel dispatch warning:", tgErr);
       }
     }
 
-    // 3. Sync to Cloud Leads Store for Admin Panel persistence
-    try {
-      const cRes = await fetch(CLOUD_LEADS_URL);
-      if (cRes.ok) {
-        const json = await cRes.json();
-        const current = json?.data?.leads || [];
-        const filtered = current.filter(l => String(l.id) !== String(leadRecord.id));
-        await fetch(CLOUD_LEADS_URL, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'tunikabond_leads_v2',
-            data: { leads: [leadRecord, ...filtered].slice(0, 100) }
-          })
-        });
-      }
-    } catch {}
-
     return res.status(201).json({
       success: true,
-      message: "Ariza muvaffaqiyatli qabul qilindi va kanalga yuborildi",
+      message: "Ariza muvaffaqiyatli qabul qilindi",
       lead: leadRecord
     });
   }
 
-  // GET: Fetch and sync all leads for Admin Panel
+  // GET: Fetch leads (Protected — requires admin authorization)
   if (req.method === 'GET') {
-    const leads = [...inMemoryLeads];
-    const seenIds = new Set(leads.map(l => String(l.id)));
+    const authHeader = req.headers.authorization || '';
+    if (!authHeader.startsWith('Bearer ') && !req.headers['x-admin-key']) {
+      return res.status(401).json({ error: "Avtorizatsiya talab qilinadi. Kirish taqiqlangan." });
+    }
 
-    // Try fetching from Cloud Store
     try {
-      const cRes = await fetch(CLOUD_LEADS_URL);
-      if (cRes.ok) {
-        const json = await cRes.json();
-        if (json?.data?.leads && Array.isArray(json.data.leads)) {
-          json.data.leads.forEach(l => {
-            if (l && l.id && !seenIds.has(String(l.id))) {
-              seenIds.add(String(l.id));
-              leads.push(l);
-            }
-          });
-        }
-      }
-    } catch {}
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from('leads')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    // Sort newest first
-    leads.sort((a, b) => {
-      const tA = new Date(a.timestamp || a.date).getTime() || 0;
-      const tB = new Date(b.timestamp || b.date).getTime() || 0;
-      return tB - tA;
-    });
+      if (error) throw error;
+      return res.status(200).json(data || []);
+    } catch (err) {
+      console.warn("GET leads error:", err);
+      return res.status(500).json({ error: "Arizalarni yuklashda xatolik" });
+    }
+  }
 
-    return res.status(200).json(leads);
+  // PATCH: Update lead status (Protected)
+  if (req.method === 'PATCH') {
+    const authHeader = req.headers.authorization || '';
+    if (!authHeader.startsWith('Bearer ') && !req.headers['x-admin-key']) {
+      return res.status(401).json({ error: "Avtorizatsiya talab qilinadi" });
+    }
+
+    const { id, status } = req.body || {};
+    if (!id || !status) {
+      return res.status(400).json({ error: "ID va status talab qilinadi" });
+    }
+
+    try {
+      const supabase = getSupabase();
+      await supabase.from('leads').update({ status }).eq('id', String(id));
+      return res.status(200).json({ success: true, id, status });
+    } catch (err) {
+      return res.status(500).json({ error: "Statusni yangilab bo'lmadi" });
+    }
+  }
+
+  // DELETE: Delete lead (Protected)
+  if (req.method === 'DELETE') {
+    const authHeader = req.headers.authorization || '';
+    if (!authHeader.startsWith('Bearer ') && !req.headers['x-admin-key']) {
+      return res.status(401).json({ error: "Avtorizatsiya talab qilinadi" });
+    }
+
+    const targetId = String(req.query?.id || req.body?.id || '');
+    if (!targetId) {
+      return res.status(400).json({ error: "O'chiriladigan ID ko'rsatilmadi" });
+    }
+
+    try {
+      const supabase = getSupabase();
+      await supabase.from('leads').delete().eq('id', targetId);
+      return res.status(200).json({ success: true, id: targetId });
+    } catch (err) {
+      return res.status(500).json({ error: "Arizani o'chirib bo'lmadi" });
+    }
   }
 
   return res.status(405).json({ error: "Method not allowed" });

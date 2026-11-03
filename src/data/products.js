@@ -96,7 +96,7 @@ export const products = [
       en: "Class A2 non-combustible aluminum composite panel engineered for commercial towers and public complexes."
     },
     thickness: "4.0 mm (0.40 mm alyumin)",
-    coating: "Flüoropolimer PVDF",
+    coating: "Fluoropolimer PVDF",
     warranty: "15 yil",
     badge: "Premium Standart",
     priceRange: "235,000 - 310,000 so'm / m²",

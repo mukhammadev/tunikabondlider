@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
 
   // DELETE: Remove review permanently from Supabase
@@ -95,29 +95,31 @@ export default async function handler(req, res) {
     }
 
     // 2. Broadcast to Telegram channel with #REV_DATA tag
-    try {
-      const escapedJson = JSON.stringify(reviewRecord);
-      const text =
-        `#REV_DATA\n\n` +
-        `⭐ <b>YANGI MIJOZ SHARHI (${reviewRecord.rating}/5)</b>\n\n` +
-        `👤 <b>Ism:</b> ${reviewRecord.name}\n` +
-        `💼 <b>Obyekt:</b> ${reviewRecord.project}\n` +
-        `📍 <b>Manzil:</b> ${reviewRecord.location}\n` +
-        `💬 <b>Sharh:</b> <i>"${reviewRecord.comment}"</i>\n` +
-        `⏰ <b>Sana:</b> ${reviewRecord.date}\n\n` +
-        `<code>${escapedJson}</code>`;
+    if (BOT_TOKEN) {
+      try {
+        const escapedJson = JSON.stringify(reviewRecord);
+        const text =
+          `#REV_DATA\n\n` +
+          `⭐ <b>YANGI MIJOZ SHARHI (${reviewRecord.rating}/5)</b>\n\n` +
+          `👤 <b>Ism:</b> ${reviewRecord.name}\n` +
+          `💼 <b>Obyekt:</b> ${reviewRecord.project}\n` +
+          `📍 <b>Manzil:</b> ${reviewRecord.location}\n` +
+          `💬 <b>Sharh:</b> <i>"${reviewRecord.comment}"</i>\n` +
+          `⏰ <b>Sana:</b> ${reviewRecord.date}\n\n` +
+          `<code>${escapedJson}</code>`;
 
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CHANNEL_ID,
-          text: text,
-          parse_mode: 'HTML'
-        })
-      });
-    } catch (err) {
-      console.warn("Review dispatch error:", err);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: CHANNEL_ID,
+            text: text,
+            parse_mode: 'HTML'
+          })
+        });
+      } catch (err) {
+        console.warn("Review dispatch error:", err);
+      }
     }
 
     return res.status(201).json({

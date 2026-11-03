@@ -24,9 +24,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ status: "ok", bot: "@tunikabondlider_rasmiy_bot" });
   }
 
-  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA";
+  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || "-1004415750690";
-  const CLOUD_LEADS_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a0fc19c245604c";
 
   const update = req.body || {};
   const message = update.message;
@@ -61,36 +60,16 @@ export default async function handler(req, res) {
     }
   };
 
-  // Helper: sync lead to Admin Panel (both serverless API & cloud store)
+  // Helper: sync lead to Admin Panel (via serverless API)
   const syncLeadToAdminPanel = async (leadRecord) => {
     try {
-      // 1. Post to Vercel serverless /api/leads
-      fetch('https://tunikabondlider.vercel.app/api/leads', {
+      // Post to Vercel serverless /api/leads
+      fetch('https://tunikabondlider.uz/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadRecord)
       }).catch(() => {});
     } catch {}
-
-    try {
-      // 2. Sync to cloud leads store if accessible
-      const cRes = await fetch(CLOUD_LEADS_URL);
-      if (cRes.ok) {
-        const json = await cRes.json();
-        const current = json?.data?.leads || [];
-        const filtered = current.filter(l => String(l.id) !== String(leadRecord.id));
-        await fetch(CLOUD_LEADS_URL, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: 'tunikabond_leads_v2',
-            data: { leads: [leadRecord, ...filtered].slice(0, 100) }
-          })
-        });
-      }
-    } catch (err) {
-      console.warn("Cloud sync warning:", err);
-    }
   };
 
   // 1. User sends /start

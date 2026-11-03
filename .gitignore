@@ -31,3 +31,7 @@ staticfiles/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Private Server Data
+server_data/
+*.bak

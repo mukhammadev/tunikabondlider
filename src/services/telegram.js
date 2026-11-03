@@ -9,7 +9,7 @@ import { cloudPushLead } from './api.js';
 export const STORAGE_TELEGRAM_KEY = 'tunikabond_telegram_config_v9_channel_only';
 
 export const DEFAULT_TELEGRAM_CONFIG = {
-  botToken: "8697018482:AAFwxsWVPoHl7sEfGpR9wPtQEtxBL3ivozA",
+  botToken: "",
   botUsername: "tunikabondlider_rasmiy_bot",
   adminUsername: "Mukhammad_azez",
   channelId: "-1004415750690",
@@ -238,10 +238,12 @@ export const testTelegramRecipient = async (botToken, chatId) => {
  */
 export const dispatchToTelegram = async (leadData, customConfig = null) => {
   const config = customConfig || getTelegramConfig();
-  const rawToken = config.botToken || DEFAULT_TELEGRAM_CONFIG.botToken;
-  const token = (rawToken && !rawToken.startsWith("8160493029")) 
-    ? rawToken 
-    : DEFAULT_TELEGRAM_CONFIG.botToken;
+  const token = config.botToken || DEFAULT_TELEGRAM_CONFIG.botToken;
+
+  // If no client-side bot token configured, dispatch is handled safely by serverless /api/leads
+  if (!token) {
+    return { success: true, viaServerless: true };
+  }
 
   // Strictly dispatch ONLY to the Private Channel (-1004415750690)
   const activeRecipients = [

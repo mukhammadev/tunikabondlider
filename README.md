@@ -76,10 +76,10 @@ Server standart holatda `http://localhost:5001` da ishga tushadi.
 
 ## 🔒 Xavfsizlik va Atrof-muhit O'zgaruvchilari (`.env`)
 
-Telegram bot integratsiyasi uchun:
+Telegram bot integratsiyasi uchun (ushbu qiymatlarni faqat `.env` faylida yoki Vercel Environment Variables sozlamalarida saqlang, hech qachon ochiq kodga yozmang):
 ```env
-TELEGRAM_BOT_TOKEN="8160493029:AAHA2wWKlaSR__UTzByJtLt24rWXtsxV3c4"
-TELEGRAM_CHAT_ID="-1003209002534"
+TELEGRAM_BOT_TOKEN="your_telegram_bot_token_here"
+TELEGRAM_CHAT_ID="your_channel_or_chat_id_here"
 PORT=5001
 ```
 
