@@ -630,13 +630,14 @@ export const compressImageFile = (file, maxWidth = 1000, maxHeight = 1000, quali
 
 // --- PRODUCTS API ---
 export const apiGetProducts = async () => {
-  // 1. Fetch from Supabase products table
+  // 1. Fetch from Supabase products table (single source of truth)
   try {
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: true });
-    if (!error && Array.isArray(data) && data.length > 0) {
+    if (!error && Array.isArray(data)) {
+      // Trust Supabase even if empty — means all products were deleted
       const formatted = data.map(p => ({
         ...p,
         isActive: p.is_active !== false
@@ -648,33 +649,24 @@ export const apiGetProducts = async () => {
     console.warn('Supabase get products error:', e);
   }
 
+  // Fallbacks only if Supabase connection failed
   try {
     const res = await apiFetch('/api/products/');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data)) return data;
     }
   } catch {}
 
-  // Cloud store sync fallback
-  try {
-    const cData = await cloudGetCatalogData();
-    if (cData?.products && Array.isArray(cData.products) && cData.products.length > 0) {
-      try {
-        localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(cData.products));
-      } catch {}
-      return cData.products;
-    }
-  } catch {}
-  
   try {
     const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY) || localStorage.getItem('tunikabond_custom_products');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {}
 
+  // Only return defaults on first-ever visit (no Supabase data yet)
   return initialProducts;
 };
 
@@ -775,24 +767,15 @@ export const apiDeleteProduct = async (productId) => {
     console.warn('Supabase delete product error:', e);
   }
 
+  // 2. Update localStorage directly (don't re-fetch — avoids fallback chain)
   try {
-    await apiFetch(`/api/products/${productId}`, {
-      method: 'DELETE',
-      headers: getHeaders()
-    });
-  } catch {}
-
-  let updated = [];
-  try {
-    const current = await apiGetProducts();
-    updated = current.filter(p => p.id !== productId);
-    localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
-    localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ products: updated });
+    const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.filter(p => p.id !== productId) : [];
+      localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
+      localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
@@ -801,13 +784,13 @@ export const apiDeleteProduct = async (productId) => {
 
 // --- PORTFOLIO API ---
 export const apiGetPortfolio = async () => {
-  // 1. Fetch from Supabase portfolio table
+  // 1. Fetch from Supabase portfolio table (single source of truth)
   try {
     const { data, error } = await supabase
       .from('portfolio')
       .select('*')
       .order('created_at', { ascending: true });
-    if (!error && Array.isArray(data) && data.length > 0) {
+    if (!error && Array.isArray(data)) {
       const formatted = data.map(item => ({
         ...item,
         masterId: item.master_id || item.masterId,
@@ -824,18 +807,7 @@ export const apiGetPortfolio = async () => {
     const res = await apiFetch('/api/portfolio/');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
-    }
-  } catch {}
-
-  // Cloud store sync fallback
-  try {
-    const cData = await cloudGetCatalogData();
-    if (cData?.portfolio && Array.isArray(cData.portfolio) && cData.portfolio.length > 0) {
-      try {
-        localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(cData.portfolio));
-      } catch {}
-      return cData.portfolio;
+      if (Array.isArray(data)) return data;
     }
   } catch {}
 
@@ -843,7 +815,7 @@ export const apiGetPortfolio = async () => {
     const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY) || localStorage.getItem('tunikabond_custom_portfolio');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {}
 
@@ -944,24 +916,15 @@ export const apiDeletePortfolio = async (itemId) => {
     console.warn('Supabase delete portfolio error:', e);
   }
 
+  // 2. Update localStorage directly
   try {
-    await apiFetch(`/api/portfolio/${itemId}`, {
-      method: 'DELETE',
-      headers: getHeaders()
-    });
-  } catch {}
-
-  let updated = [];
-  try {
-    const current = await apiGetPortfolio();
-    updated = current.filter(item => item.id !== itemId);
-    localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
-    localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ portfolio: updated });
+    const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.filter(item => item.id !== itemId) : [];
+      localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
+      localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
@@ -970,31 +933,50 @@ export const apiDeletePortfolio = async (itemId) => {
 
 // --- TEAM & MASTERS API ---
 export const apiGetTeam = async () => {
-  // 1. Fetch from Supabase team table
+  // 1. Fetch from Supabase team table (single source of truth)
   try {
     const { data, error } = await supabase
       .from('team')
       .select('*')
       .order('created_at', { ascending: true });
-    if (!error && Array.isArray(data) && data.length > 0) {
+    if (!error && Array.isArray(data)) {
+      // Trust Supabase even if empty
       const formatted = data.map(m => ({
         ...m,
         completedProjects: m.completed_projects || m.completedProjects,
         isLeader: m.is_leader || m.isLeader || false
       }));
       safeStorage.set(STORAGE_TEAM_KEY, formatted);
-      return formatted;
+      if (formatted.length > 0) {
+        // Deduplicate
+        const seenIds = new Set();
+        const seenNames = new Set();
+        const uniqueList = [];
+        for (const m of formatted) {
+          if (!m) continue;
+          const idKey = m.id ? String(m.id).toLowerCase() : null;
+          const nameKey = m.name ? String(m.name).trim().toLowerCase() : null;
+          if (idKey && seenIds.has(idKey)) continue;
+          if (nameKey && seenNames.has(nameKey)) continue;
+          if (idKey) seenIds.add(idKey);
+          if (nameKey) seenNames.add(nameKey);
+          uniqueList.push(m);
+        }
+        return uniqueList;
+      }
+      return formatted; // empty array — all deleted
     }
   } catch (e) {
     console.warn('Supabase get team error:', e);
   }
 
+  // Fallbacks only if Supabase failed
   let list = null;
   try {
     const res = await apiFetch('/api/team/');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) list = data;
+      if (Array.isArray(data)) list = data;
     }
   } catch {}
 
@@ -1003,7 +985,7 @@ export const apiGetTeam = async () => {
       const saved = localStorage.getItem(STORAGE_TEAM_KEY) || localStorage.getItem('tunikabond_custom_team');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) list = parsed;
+        if (Array.isArray(parsed)) list = parsed;
       }
     } catch {}
   }
@@ -1119,19 +1101,15 @@ export const apiDeleteTeamMember = async (memberId) => {
     console.warn('Supabase delete team error:', e);
   }
 
+  // 2. Update localStorage directly
   try {
-    const res = await apiFetch(`/api/team/${memberId}`, {
-      method: 'DELETE',
-      headers: getHeaders()
-    });
-    if (res.ok) return true;
-  } catch {}
-
-  try {
-    const current = await apiGetTeam();
-    const updated = current.filter(m => m.id !== memberId);
-    localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
-    localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
+    const saved = localStorage.getItem(STORAGE_TEAM_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.filter(m => m.id !== memberId) : [];
+      localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
+      localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
@@ -1429,13 +1407,13 @@ export const apiUpdateCalcSettings = async (settings) => {
 
 // --- SWATCHES (RANGLAR VA TEKSTURALAR) API ---
 export const apiGetSwatches = async () => {
-  // 1. Fetch from Supabase swatches table
+  // 1. Fetch from Supabase swatches table (single source of truth)
   try {
     const { data, error } = await supabase
       .from('swatches')
       .select('*')
       .order('created_at', { ascending: true });
-    if (!error && Array.isArray(data) && data.length > 0) {
+    if (!error && Array.isArray(data)) {
       const formatted = data.map(s => ({
         ...s,
         colorHex: s.color_hex || s.colorHex,
@@ -1452,18 +1430,7 @@ export const apiGetSwatches = async () => {
     const res = await apiFetch('/api/swatches/');
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
-    }
-  } catch {}
-
-  // Cloud sync fallback
-  try {
-    const cData = await cloudGetCatalogData();
-    if (cData?.swatches && Array.isArray(cData.swatches) && cData.swatches.length > 0) {
-      try {
-        localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(cData.swatches));
-      } catch {}
-      return cData.swatches;
+      if (Array.isArray(data)) return data;
     }
   } catch {}
 
@@ -1471,7 +1438,7 @@ export const apiGetSwatches = async () => {
     const saved = localStorage.getItem(STORAGE_SWATCHES_KEY) || localStorage.getItem('tl_dynamic_swatches');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {}
 
@@ -1578,24 +1545,15 @@ export const apiDeleteSwatch = async (swatchId) => {
     console.warn('Supabase delete swatch error:', e);
   }
 
+  // 2. Update localStorage directly
   try {
-    await apiFetch(`/api/swatches/${swatchId}`, {
-      method: 'DELETE',
-      headers: getHeaders()
-    });
-  } catch {}
-
-  let updated = [];
-  try {
-    const existing = await apiGetSwatches();
-    updated = existing.filter(s => String(s.id) !== String(swatchId));
-    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
-    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ swatches: updated });
+    const saved = localStorage.getItem(STORAGE_SWATCHES_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.filter(s => String(s.id) !== String(swatchId)) : [];
+      localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+      localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
