@@ -18,23 +18,24 @@ import { TeamSection } from './components/TeamSection';
 import { BrandIntro } from './components/BrandIntro';
 import { HomeNavigationBento } from './components/HomeNavigationBento';
 import { PageBanner } from './components/PageBanner';
+import { AdminDashboard } from './components/admin/AdminDashboard';
+import { AdminAuthModal } from './components/admin/AdminAuthModal';
 import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGetTeam, apiGetSwatches } from './services/api';
 
 const VALID_PAGES = ['home', 'products', 'portfolio', 'about', 'contact'];
 
 export function App() {
-  useEffect(() => {
-    const p = window.location.pathname.toLowerCase();
-    if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/')) {
-      window.location.replace('/admin.html');
-      return;
+  const [isAdminOpen, setIsAdminOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase();
+      return hash === '#admin';
     }
-  }, []);
+    return false;
+  });
 
   const getPageFromHash = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
     if (hash === 'admin') {
-      window.location.href = '/admin.html';
       return 'home';
     }
     if (VALID_PAGES.includes(hash)) return hash;
@@ -55,7 +56,7 @@ export function App() {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
       if (hash === 'admin') {
-        window.location.href = '/admin.html';
+        setIsAdminOpen(true);
         return;
       }
       const page = getPageFromHash();
@@ -64,6 +65,46 @@ export function App() {
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Secret Pro-Admin Keyboard Shortcuts:
+  // 1. Ctrl + Shift + A (or Cmd + Shift + A on Mac)
+  // 2. Typing 'admin' anywhere on the page
+  useEffect(() => {
+    let typedBuffer = '';
+    let bufferTimer = null;
+
+    const handleKeyDown = (e) => {
+      // Shortcut: Ctrl+Shift+A or Cmd+Shift+A
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setIsAdminOpen((prev) => !prev);
+        return;
+      }
+
+      // Ignore if user is currently typing in an input or textarea
+      const target = e.target;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.key && e.key.length === 1) {
+        typedBuffer += e.key.toLowerCase();
+        clearTimeout(bufferTimer);
+        bufferTimer = setTimeout(() => { typedBuffer = ''; }, 1500);
+
+        if (typedBuffer.endsWith('admin')) {
+          typedBuffer = '';
+          setIsAdminOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(bufferTimer);
+    };
   }, []);
 
   const [currentLang, setCurrentLang] = useState(() => {
@@ -163,9 +204,9 @@ export function App() {
     };
   }, []);
 
-  // Admin handler - navigates to dedicated /admin page
+  // Admin handler - opens integrated secret admin panel
   const handleOpenAdmin = () => {
-    window.location.href = '/admin.html';
+    setIsAdminOpen(true);
   };
 
   // Modals handlers
@@ -371,6 +412,7 @@ export function App() {
       <Footer
         t={t}
         onNavigate={navigateToPage}
+        onOpenAdmin={handleOpenAdmin}
       />
 
       {/* Product Detail Modal */}
@@ -394,6 +436,57 @@ export function App() {
       <QuickActions
         onOpenLeadModal={handleOpenLeadModal}
       />
+
+      {/* Discreet Floating Admin Badge (Visible ONLY when admin is currently logged in) */}
+      {currentUser && !isAdminOpen && (
+        <button
+          type="button"
+          onClick={() => setIsAdminOpen(true)}
+          className="fixed bottom-4 left-4 z-40 px-3.5 py-2 rounded-2xl bg-brand-surface/95 backdrop-blur-xl border border-brand-red/50 text-white text-xs font-bold shadow-2xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all group cursor-pointer"
+          title="Boshqaruv panelini ochish"
+        >
+          <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
+          <span className="text-brand-red font-black">TL Admin</span>
+          <span className="text-[10px] text-slate-400 group-hover:text-white transition-colors">({currentUser.username})</span>
+        </button>
+      )}
+
+      {/* Seamless Integrated Admin Panel & Authentication */}
+      {isAdminOpen && (
+        currentUser ? (
+          <AdminDashboard
+            currentUser={currentUser}
+            onLogout={() => {
+              clearAuthSession();
+              setCurrentUser(null);
+              setIsAdminOpen(false);
+            }}
+            onClose={() => {
+              setIsAdminOpen(false);
+              if (window.location.hash === '#admin') {
+                window.history.replaceState(null, '', window.location.pathname);
+              }
+            }}
+            onDataChanged={loadDynamicData}
+            isStandaloneApp={false}
+            swatchesList={swatchesList}
+          />
+        ) : (
+          <AdminAuthModal
+            isOpen={isAdminOpen}
+            onClose={() => {
+              setIsAdminOpen(false);
+              if (window.location.hash === '#admin') {
+                window.history.replaceState(null, '', window.location.pathname);
+              }
+            }}
+            onLoginSuccess={(user) => {
+              setCurrentUser(user);
+              setIsAdminOpen(true);
+            }}
+          />
+        )
+      )}
 
     </div>
   );

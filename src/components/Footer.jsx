@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Phone, ArrowUp, Send, UserCheck } from 'lucide-react';
 
-export const Footer = ({ t, onNavigate }) => {
+export const Footer = ({ t, onNavigate, onOpenAdmin }) => {
+  const [footerClicks, setFooterClicks] = useState(0);
+  const footerTimerRef = useRef(null);
+
+  const handleSecretDot = () => {
+    setFooterClicks((prev) => {
+      const next = prev + 1;
+      clearTimeout(footerTimerRef.current);
+      footerTimerRef.current = setTimeout(() => setFooterClicks(0), 1200);
+      if (next >= 3) {
+        setFooterClicks(0);
+        if (onOpenAdmin) onOpenAdmin();
+      }
+      return next;
+    });
+  };
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -189,7 +205,14 @@ export const Footer = ({ t, onNavigate }) => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
-            © {new Date().getFullYear()} Tunikabond Lider. {t.footer.rights}
+            © {new Date().getFullYear()} Tunikabond Lider.{' '}
+            <span 
+              onClick={handleSecretDot}
+              className="cursor-default select-none hover:text-brand-red/50 transition-colors"
+            >
+              •
+            </span>{' '}
+            {t.footer.rights}
           </div>
 
           <div className="flex items-center gap-6">

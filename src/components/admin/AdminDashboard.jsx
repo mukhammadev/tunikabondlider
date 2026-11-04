@@ -820,10 +820,12 @@ export const AdminDashboard = ({
           ) : (
             <button
               onClick={onClose}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors cursor-pointer"
+              title="Asosiy saytga qaytish"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Saytga qaytish</span>
+              <span className="hidden sm:inline">Saytga qaytish</span>
+              <span className="sm:hidden">Sayt</span>
             </button>
           )}
 

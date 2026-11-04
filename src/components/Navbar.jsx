@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Phone, Menu, X, Layers, Info, HelpCircle, Lock, Shield, Sun, Moon, Home, Compass } from 'lucide-react';
 
 export const Navbar = ({ 
@@ -15,6 +15,35 @@ export const Navbar = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Secret Logo Easter Egg (4 taps or 1.8s long-press triggers admin)
+  const [logoClicks, setLogoClicks] = useState(0);
+  const clickTimerRef = useRef(null);
+  const longPressTimerRef = useRef(null);
+
+  const handleLogoClick = () => {
+    handleLinkClick('home');
+    setLogoClicks((prev) => {
+      const next = prev + 1;
+      clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = setTimeout(() => setLogoClicks(0), 1200);
+      if (next >= 4) {
+        setLogoClicks(0);
+        if (onOpenAdmin) onOpenAdmin();
+      }
+      return next;
+    });
+  };
+
+  const handleTouchStart = () => {
+    longPressTimerRef.current = setTimeout(() => {
+      if (onOpenAdmin) onOpenAdmin();
+    }, 1800);
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(longPressTimerRef.current);
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -57,11 +86,14 @@ export const Navbar = ({
         >
           <div className="flex items-center h-14 px-4 sm:px-5 gap-3">
 
-            {/* ── Logo ── */}
+            {/* ── Logo with Secret Easter Egg Trigger ── */}
             <button
               type="button"
-              onClick={() => handleLinkClick('home')}
-              className="flex items-center gap-2.5 group shrink-0 text-left cursor-pointer"
+              onClick={handleLogoClick}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              className="flex items-center gap-2.5 group shrink-0 text-left cursor-pointer select-none"
+              title="Tunikabond Lider"
             >
               <div className="w-9 h-9 rounded-xl overflow-hidden border border-brand-red/40 p-0.5 flex items-center justify-center group-hover:border-brand-red transition-all bg-white shadow-sm shrink-0">
                 <img src="/brand-logo.jpg" alt="TL Tunikabond Lider" className="w-full h-full object-contain" />
