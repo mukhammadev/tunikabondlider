@@ -383,10 +383,18 @@ export const AdminDashboard = ({
     };
 
     if (editingProduct) {
-      await apiUpdateProduct(editingProduct.id, productPayload);
+      const res = await apiUpdateProduct(editingProduct.id, productPayload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       setProductsList(productsList.map(p => p.id === editingProduct.id ? { ...p, ...productPayload } : p));
     } else {
       const res = await apiCreateProduct(productPayload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       if (res.product) {
         setProductsList([...productsList, res.product]);
       }
@@ -457,10 +465,18 @@ export const AdminDashboard = ({
     };
 
     if (editingPortfolio) {
-      await apiUpdatePortfolio(editingPortfolio.id, portfolioPayload);
+      const res = await apiUpdatePortfolio(editingPortfolio.id, portfolioPayload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       setPortfolioList(portfolioList.map(p => p.id === editingPortfolio.id ? { ...p, ...portfolioPayload } : p));
     } else {
       const res = await apiCreatePortfolio(portfolioPayload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       if (res.item) {
         setPortfolioList([...portfolioList, res.item]);
       }
@@ -532,10 +548,18 @@ export const AdminDashboard = ({
     };
 
     if (editingTeamMember) {
-      await apiUpdateTeamMember(editingTeamMember.id, payload);
+      const res = await apiUpdateTeamMember(editingTeamMember.id, payload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       setTeamList(teamList.map(m => m.id === editingTeamMember.id ? { ...m, ...payload } : m));
     } else {
       const res = await apiCreateTeamMember(payload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       if (res.member) {
         setTeamList([...teamList, res.member]);
       }
@@ -687,10 +711,18 @@ export const AdminDashboard = ({
     };
 
     if (editingSwatch) {
-      await apiUpdateSwatch(editingSwatch.id, payload);
+      const res = await apiUpdateSwatch(editingSwatch.id, payload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       setSwatchesList(swatchesList.map(s => s.id === editingSwatch.id ? { ...s, ...payload } : s));
     } else {
       const res = await apiCreateSwatch(payload);
+      if (res && res.error) {
+        alert("Xatolik: " + res.error);
+        return;
+      }
       if (res.swatch) {
         setSwatchesList([res.swatch, ...swatchesList]);
       }

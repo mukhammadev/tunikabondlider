@@ -5,7 +5,7 @@ import { Layers, ShieldCheck, ArrowRight } from 'lucide-react';
 export const Products = ({ currentLang, t, onSelectProduct, items }) => {
   const [activeTab, setActiveTab] = useState('tunikabond');
 
-  const productsToUse = items && items.length > 0 ? items : defaultProducts;
+  const productsToUse = Array.isArray(items) ? items : defaultProducts;
 
   const getProductCategory = (p) => {
     const cat = String(p?.category || '').toLowerCase().trim();

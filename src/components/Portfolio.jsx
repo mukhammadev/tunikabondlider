@@ -6,7 +6,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
   const [activeFilter, setActiveFilter] = useState('naves');
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const portfolioToUse = items && items.length > 0 ? items : defaultPortfolio;
+  const portfolioToUse = Array.isArray(items) ? items : defaultPortfolio;
 
   const getPortfolioCategory = (item) => {
     const cat = String(item?.category || '').toLowerCase().trim();

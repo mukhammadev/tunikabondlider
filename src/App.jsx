@@ -174,7 +174,7 @@ export function App() {
     setProductsList(prods);
     setPortfolioList(ports);
     setTeamList(teams);
-    if (swt && Array.isArray(swt) && swt.length > 0) {
+    if (Array.isArray(swt)) {
       setSwatchesList(swt);
     }
   };

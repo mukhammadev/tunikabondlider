@@ -637,11 +637,18 @@ export const apiGetProducts = async () => {
       .select('*')
       .order('created_at', { ascending: true });
     if (!error && Array.isArray(data)) {
-      // Trust Supabase even if empty — means all products were deleted
-      const formatted = data.map(p => ({
-        ...p,
-        isActive: p.is_active !== false
-      }));
+      const formatted = data.map(p => {
+        const specs = p.specs || {};
+        const shortDesc = p.shortDesc || specs.shortDesc || '';
+        const priceRange = p.priceRange || p.price || '';
+        return {
+          ...p,
+          priceRange,
+          shortDesc,
+          specs,
+          isActive: p.is_active !== false
+        };
+      });
       safeStorage.set(STORAGE_PRODUCTS_KEY, formatted);
       return formatted;
     }
@@ -673,48 +680,41 @@ export const apiGetProducts = async () => {
 export const apiCreateProduct = async (productData) => {
   const newProduct = { ...productData, id: productData.id || `prod-${Date.now()}` };
 
-  // 1. Save to Supabase
+  const specsData = { ...(newProduct.specs || {}) };
+  if (newProduct.shortDesc) {
+    specsData.shortDesc = newProduct.shortDesc;
+  }
+
+  // 1. Save to Supabase (primary source of truth)
   try {
-    await supabase.from('products').upsert({
+    const { error } = await supabase.from('products').upsert({
       id: String(newProduct.id),
-      name: newProduct.name,
+      name: typeof newProduct.name === 'string' ? { uz: newProduct.name, ru: newProduct.name, en: newProduct.name } : newProduct.name,
       category: newProduct.category || '',
-      price: newProduct.price || '',
+      price: newProduct.priceRange || newProduct.price || '',
       thickness: newProduct.thickness || '',
       coating: newProduct.coating || '',
       warranty: newProduct.warranty || '',
       image: newProduct.image || '',
-      specs: newProduct.specs || {},
+      specs: specsData,
       badge: newProduct.badge || null,
       is_active: newProduct.isActive !== false
     });
+    if (error) {
+      console.error('Supabase create product error:', error);
+      return { success: false, error: error.message || "Bazada saqlashda xatolik yuz berdi" };
+    }
   } catch (e) {
-    console.warn('Supabase create product error:', e);
+    console.warn('Supabase create product exception:', e);
+    return { success: false, error: e.message };
   }
 
   try {
-    const res = await apiFetch('/api/products/', {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(newProduct)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.product) Object.assign(newProduct, data.product);
-    }
-  } catch {}
-
-  let updated = [newProduct];
-  try {
-    const current = await apiGetProducts();
-    updated = [newProduct, ...current.filter(p => p.id !== newProduct.id)];
+    const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY);
+    const current = saved ? JSON.parse(saved) : [];
+    const updated = [newProduct, ...(Array.isArray(current) ? current.filter(p => p.id !== newProduct.id) : [])];
     localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ products: updated });
   } catch {}
 
   notifyDataChanged();
@@ -722,57 +722,67 @@ export const apiCreateProduct = async (productData) => {
 };
 
 export const apiUpdateProduct = async (productId, productData) => {
-  // 1. Update in Supabase
   try {
-    const supaPayload = { ...productData };
-    if (productData.isActive !== undefined) {
-      supaPayload.is_active = productData.isActive;
-      delete supaPayload.isActive;
+    const specsData = { ...(productData.specs || {}) };
+    if (productData.shortDesc) {
+      specsData.shortDesc = productData.shortDesc;
     }
-    await supabase.from('products').update(supaPayload).eq('id', String(productId));
+
+    const supaPayload = {};
+    if (productData.name !== undefined) supaPayload.name = typeof productData.name === 'string' ? { uz: productData.name, ru: productData.name, en: productData.name } : productData.name;
+    if (productData.category !== undefined) supaPayload.category = productData.category;
+    if (productData.priceRange !== undefined || productData.price !== undefined) {
+      supaPayload.price = productData.priceRange || productData.price || '';
+    }
+    if (productData.thickness !== undefined) supaPayload.thickness = productData.thickness;
+    if (productData.coating !== undefined) supaPayload.coating = productData.coating;
+    if (productData.warranty !== undefined) supaPayload.warranty = productData.warranty;
+    if (productData.image !== undefined) supaPayload.image = productData.image;
+    if (productData.specs !== undefined || productData.shortDesc !== undefined) {
+      supaPayload.specs = specsData;
+    }
+    if (productData.badge !== undefined) supaPayload.badge = productData.badge;
+    if (productData.isActive !== undefined) supaPayload.is_active = productData.isActive;
+
+    const { error } = await supabase.from('products').update(supaPayload).eq('id', String(productId));
+    if (error) {
+      console.error('Supabase update product error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
     console.warn('Supabase update product error:', e);
+    return { success: false, error: e.message };
   }
 
   try {
-    await apiFetch(`/api/products/${productId}`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(productData)
-    });
-  } catch {}
-
-  let updated = [];
-  try {
-    const current = await apiGetProducts();
-    updated = current.map(p => p.id === productId ? { ...p, ...productData } : p);
-    localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
-    localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ products: updated });
+    const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.map(p => p.id === productId ? { ...p, ...productData } : p) : [];
+      localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
+      localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
-  return true;
+  return { success: true };
 };
 
 export const apiDeleteProduct = async (productId) => {
   // 1. Delete from Supabase
   try {
-    await supabase.from('products').delete().eq('id', String(productId));
+    const { error } = await supabase.from('products').delete().eq('id', String(productId));
+    if (error) console.error('Supabase delete product error:', error);
   } catch (e) {
     console.warn('Supabase delete product error:', e);
   }
 
-  // 2. Update localStorage directly (don't re-fetch — avoids fallback chain)
+  // 2. Update localStorage directly
   try {
     const saved = localStorage.getItem(STORAGE_PRODUCTS_KEY);
     if (saved) {
       const current = JSON.parse(saved);
-      const updated = Array.isArray(current) ? current.filter(p => p.id !== productId) : [];
+      const updated = Array.isArray(current) ? current.filter(p => String(p.id) !== String(productId)) : [];
       localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updated));
       localStorage.setItem('tunikabond_custom_products', JSON.stringify(updated));
     }
@@ -791,11 +801,20 @@ export const apiGetPortfolio = async () => {
       .select('*')
       .order('created_at', { ascending: true });
     if (!error && Array.isArray(data)) {
-      const formatted = data.map(item => ({
-        ...item,
-        masterId: item.master_id || item.masterId,
-        desc: item.description || item.desc || {}
-      }));
+      const formatted = data.map(item => {
+        const desc = item.description || item.desc || {};
+        return {
+          ...item,
+          masterId: item.master_id || item.masterId || null,
+          masterName: desc.masterName || item.masterName || '',
+          masterPhoto: desc.masterPhoto || item.masterPhoto || '',
+          masterRole: desc.masterRole || item.masterRole || '',
+          material: desc.material || item.material || '',
+          area: desc.area || item.area || '',
+          time: desc.time || item.duration || '',
+          desc
+        };
+      });
       safeStorage.set(STORAGE_PORTFOLIO_KEY, formatted);
       return formatted;
     }
@@ -823,47 +842,43 @@ export const apiGetPortfolio = async () => {
 };
 
 export const apiCreatePortfolio = async (itemData) => {
-  const newItem = { ...itemData, id: itemData.id || `port-${Date.now()}` };
+  const newItem = { ...itemData, id: itemData.id || ('port-' + Date.now()) };
+
+  const descData = typeof newItem.desc === 'object' ? { ...newItem.desc } : {};
+  if (newItem.material) descData.material = newItem.material;
+  if (newItem.area) descData.area = newItem.area;
+  if (newItem.time) descData.time = newItem.time;
+  if (newItem.masterName) descData.masterName = newItem.masterName;
+  if (newItem.masterPhoto) descData.masterPhoto = newItem.masterPhoto;
+  if (newItem.masterRole) descData.masterRole = newItem.masterRole;
 
   // 1. Save to Supabase
   try {
-    await supabase.from('portfolio').upsert({
+    const { error } = await supabase.from('portfolio').upsert({
       id: String(newItem.id),
-      title: newItem.title,
+      title: typeof newItem.title === 'string' ? { uz: newItem.title, ru: newItem.title, en: newItem.title } : newItem.title,
       category: newItem.category || '',
       image: newItem.image || '',
-      master_id: newItem.masterId || newItem.master_id || null,
-      duration: newItem.duration || '',
+      master_id: newItem.masterId ? String(newItem.masterId) : null,
+      duration: newItem.duration || newItem.time || '',
       location: newItem.location || '',
-      description: newItem.desc || newItem.description || {}
+      description: descData
     });
+    if (error) {
+      console.error('Supabase create portfolio error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
-    console.warn('Supabase create portfolio error:', e);
+    console.warn('Supabase create portfolio exception:', e);
+    return { success: false, error: e.message };
   }
 
   try {
-    const res = await apiFetch('/api/portfolio/', {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(newItem)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.item) Object.assign(newItem, data.item);
-    }
-  } catch {}
-
-  let updated = [newItem];
-  try {
-    const current = await apiGetPortfolio();
-    updated = [newItem, ...current.filter(i => i.id !== newItem.id)];
+    const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY);
+    const current = saved ? JSON.parse(saved) : [];
+    const updated = [newItem, ...(Array.isArray(current) ? current.filter(i => i.id !== newItem.id) : [])];
     localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ portfolio: updated });
   } catch {}
 
   notifyDataChanged();
@@ -871,47 +886,55 @@ export const apiCreatePortfolio = async (itemData) => {
 };
 
 export const apiUpdatePortfolio = async (itemId, itemData) => {
-  // 1. Update in Supabase
   try {
-    const supaPayload = { ...itemData };
-    if (itemData.desc) supaPayload.description = itemData.desc;
-    if (itemData.masterId) supaPayload.master_id = itemData.masterId;
-    delete supaPayload.desc;
-    delete supaPayload.masterId;
-    await supabase.from('portfolio').update(supaPayload).eq('id', String(itemId));
+    const descData = typeof itemData.desc === 'object' ? { ...itemData.desc } : {};
+    if (itemData.material) descData.material = itemData.material;
+    if (itemData.area) descData.area = itemData.area;
+    if (itemData.time) descData.time = itemData.time;
+    if (itemData.masterName) descData.masterName = itemData.masterName;
+    if (itemData.masterPhoto) descData.masterPhoto = itemData.masterPhoto;
+    if (itemData.masterRole) descData.masterRole = itemData.masterRole;
+
+    const supaPayload = {};
+    if (itemData.title !== undefined) supaPayload.title = typeof itemData.title === 'string' ? { uz: itemData.title, ru: itemData.title, en: itemData.title } : itemData.title;
+    if (itemData.category !== undefined) supaPayload.category = itemData.category;
+    if (itemData.image !== undefined) supaPayload.image = itemData.image;
+    if (itemData.masterId !== undefined) supaPayload.master_id = itemData.masterId ? String(itemData.masterId) : null;
+    if (itemData.duration !== undefined || itemData.time !== undefined) {
+      supaPayload.duration = itemData.duration || itemData.time || '';
+    }
+    if (itemData.location !== undefined) supaPayload.location = itemData.location;
+    supaPayload.description = descData;
+
+    const { error } = await supabase.from('portfolio').update(supaPayload).eq('id', String(itemId));
+    if (error) {
+      console.error('Supabase update portfolio error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
     console.warn('Supabase update portfolio error:', e);
+    return { success: false, error: e.message };
   }
 
   try {
-    await apiFetch(`/api/portfolio/${itemId}`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(itemData)
-    });
-  } catch {}
-
-  let updated = [];
-  try {
-    const current = await apiGetPortfolio();
-    updated = current.map(item => item.id === itemId ? { ...item, ...itemData } : item);
-    localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
-    localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ portfolio: updated });
+    const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.map(item => item.id === itemId ? { ...item, ...itemData } : item) : [];
+      localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
+      localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
-  return true;
+  return { success: true };
 };
 
 export const apiDeletePortfolio = async (itemId) => {
   // 1. Delete from Supabase
   try {
-    await supabase.from('portfolio').delete().eq('id', String(itemId));
+    const { error } = await supabase.from('portfolio').delete().eq('id', String(itemId));
+    if (error) console.error('Supabase delete portfolio error:', error);
   } catch (e) {
     console.warn('Supabase delete portfolio error:', e);
   }
@@ -921,7 +944,7 @@ export const apiDeletePortfolio = async (itemId) => {
     const saved = localStorage.getItem(STORAGE_PORTFOLIO_KEY);
     if (saved) {
       const current = JSON.parse(saved);
-      const updated = Array.isArray(current) ? current.filter(item => item.id !== itemId) : [];
+      const updated = Array.isArray(current) ? current.filter(item => String(item.id) !== String(itemId)) : [];
       localStorage.setItem(STORAGE_PORTFOLIO_KEY, JSON.stringify(updated));
       localStorage.setItem('tunikabond_custom_portfolio', JSON.stringify(updated));
     }
@@ -940,87 +963,35 @@ export const apiGetTeam = async () => {
       .select('*')
       .order('created_at', { ascending: true });
     if (!error && Array.isArray(data)) {
-      // Trust Supabase even if empty
       const formatted = data.map(m => ({
         ...m,
-        completedProjects: m.completed_projects || m.completedProjects,
-        isLeader: m.is_leader || m.isLeader || false
+        completedProjects: m.completed_projects || m.completedProjects || '',
+        isLeader: m.is_leader !== undefined ? m.is_leader : (m.isLeader || false)
       }));
       safeStorage.set(STORAGE_TEAM_KEY, formatted);
-      if (formatted.length > 0) {
-        // Deduplicate
-        const seenIds = new Set();
-        const seenNames = new Set();
-        const uniqueList = [];
-        for (const m of formatted) {
-          if (!m) continue;
-          const idKey = m.id ? String(m.id).toLowerCase() : null;
-          const nameKey = m.name ? String(m.name).trim().toLowerCase() : null;
-          if (idKey && seenIds.has(idKey)) continue;
-          if (nameKey && seenNames.has(nameKey)) continue;
-          if (idKey) seenIds.add(idKey);
-          if (nameKey) seenNames.add(nameKey);
-          uniqueList.push(m);
-        }
-        return uniqueList;
-      }
-      return formatted; // empty array — all deleted
+      return formatted;
     }
   } catch (e) {
     console.warn('Supabase get team error:', e);
   }
 
-  // Fallbacks only if Supabase failed
-  let list = null;
   try {
-    const res = await apiFetch('/api/team/');
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data)) list = data;
+    const saved = localStorage.getItem(STORAGE_TEAM_KEY) || localStorage.getItem('tunikabond_custom_team');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
     }
   } catch {}
 
-  if (!list) {
-    try {
-      const saved = localStorage.getItem(STORAGE_TEAM_KEY) || localStorage.getItem('tunikabond_custom_team');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) list = parsed;
-      }
-    } catch {}
-  }
-
-  if (!list || !Array.isArray(list) || list.length === 0) {
-    list = initialTeam;
-  }
-
-  // Deduplicate by ID and Name to guarantee no duplicated profiles
-  const seenIds = new Set();
-  const seenNames = new Set();
-  const uniqueList = [];
-
-  for (const m of list) {
-    if (!m) continue;
-    const idKey = m.id ? String(m.id).toLowerCase() : null;
-    const nameKey = m.name ? String(m.name).trim().toLowerCase() : null;
-
-    if (idKey && seenIds.has(idKey)) continue;
-    if (nameKey && seenNames.has(nameKey)) continue;
-
-    if (idKey) seenIds.add(idKey);
-    if (nameKey) seenNames.add(nameKey);
-    uniqueList.push(m);
-  }
-
-  return uniqueList.length > 0 ? uniqueList : initialTeam;
+  return initialTeam;
 };
 
 export const apiCreateTeamMember = async (memberData) => {
-  const newMember = { ...memberData, id: memberData.id || `team-${Date.now()}` };
+  const newMember = { ...memberData, id: memberData.id || ('team-' + Date.now()) };
 
   // 1. Save to Supabase
   try {
-    await supabase.from('team').upsert({
+    const { error } = await supabase.from('team').upsert({
       id: String(newMember.id),
       name: newMember.name,
       role: newMember.role || '',
@@ -1033,25 +1004,19 @@ export const apiCreateTeamMember = async (memberData) => {
       works: newMember.works || [],
       is_leader: newMember.isLeader || newMember.is_leader || false
     });
+    if (error) {
+      console.error('Supabase create team error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
     console.warn('Supabase create team member error:', e);
+    return { success: false, error: e.message };
   }
 
   try {
-    const res = await apiFetch('/api/team/', {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(newMember)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.member) Object.assign(newMember, data.member);
-    }
-  } catch {}
-
-  try {
-    const current = await apiGetTeam();
-    const updated = [newMember, ...current];
+    const saved = localStorage.getItem(STORAGE_TEAM_KEY);
+    const current = saved ? JSON.parse(saved) : [];
+    const updated = [newMember, ...(Array.isArray(current) ? current.filter(m => m.id !== newMember.id) : [])];
     localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
     localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
   } catch {}
@@ -1061,42 +1026,52 @@ export const apiCreateTeamMember = async (memberData) => {
 };
 
 export const apiUpdateTeamMember = async (memberId, memberData) => {
-  // 1. Update in Supabase
   try {
-    const supaPayload = { ...memberData };
-    if (memberData.completedProjects) supaPayload.completed_projects = memberData.completedProjects;
-    if (memberData.isLeader !== undefined) supaPayload.is_leader = memberData.isLeader;
-    delete supaPayload.completedProjects;
-    delete supaPayload.isLeader;
-    await supabase.from('team').update(supaPayload).eq('id', String(memberId));
+    const supaPayload = {};
+    if (memberData.name !== undefined) supaPayload.name = memberData.name;
+    if (memberData.role !== undefined) supaPayload.role = memberData.role;
+    if (memberData.label !== undefined) supaPayload.label = memberData.label;
+    if (memberData.phone !== undefined) supaPayload.phone = memberData.phone;
+    if (memberData.photo !== undefined) supaPayload.photo = memberData.photo;
+    if (memberData.experience !== undefined) supaPayload.experience = memberData.experience;
+    if (memberData.completedProjects !== undefined || memberData.completed_projects !== undefined) {
+      supaPayload.completed_projects = memberData.completedProjects || memberData.completed_projects || '';
+    }
+    if (memberData.bio !== undefined) supaPayload.bio = memberData.bio;
+    if (memberData.works !== undefined) supaPayload.works = memberData.works;
+    if (memberData.isLeader !== undefined || memberData.is_leader !== undefined) {
+      supaPayload.is_leader = memberData.isLeader !== undefined ? memberData.isLeader : memberData.is_leader;
+    }
+
+    const { error } = await supabase.from('team').update(supaPayload).eq('id', String(memberId));
+    if (error) {
+      console.error('Supabase update team error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
     console.warn('Supabase update team error:', e);
+    return { success: false, error: e.message };
   }
 
   try {
-    const res = await apiFetch(`/api/team/${memberId}`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(memberData)
-    });
-    if (res.ok) return true;
-  } catch {}
-
-  try {
-    const current = await apiGetTeam();
-    const updated = current.map(m => m.id === memberId ? { ...m, ...memberData } : m);
-    localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
-    localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
+    const saved = localStorage.getItem(STORAGE_TEAM_KEY);
+    if (saved) {
+      const current = JSON.parse(saved);
+      const updated = Array.isArray(current) ? current.map(m => m.id === memberId ? { ...m, ...memberData } : m) : [];
+      localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
+      localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
+    }
   } catch {}
 
   notifyDataChanged();
-  return true;
+  return { success: true };
 };
 
 export const apiDeleteTeamMember = async (memberId) => {
   // 1. Delete from Supabase
   try {
-    await supabase.from('team').delete().eq('id', String(memberId));
+    const { error } = await supabase.from('team').delete().eq('id', String(memberId));
+    if (error) console.error('Supabase delete team error:', error);
   } catch (e) {
     console.warn('Supabase delete team error:', e);
   }
@@ -1106,7 +1081,7 @@ export const apiDeleteTeamMember = async (memberId) => {
     const saved = localStorage.getItem(STORAGE_TEAM_KEY);
     if (saved) {
       const current = JSON.parse(saved);
-      const updated = Array.isArray(current) ? current.filter(m => m.id !== memberId) : [];
+      const updated = Array.isArray(current) ? current.filter(m => String(m.id) !== String(memberId)) : [];
       localStorage.setItem(STORAGE_TEAM_KEY, JSON.stringify(updated));
       localStorage.setItem('tunikabond_custom_team', JSON.stringify(updated));
     }
@@ -1116,7 +1091,6 @@ export const apiDeleteTeamMember = async (memberId) => {
   return true;
 };
 
-// --- CUSTOMER REVIEWS API ---
 export const apiGetReviews = async () => {
   // Tombstone filter: avoid resurrecting reviews that were deleted by admin
   let deletedSet = new Set();
@@ -1453,9 +1427,9 @@ export const apiCreateSwatch = async (swatchData) => {
 
   // 1. Save to Supabase
   try {
-    await supabase.from('swatches').upsert({
+    const { error } = await supabase.from('swatches').upsert({
       id: String(newSwatch.id),
-      name: newSwatch.name,
+      name: typeof newSwatch.name === 'string' ? { uz: newSwatch.name, ru: newSwatch.name, en: newSwatch.name } : newSwatch.name,
       category: newSwatch.category || '',
       code: newSwatch.code || '',
       color_hex: newSwatch.colorHex || newSwatch.color_hex || '',
@@ -1466,21 +1440,14 @@ export const apiCreateSwatch = async (swatchData) => {
       coating: newSwatch.coating || '',
       application: newSwatch.application || ''
     });
+    if (error) {
+      console.error('Supabase create swatch error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
     console.warn('Supabase create swatch error:', e);
+    return { success: false, error: e.message };
   }
-
-  try {
-    const res = await apiFetch('/api/swatches/', {
-      method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(newSwatch)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.swatch) newSwatch.id = data.swatch.id;
-    }
-  } catch {}
 
   let updated = [newSwatch];
   try {
@@ -1490,11 +1457,6 @@ export const apiCreateSwatch = async (swatchData) => {
     localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ swatches: updated });
-  } catch {}
-
   notifyDataChanged();
   return { success: true, swatch: newSwatch };
 };
@@ -1502,23 +1464,31 @@ export const apiCreateSwatch = async (swatchData) => {
 export const apiUpdateSwatch = async (swatchId, swatchData) => {
   // 1. Update in Supabase
   try {
-    const supaPayload = { ...swatchData };
-    if (swatchData.colorHex) supaPayload.color_hex = swatchData.colorHex;
-    if (swatchData.bgGradient) supaPayload.bg_gradient = swatchData.bgGradient;
-    delete supaPayload.colorHex;
-    delete supaPayload.bgGradient;
-    await supabase.from('swatches').update(supaPayload).eq('id', String(swatchId));
+    const supaPayload = {};
+    if (swatchData.name !== undefined) supaPayload.name = typeof swatchData.name === 'string' ? { uz: swatchData.name, ru: swatchData.name, en: swatchData.name } : swatchData.name;
+    if (swatchData.category !== undefined) supaPayload.category = swatchData.category;
+    if (swatchData.code !== undefined) supaPayload.code = swatchData.code;
+    if (swatchData.colorHex !== undefined || swatchData.color_hex !== undefined) {
+      supaPayload.color_hex = swatchData.colorHex || swatchData.color_hex;
+    }
+    if (swatchData.bgGradient !== undefined || swatchData.bg_gradient !== undefined) {
+      supaPayload.bg_gradient = swatchData.bgGradient || swatchData.bg_gradient;
+    }
+    if (swatchData.image !== undefined) supaPayload.image = swatchData.image;
+    if (swatchData.texture !== undefined) supaPayload.texture = swatchData.texture;
+    if (swatchData.finish !== undefined) supaPayload.finish = swatchData.finish;
+    if (swatchData.coating !== undefined) supaPayload.coating = swatchData.coating;
+    if (swatchData.application !== undefined) supaPayload.application = swatchData.application;
+
+    const { error } = await supabase.from('swatches').update(supaPayload).eq('id', String(swatchId));
+    if (error) {
+      console.error('Supabase update swatch error:', error);
+      return { success: false, error: error.message };
+    }
   } catch (e) {
     console.warn('Supabase update swatch error:', e);
+    return { success: false, error: e.message };
   }
-
-  try {
-    await apiFetch(`/api/swatches/${swatchId}`, {
-      method: 'PUT',
-      headers: getHeaders(),
-      body: JSON.stringify(swatchData)
-    });
-  } catch {}
 
   let updated = [];
   try {
@@ -1526,11 +1496,6 @@ export const apiUpdateSwatch = async (swatchId, swatchData) => {
     updated = existing.map(s => String(s.id) === String(swatchId) ? { ...s, ...swatchData } : s);
     localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
     localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
-  } catch {}
-
-  // Sync to Cloud Catalog Store
-  try {
-    await cloudSaveCatalogData({ swatches: updated });
   } catch {}
 
   notifyDataChanged();
