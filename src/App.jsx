@@ -29,7 +29,7 @@ export function App() {
     if (typeof window === 'undefined') return false;
     const path = (window.location.pathname || '').toLowerCase().replace(/\/+$/, '');
     const hash = (window.location.hash || '').toLowerCase().replace(/\/+$/, '');
-    return path === '/admin' || hash === '#admin';
+    return path === '/admin' || path.startsWith('/admin/') || path === '/admin.html' || hash === '#admin';
   };
 
   const [isAdminOpen, setIsAdminOpen] = useState(checkIsAdminRoute);
@@ -298,6 +298,9 @@ export function App() {
         onClose={handleCloseAdmin}
         onDataChanged={loadDynamicData}
         isStandaloneApp={false}
+        productsList={productsList}
+        portfolioList={portfolioList}
+        teamList={teamList}
         swatchesList={swatchesList}
       />
     ) : (

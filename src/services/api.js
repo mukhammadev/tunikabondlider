@@ -450,10 +450,13 @@ export const apiGetLeads = async () => {
   // 2. Fetch from serverless API /api/leads or /api/leads/
   try {
     let res = await fetch('/api/leads', { headers: getHeaders() });
-    if (!res.ok) {
-      res = await apiFetch('/api/leads/', { headers: getHeaders() });
+    const ct1 = res.headers.get('content-type') || '';
+    if (!res.ok || !ct1.includes('application/json')) {
+      const res2 = await apiFetch('/api/leads/', { headers: getHeaders() });
+      const ct2 = res2.headers.get('content-type') || '';
+      res = res2.ok && ct2.includes('application/json') ? res2 : null;
     }
-    if (res.ok) {
+    if (res && res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         backendLeads = data;

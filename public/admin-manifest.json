@@ -2,7 +2,7 @@
   "name": "Tunikabond Lider Boshqaruv Ilovasi",
   "short_name": "TL Admin",
   "description": "Tunikabond Lider korxonasining rasmiy boshqaruv mobil ilovasi",
-  "start_url": "/admin.html",
+  "start_url": "/admin",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

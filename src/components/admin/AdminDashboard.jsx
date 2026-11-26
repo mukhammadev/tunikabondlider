@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  apiGetStats, apiGetLeads, apiUpdateLead, apiDeleteLead,
+  apiGetLeads, apiUpdateLead, apiDeleteLead,
   apiGetProducts, apiCreateProduct, apiUpdateProduct, apiDeleteProduct,
   apiGetPortfolio, apiCreatePortfolio, apiUpdatePortfolio, apiDeletePortfolio,
   apiGetTeam, apiCreateTeamMember, apiUpdateTeamMember, apiDeleteTeamMember,
@@ -32,20 +32,23 @@ export const AdminDashboard = ({
   onClose, 
   onDataChanged, 
   isStandaloneApp = false,
+  productsList: propProductsList,
+  portfolioList: propPortfolioList,
+  teamList: propTeamList,
   swatchesList: propSwatchesList
 }) => {
   const [activeTab, setActiveTab] = useState('overview'); // overview | leads | products | portfolio | team | swatches | telegram | admins
-  const [stats, setStats] = useState(null);
   const [leads, setLeads] = useState([]);
   const [leadSearch, setLeadSearch] = useState('');
   const [leadStatusFilter, setLeadStatusFilter] = useState('all');
-  const [productsList, setProductsList] = useState([]);
-  const [portfolioList, setPortfolioList] = useState([]);
-  const [teamList, setTeamList] = useState([]);
+  const [productsList, setProductsList] = useState(propProductsList || []);
+  const [portfolioList, setPortfolioList] = useState(propPortfolioList || []);
+  const [teamList, setTeamList] = useState(propTeamList || []);
   const [swatchesList, setSwatchesList] = useState(propSwatchesList || []);
-  const [adminsList, setAdminsList] = useState([]);
+  const [adminsList, setAdminsList] = useState(() => (currentUser ? [currentUser] : []));
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const hasLoadedRef = useRef({ products: false, portfolio: false, team: false, swatches: false });
 
   // Swatch CRUD state
   const [swatchModalOpen, setSwatchModalOpen] = useState(false);
@@ -143,37 +146,36 @@ export const AdminDashboard = ({
   const loadData = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      const results = await Promise.allSettled([
-        apiGetStats(),
-        apiGetLeads(),
-        apiGetProducts(),
-        apiGetPortfolio(),
-        apiGetAdmins(),
-        apiGetTeam(),
-        apiGetSwatches(),
-        apiGetReviews()
-      ]);
-
-      const val = (idx) => (results[idx]?.status === 'fulfilled' ? results[idx].value : null);
-
-      const st = val(0);
-      const ld = val(1);
-      const pr = val(2);
-      const pf = val(3);
-      const ad = val(4);
-      const tm = val(5);
-      const swt = val(6);
-      const revs = val(7);
-
-      if (st) setStats(st);
-      if (Array.isArray(ld)) setLeads(ld);
-      if (Array.isArray(pr)) setProductsList(pr);
-      if (Array.isArray(pf)) setPortfolioList(pf);
-      if (Array.isArray(ad)) setAdminsList(ad);
-      if (Array.isArray(tm)) setTeamList(tm);
-      if (Array.isArray(swt)) setSwatchesList(swt);
-      if (Array.isArray(revs)) setReviewsList(revs);
       setTelegramConfig(getTelegramConfig());
+      await Promise.allSettled([
+        apiGetLeads().then((ld) => { if (Array.isArray(ld)) setLeads(ld); }),
+        apiGetProducts().then((pr) => {
+          if (Array.isArray(pr)) {
+            hasLoadedRef.current.products = true;
+            setProductsList(pr);
+          }
+        }),
+        apiGetPortfolio().then((pf) => {
+          if (Array.isArray(pf)) {
+            hasLoadedRef.current.portfolio = true;
+            setPortfolioList(pf);
+          }
+        }),
+        apiGetAdmins().then((ad) => { if (Array.isArray(ad)) setAdminsList(ad); }),
+        apiGetTeam().then((tm) => {
+          if (Array.isArray(tm)) {
+            hasLoadedRef.current.team = true;
+            setTeamList(tm);
+          }
+        }),
+        apiGetSwatches().then((swt) => {
+          if (Array.isArray(swt)) {
+            hasLoadedRef.current.swatches = true;
+            setSwatchesList(swt);
+          }
+        }),
+        apiGetReviews().then((revs) => { if (Array.isArray(revs)) setReviewsList(revs); }),
+      ]);
     } catch (e) {
       console.warn('Admin loadData error:', e);
     } finally {
@@ -207,7 +209,25 @@ export const AdminDashboard = ({
   }, []);
 
   useEffect(() => {
-    if (propSwatchesList && Array.isArray(propSwatchesList) && propSwatchesList.length > 0) {
+    if (!hasLoadedRef.current.products && Array.isArray(propProductsList) && propProductsList.length > 0) {
+      setProductsList(propProductsList);
+    }
+  }, [propProductsList]);
+
+  useEffect(() => {
+    if (!hasLoadedRef.current.portfolio && Array.isArray(propPortfolioList) && propPortfolioList.length > 0) {
+      setPortfolioList(propPortfolioList);
+    }
+  }, [propPortfolioList]);
+
+  useEffect(() => {
+    if (!hasLoadedRef.current.team && Array.isArray(propTeamList) && propTeamList.length > 0) {
+      setTeamList(propTeamList);
+    }
+  }, [propTeamList]);
+
+  useEffect(() => {
+    if (!hasLoadedRef.current.swatches && Array.isArray(propSwatchesList) && propSwatchesList.length > 0) {
       setSwatchesList(propSwatchesList);
     }
   }, [propSwatchesList]);
