@@ -25,13 +25,14 @@ import { getStoredUser, clearAuthSession, apiGetProducts, apiGetPortfolio, apiGe
 const VALID_PAGES = ['home', 'products', 'portfolio', 'about', 'contact'];
 
 export function App() {
-  const [isAdminOpen, setIsAdminOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash.toLowerCase();
-      return hash === '#admin';
-    }
-    return false;
-  });
+  const checkIsAdminRoute = () => {
+    if (typeof window === 'undefined') return false;
+    const path = (window.location.pathname || '').toLowerCase().replace(/\/+$/, '');
+    const hash = (window.location.hash || '').toLowerCase().replace(/\/+$/, '');
+    return path === '/admin' || hash === '#admin';
+  };
+
+  const [isAdminOpen, setIsAdminOpen] = useState(checkIsAdminRoute);
 
   const getPageFromHash = () => {
     const hash = window.location.hash.replace('#', '').toLowerCase();
@@ -52,19 +53,40 @@ export function App() {
     }
   };
 
+  const handleOpenAdmin = () => {
+    setIsAdminOpen(true);
+    if (!window.location.pathname.toLowerCase().startsWith('/admin') && window.location.hash.toLowerCase() !== '#admin') {
+      window.history.pushState(null, '', '/admin');
+    }
+  };
+
+  const handleCloseAdmin = () => {
+    setIsAdminOpen(false);
+    if ((window.location.pathname || '').toLowerCase().startsWith('/admin')) {
+      window.history.pushState(null, '', '/');
+    } else if (window.location.hash.toLowerCase() === '#admin') {
+      window.history.replaceState(null, '', window.location.pathname || '/');
+    }
+  };
+
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '').toLowerCase();
-      if (hash === 'admin') {
+    const handleLocationChange = () => {
+      if (checkIsAdminRoute()) {
         setIsAdminOpen(true);
         return;
       }
+      setIsAdminOpen(false);
       const page = getPageFromHash();
       setCurrentPage(page);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
   }, []);
 
   // Secret Pro-Admin Keyboard Shortcuts:
@@ -78,7 +100,15 @@ export function App() {
       // Shortcut: Ctrl+Shift+A or Cmd+Shift+A
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
-        setIsAdminOpen((prev) => !prev);
+        setIsAdminOpen((prev) => {
+          if (prev) {
+            handleCloseAdmin();
+            return false;
+          } else {
+            handleOpenAdmin();
+            return true;
+          }
+        });
         return;
       }
 
@@ -95,7 +125,7 @@ export function App() {
 
         if (typedBuffer.endsWith('admin')) {
           typedBuffer = '';
-          setIsAdminOpen(true);
+          handleOpenAdmin();
         }
       }
     };
@@ -204,11 +234,6 @@ export function App() {
     };
   }, []);
 
-  // Admin handler - opens integrated secret admin panel
-  const handleOpenAdmin = () => {
-    setIsAdminOpen(true);
-  };
-
   // Modals handlers
   const handleOpenLeadModal = (serviceName = "Bepul o'lchash va konsultatsiya") => {
     setLeadModalData({ service: serviceName, source: "Tezkor tugma" });
@@ -244,7 +269,7 @@ export function App() {
     <div className="min-h-screen bg-brand-dark text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-brand-red selection:text-white">
       
       {/* Brand Intro & Splash Screen Animation on Site Load & Refresh */}
-      {showBrandIntro && (
+      {showBrandIntro && !isAdminOpen && (
         <BrandIntro onComplete={() => setShowBrandIntro(false)} t={t} />
       )}
 
@@ -441,7 +466,7 @@ export function App() {
       {currentUser && !isAdminOpen && (
         <button
           type="button"
-          onClick={() => setIsAdminOpen(true)}
+          onClick={handleOpenAdmin}
           className="fixed bottom-4 left-4 z-40 px-3.5 py-2 rounded-2xl bg-brand-surface/95 backdrop-blur-xl border border-brand-red/50 text-white text-xs font-bold shadow-2xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all group cursor-pointer"
           title="Boshqaruv panelini ochish"
         >
@@ -459,14 +484,9 @@ export function App() {
             onLogout={() => {
               clearAuthSession();
               setCurrentUser(null);
-              setIsAdminOpen(false);
+              handleCloseAdmin();
             }}
-            onClose={() => {
-              setIsAdminOpen(false);
-              if (window.location.hash === '#admin') {
-                window.history.replaceState(null, '', window.location.pathname);
-              }
-            }}
+            onClose={handleCloseAdmin}
             onDataChanged={loadDynamicData}
             isStandaloneApp={false}
             swatchesList={swatchesList}
@@ -474,12 +494,7 @@ export function App() {
         ) : (
           <AdminAuthModal
             isOpen={isAdminOpen}
-            onClose={() => {
-              setIsAdminOpen(false);
-              if (window.location.hash === '#admin') {
-                window.history.replaceState(null, '', window.location.pathname);
-              }
-            }}
+            onClose={handleCloseAdmin}
             onLoginSuccess={(user) => {
               setCurrentUser(user);
               setIsAdminOpen(true);

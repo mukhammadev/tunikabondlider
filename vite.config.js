@@ -4,19 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [
-    react(),
-    {
-      name: 'admin-route-rewrite',
-      configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          const rawUrl = req.url ? req.url.split('?')[0] : '';
-          if (rawUrl === '/admin' || rawUrl === '/admin/') {
-            req.url = '/admin.html';
-          }
-          next();
-        });
-      }
-    }
+    react()
   ],
   build: {
     rollupOptions: {
