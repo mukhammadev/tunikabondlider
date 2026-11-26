@@ -124,13 +124,14 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/20 shadow-2xl relative my-auto"
+            className="w-full max-w-lg rounded-3xl p-6 sm:p-8 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-white/20 shadow-2xl relative my-auto"
           >
             
             {/* Close button */}
             <button
               onClick={() => setSelectedSwatch(null)}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/5 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/20 transition-colors cursor-pointer"
+              aria-label={t?.productModal?.closeAria || "Yopish"}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

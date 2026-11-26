@@ -6,8 +6,8 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
   const [counts, setCounts] = useState({ exp: 0, projects: 0, warranty: 0, measure: 0 });
 
   useEffect(() => {
-    const duration = 1200; // ms
-    const steps = 30;
+    const duration = 500; // ms
+    const steps = 20;
     const intervalTime = duration / steps;
     let step = 0;
 
@@ -44,7 +44,7 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
   };
 
   return (
-    <section className="relative pt-28 pb-24 md:pt-36 md:pb-28 overflow-hidden">
+    <section className="relative pt-24 pb-24 md:pt-32 md:pb-24 overflow-hidden">
       {/* Background Decorative Ambient Gradients (Clean, zero lines) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-red/10 rounded-full blur-[150px]" />
@@ -70,7 +70,7 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
           </p>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 sm:mb-12">
             <button
               type="button"
               onClick={handleCatalogClick}
@@ -126,7 +126,7 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
                 <div className="w-10 h-10 rounded-xl bg-brand-red/15 flex items-center justify-center text-brand-red group-hover:scale-110 transition-transform">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-display">
+                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-display whitespace-nowrap">
                   {counts.warranty} {t.hero?.yearsUnit || "Yil"}
                 </div>
               </div>

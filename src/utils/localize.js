@@ -127,6 +127,7 @@ export const localizeSpecText = (val, currentLang = 'uz') => {
 
 const RU_NAME_MAP = {
   'Muhammadaziz Mirzayev': 'Мухаммадазиз Мирзаев',
+  'Rustam Karimov': 'Рустам Каримов',
   'Dilshod Usta': 'Мастер Дилшод',
   'Sanjar Usta': 'Мастер Санжар',
   'Bobur Usta': 'Мастер Бобур',

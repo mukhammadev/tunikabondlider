@@ -504,7 +504,8 @@ export const TeamSection = ({
                 type="button"
                 onClick={handlePrev}
                 className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
-                title="Oldingi"
+                title={currentLang === 'ru' ? 'Назад' : currentLang === 'en' ? 'Previous' : 'Oldingi'}
+                aria-label={currentLang === 'ru' ? 'Назад' : currentLang === 'en' ? 'Previous' : 'Oldingi'}
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -512,7 +513,8 @@ export const TeamSection = ({
                 type="button"
                 onClick={handleNext}
                 className="pointer-events-auto p-3 rounded-full bg-white dark:bg-brand-surface/90 hover:bg-brand-red dark:hover:bg-brand-red text-slate-800 dark:text-white hover:text-white border border-slate-200 dark:border-white/20 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
-                title="Keyingi"
+                title={currentLang === 'ru' ? 'Вперёд' : currentLang === 'en' ? 'Next' : 'Keyingi'}
+                aria-label={currentLang === 'ru' ? 'Вперёд' : currentLang === 'en' ? 'Next' : 'Keyingi'}
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
