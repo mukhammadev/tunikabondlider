@@ -69,7 +69,7 @@ export const Navbar = ({
   };
 
   return (
-    <header className="fixed top-3 sm:top-4 left-0 right-0 z-50 px-3 sm:px-5 pointer-events-none">
+    <header className="fixed top-3 sm:top-4 left-0 right-0 z-[60] isolate px-3 sm:px-5 pointer-events-none">
       <div className="max-w-[1150px] mx-auto pointer-events-auto flex flex-col gap-2">
 
         {/* ══ PILL BAR ══ */}
@@ -131,11 +131,11 @@ export const Navbar = ({
               })}
             </nav>
 
-            {/* Spacer for md/lg (no nav shown) */}
-            <div className="hidden md:flex xl:hidden flex-1" />
+            {/* Spacer for md..lg (when desktop links are collapsed into tablet/mobile menu) */}
+            <div className="hidden md:flex lg:hidden flex-1" />
 
-            {/* ── Desktop right controls ── */}
-            <div className="hidden md:flex items-center gap-1.5 shrink-0 ml-auto xl:ml-0">
+            {/* ── Desktop & Tablet right controls ── */}
+            <div className="hidden md:flex items-center gap-1.5 shrink-0 ml-auto lg:ml-0">
 
               {/* Language */}
               <div className={`flex items-center rounded-lg p-0.5 border text-[11px] font-bold ${isLight ? 'bg-black/5 border-slate-200' : 'bg-white/10 border-white/15'}`}>
@@ -173,6 +173,16 @@ export const Navbar = ({
               >
                 {t.nav.requestMeasurement}
               </button>
+
+              {/* Tablet Hamburger Menu (768px - 1023px) */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className={`lg:hidden p-1.5 rounded-lg border active:scale-95 transition-all hover:text-brand-red ${isLight ? 'bg-black/5 border-slate-200 text-slate-800' : 'bg-white/10 border-white/15 text-slate-200'}`}
+                aria-label="Menyu"
+              >
+                {mobileMenuOpen ? <X className="w-4 h-4 text-brand-red" /> : <Menu className="w-4 h-4" />}
+              </button>
             </div>
 
             {/* ── Mobile right controls ── */}
@@ -198,9 +208,9 @@ export const Navbar = ({
           </div>{/* end h-14 row */}
         </div>{/* end PILL */}
 
-        {/* ══ MOBILE DRAWER ══ */}
+        {/* ══ MOBILE & TABLET DRAWER ══ */}
         {mobileMenuOpen && (
-          <div className={`md:hidden rounded-2xl border-2 shadow-2xl px-4 pt-3.5 pb-4 animate-slideDown ${
+          <div className={`lg:hidden relative z-[70] rounded-2xl border-2 shadow-2xl px-4 pt-3.5 pb-4 animate-slideDown ${
             isLight ? 'bg-white border-slate-300 shadow-2xl text-slate-900' : 'bg-[#0c1122] border-white/20 shadow-2xl text-white'
           }`}>
 

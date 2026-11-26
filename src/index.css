@@ -170,6 +170,43 @@ html.light select:focus {
   outline: none;
 }
 
+/* Keep nested .dark portals (Admin Auth & Dashboard) strictly dark even in Light mode */
+html.light .dark .glass-panel {
+  background: rgba(17, 24, 39, 0.9) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.65) !important;
+  color: #f8fafc;
+}
+
+html.light .dark .glass-card {
+  background: rgba(31, 41, 55, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.35) !important;
+  color: #f8fafc;
+}
+
+html.light .dark .glass-card:hover {
+  background: rgba(31, 41, 55, 0.88) !important;
+  border-color: rgba(196, 0, 0, 0.5) !important;
+}
+
+html.light .dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.light .dark textarea,
+html.light .dark select {
+  background-color: rgba(11, 15, 25, 0.92);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+}
+
+html.light .dark input:focus,
+html.light .dark textarea:focus,
+html.light .dark select:focus {
+  border-color: rgba(196, 0, 0, 0.7);
+  box-shadow: 0 0 0 2px rgba(196, 0, 0, 0.2);
+}
+
 html.light input[type="range"] {
   accent-color: #C40000;
 }
@@ -192,9 +229,9 @@ html.light input[type="range"] {
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: none; }
 }
-.animate-fadeIn { animation: fadeIn 0.25s ease-out both; }
+.animate-fadeIn { animation: fadeIn 0.25s ease-out; }
 
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-8px); }

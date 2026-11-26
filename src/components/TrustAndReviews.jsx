@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   ShieldCheck, Award, Star, CheckCircle, FileText, 
   ThumbsUp, MessageSquarePlus, ChevronDown, ChevronUp, X, 
@@ -25,6 +26,15 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   const [allReviews, setAllReviews] = useState(defaultReviews);
   const [showAll, setShowAll] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsModalOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isModalOpen]);
   const [submitting, setSubmitting] = useState(false);
   const [successNotice, setSuccessNotice] = useState(false);
 
@@ -345,9 +355,11 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
       </div>
 
       {/* --- LEAVE REVIEW MODAL --- */}
-      {isModalOpen && (
+      {isModalOpen && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn"
           onClick={() => setIsModalOpen(false)}
         >
           <div 
@@ -505,7 +517,8 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
 
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </section>

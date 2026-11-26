@@ -850,7 +850,10 @@ export const AdminDashboard = ({
   };
 
   return (
-    <div className="dark fixed inset-0 z-50 bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn">
+    <div
+      style={{ colorScheme: 'dark' }}
+      className="dark fixed inset-0 z-[100] bg-brand-dark/95 backdrop-blur-xl flex flex-col overflow-hidden text-slate-100 animate-fadeIn"
+    >
       
       {/* Top Navbar */}
       <div className="bg-brand-surface border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-4 flex items-center justify-between flex-shrink-0">

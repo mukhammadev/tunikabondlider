@@ -135,9 +135,11 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                     <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white group-hover:text-brand-red transition-colors mb-2 leading-snug">
                       {name}
                     </h3>
-                    <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
-                      {desc}
-                    </p>
+                    {desc && (
+                      <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-6">
+                        {desc}
+                      </p>
+                    )}
 
                     {/* Quick Specs List */}
                     <div className="space-y-2 mb-6 text-xs text-slate-700 dark:text-slate-300">

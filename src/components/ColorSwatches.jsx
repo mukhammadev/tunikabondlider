@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { swatches } from '../data/swatches';
 import { Palette, X, ArrowRight } from 'lucide-react';
 import { getLocalizedField as resolveLocalizedField } from '../utils/localize';
@@ -6,6 +7,15 @@ import { getLocalizedField as resolveLocalizedField } from '../utils/localize';
 export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatchesList = [] }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedSwatch, setSelectedSwatch] = useState(null);
+
+  useEffect(() => {
+    if (!selectedSwatch) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedSwatch(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedSwatch]);
 
   const allSwatches = (swatchesList && swatchesList.length > 0) ? swatchesList : swatches;
 
@@ -104,14 +114,23 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
       </div>
 
       {/* Swatch Detail Modal */}
-      {selectedSwatch && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/80 backdrop-blur-md animate-fadeIn">
-          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/20 shadow-2xl relative">
+      {selectedSwatch && typeof document !== 'undefined' && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          data-modal="swatch"
+          onClick={(e) => { if (e.target === e.currentTarget) setSelectedSwatch(null); }}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/80 backdrop-blur-md animate-fadeIn overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-white/20 shadow-2xl relative my-auto"
+          >
             
             {/* Close button */}
             <button
               onClick={() => setSelectedSwatch(null)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-black/5 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/20 transition-colors"
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/5 dark:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/20 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -168,7 +187,8 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
             </button>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

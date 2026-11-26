@@ -72,7 +72,7 @@ export const ContactSection = ({ t }) => {
         </div>
 
         {/* Contact Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* Info & Map Column (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
@@ -232,7 +232,7 @@ export const ContactSection = ({ t }) => {
               </div>
 
               {/* Google Map Box with Interactive Pin Overlay */}
-              <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/15 shadow-md h-64 sm:h-72 bg-slate-100 dark:bg-brand-surface relative group">
+              <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/15 shadow-md h-64 sm:h-72 bg-slate-100 relative group isolate">
                 <iframe
                   title="Office Location"
                   src="https://www.google.com/maps/embed?pb=!1m13!1m8!1m3!1d6002.201579445047!2d69.285698!3d41.219574!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDEzJzEwLjUiTiA2OcKwMTcnMDguNSJF!5e0!3m2!1sru!2s!4v1764096417694!5m2!1sru!2s"
@@ -240,8 +240,9 @@ export const ContactSection = ({ t }) => {
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen=""
-                  loading="lazy"
+                  loading="eager"
                   referrerPolicy="no-referrer-when-downgrade"
+                  className="w-full h-full relative z-0"
                 />
 
                 {/* Floating location pin badge */}
@@ -284,8 +285,8 @@ export const ContactSection = ({ t }) => {
           </div>
 
           {/* Form Column (7 cols) */}
-          <div className="lg:col-span-7">
-            <div className="glass-panel p-6 sm:p-10 rounded-3xl border-brand-red/30 shadow-glow-red relative">
+          <div className="lg:col-span-7 flex">
+            <div className="glass-panel p-6 sm:p-10 rounded-3xl border-brand-red/30 shadow-glow-red relative w-full flex flex-col justify-between">
               
               {success ? (
                 <div className="py-12 text-center animate-fadeIn">
@@ -397,6 +398,34 @@ export const ContactSection = ({ t }) => {
 
                 </form>
               )}
+
+              {/* Bottom Assurance Strip (balances column height and reinforces trust) */}
+              <div className="mt-8 pt-6 border-t border-slate-200 dark:border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                  <span className="block text-[10px] font-black uppercase tracking-wider text-brand-red mb-1">
+                    {t.whyUs?.p1Badge || "10 YIL KAFOLAT"}
+                  </span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {t.whyUs?.p1Pt1 || "Yuridik Shartnoma"}
+                  </span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                  <span className="block text-[10px] font-black uppercase tracking-wider text-brand-red mb-1">
+                    {t.whyUs?.p2Badge || "MILLIMETR ANIQLIK"}
+                  </span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {t.whyUs?.p2Title || "100% Bepul O'lchash va Smeta"}
+                  </span>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                  <span className="block text-[10px] font-black uppercase tracking-wider text-brand-red mb-1">
+                    {t.whyUs?.p4Badge || "VOSITACHILARSIZ"}
+                  </span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {t.whyUs?.p4Title || "Birinchi Qo'l Zavod Narxlari"}
+                  </span>
+                </div>
+              </div>
 
             </div>
           </div>

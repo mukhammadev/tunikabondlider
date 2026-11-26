@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { submitLead } from '../services/telegram';
 import { apiUploadFile } from '../services/api';
 import confetti from 'canvas-confetti';
@@ -6,6 +6,15 @@ import { X, Send, CheckCircle2, ShieldCheck, Ruler, Camera, Image as ImageIcon }
 import { normalizePhoneForSubmit } from '../utils/localize';
 
 export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const [name, setName] = useState('');
@@ -64,7 +73,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-fadeIn"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

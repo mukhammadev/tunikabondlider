@@ -60,7 +60,7 @@ export const products = [
     warranty: "8 yil",
     badge: "Trend 2026",
     priceRange: "115,000 - 145,000 so'm / m²",
-    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
         { label: "Metall qalinligi", value: "0.40 mm" },

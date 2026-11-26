@@ -39,12 +39,36 @@ export const localizeSpecText = (val, currentLang = 'uz') => {
       .replace(/Toshkent shahri/gi, 'г. Ташкент')
       .replace(/Toshkent sh\.,/gi, 'г. Ташкент,')
       .replace(/Toshkent viloyati,/gi, 'Ташкентская обл.,')
+      .replace(/\bToshkent,/gi, 'Ташкент,')
+      .replace(/\bMirobod tumani\b/gi, 'Мирабадский р-н')
+      .replace(/Yangiyo'?l/gi, 'Янгиюль')
+      .replace(/\bQibray\b/gi, 'Кибрай')
+      .replace(/\bYunusobod\b/gi, 'Юнусабад')
+      .replace(/Mirzo Ulug'?bek/gi, 'Мирзо-Улугбек')
+      .replace(/\bChilonzor\b/gi, 'Чиланзар')
+      .replace(/\bSergeli\b|\bSergili\b/gi, 'Сергели')
+      .replace(/\bYakkasaroy\b/gi, 'Яккасарай')
+      .replace(/\bOlmazor\b/gi, 'Алмазар')
+      .replace(/\bShayxontohur\b/gi, 'Шайхантахур')
+      .replace(/\bTemir Karkas\b/gi, 'Металлокаркас')
+      .replace(/Spot yoritgichlar/gi, 'Точечная подсветка')
+      .replace(/LED chiziqlar/gi, 'LED-подсветка')
+      .replace(/Olovga chidamli/gi, 'Огнестойкий')
+      .replace(/Oltin Eman/gi, 'Золотой Дуб')
+      .replace(/Mat-Antratsit/gi, 'Матовый Антрацит')
+      .replace(/\bGrafit\b/gi, 'Графит')
+      .replace(/\bTunikabond Premium\b/gi, 'Туникабонд Премиум')
+      .replace(/\bTunikabond\b/gi, 'Туникабонд')
+      .replace(/\bAlyukabond\b/gi, 'Алюкобонд')
+      .replace(/PVDF polimer/gi, 'ПВДФ полимер')
+      .replace(/Fluoropolimer PVDF/gi, 'Фторполимер ПВДФ')
       .replace(/3-qavatli polimer/gi, '3-слойный полимер')
       .replace(/Polimer qoplama/gi, 'Полимерное покрытие')
       .replace(/Mat Poliester/gi, 'Матовый полиэстер')
       .replace(/Poliester/gi, 'Полиэстер')
       .replace(/Sink \+ Polimer/gi, 'Цинк + Полимер')
       .replace(/alyumin/gi, 'алюминий')
+      .replace(/(\d+(?:[.,]\d+)?)\s*mm\b/gi, '$1 мм')
       .replace(/\bmetr\b/gi, 'м')
       .replace(/m²/g, 'м²')
       .replace(/^Yangi$/i, 'Новинка')
@@ -66,12 +90,30 @@ export const localizeSpecText = (val, currentLang = 'uz') => {
       .replace(/Toshkent shahri/gi, 'Tashkent city')
       .replace(/Toshkent sh\.,/gi, 'Tashkent,')
       .replace(/Toshkent viloyati,/gi, 'Tashkent reg.,')
+      .replace(/\bToshkent,/gi, 'Tashkent,')
+      .replace(/\bMirobod tumani\b/gi, 'Mirobod district')
+      .replace(/Yangiyo'?l/gi, 'Yangiyul')
+      .replace(/\bQibray\b/gi, 'Kibray')
+      .replace(/\bYunusobod\b/gi, 'Yunusabad')
+      .replace(/\bChilonzor\b/gi, 'Chilanzar')
+      .replace(/\bSergili\b/gi, 'Sergeli')
+      .replace(/\bTemir Karkas\b/gi, 'Steel Frame')
+      .replace(/Spot yoritgichlar/gi, 'Spot lighting')
+      .replace(/LED chiziqlar/gi, 'LED lighting')
+      .replace(/Olovga chidamli/gi, 'Fire-Retardant')
+      .replace(/Oltin Eman/gi, 'Golden Oak')
+      .replace(/Mat-Antratsit/gi, 'Matte Anthracite')
+      .replace(/\bGrafit\b/gi, 'Graphite')
+      .replace(/\bAlyukabond\b/gi, 'Alucobond')
+      .replace(/PVDF polimer/gi, 'PVDF polymer')
+      .replace(/Fluoropolimer PVDF/gi, 'Fluoropolymer PVDF')
       .replace(/3-qavatli polimer/gi, '3-layer polymer')
       .replace(/Polimer qoplama/gi, 'Polymer coating')
       .replace(/Mat Poliester/gi, 'Matte Polyester')
       .replace(/Poliester/gi, 'Polyester')
       .replace(/Sink \+ Polimer/gi, 'Zinc + Polymer')
       .replace(/alyumin/gi, 'aluminum')
+      .replace(/(\d+(?:[.,]\d+)?)\s*mm\b/gi, '$1 mm')
       .replace(/\bmetr\b/gi, 'm')
       .replace(/m²/g, 'sq.m')
       .replace(/^Yangi$/i, 'New')
@@ -81,6 +123,43 @@ export const localizeSpecText = (val, currentLang = 'uz') => {
       .replace(/^Premium Standart$/i, 'Premium Standard');
   }
   return s;
+};
+
+const RU_NAME_MAP = {
+  'Muhammadaziz Mirzayev': 'Мухаммадазиз Мирзаев',
+  'Dilshod Usta': 'Мастер Дилшод',
+  'Sanjar Usta': 'Мастер Санжар',
+  'Bobur Usta': 'Мастер Бобур',
+  'Akmal Usta': 'Мастер Акмал',
+  'Ibragimov': 'Ибрагимов',
+};
+
+export const localizePersonName = (name, currentLang = 'uz') => {
+  if (!name) return '';
+  const raw = String(name).trim();
+  if (currentLang === 'ru') {
+    if (RU_NAME_MAP[raw]) return RU_NAME_MAP[raw];
+    return raw.replace(/\bUsta\b/gi, 'Мастер');
+  }
+  if (currentLang === 'en') {
+    return raw.replace(/\bUsta\b/gi, 'Master');
+  }
+  return raw;
+};
+
+export const formatWorksCount = (count, currentLang = 'uz') => {
+  const n = Number(count) || 0;
+  if (currentLang === 'ru') {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return `${n} работа в каталоге`;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} работы в каталоге`;
+    return `${n} работ в каталоге`;
+  }
+  if (currentLang === 'en') {
+    return n === 1 ? '1 catalog work' : `${n} catalog works`;
+  }
+  return `${n} ta katalog ishi`;
 };
 
 const MONTHS = {

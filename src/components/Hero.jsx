@@ -44,7 +44,7 @@ export const Hero = ({ t, onOpenLeadModal, onNavigate }) => {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+    <section className="relative pt-28 pb-24 md:pt-36 md:pb-28 overflow-hidden">
       {/* Background Decorative Ambient Gradients (Clean, zero lines) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-red/10 rounded-full blur-[150px]" />

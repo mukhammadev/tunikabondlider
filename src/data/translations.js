@@ -83,7 +83,7 @@ export const translations = {
       ctaMeasurement: "Bepul O'lchash & Konsultatsiya",
       statExp: "Yillik tajriba",
       statProjects: "Tugallangan obyektlar",
-      statWarranty: "Yillik rasmiy kafolat",
+      statWarranty: "Rasmiy zavod kafolati",
       statMeasurement: "Bepul o'lchash va maslahat",
       yearsUnit: "Yil"
     },
@@ -520,7 +520,7 @@ export const translations = {
       ctaMeasurement: "Бесплатный Замер и Консультация",
       statExp: "Лет опыта",
       statProjects: "Сданных объектов",
-      statWarranty: "Лет гарантии",
+      statWarranty: "Официальная гарантия",
       statMeasurement: "Бесплатный замер и смета",
       yearsUnit: "Лет"
     },
@@ -957,7 +957,7 @@ export const translations = {
       ctaMeasurement: "Free Measurement & Consultation",
       statExp: "Years Experience",
       statProjects: "Completed Projects",
-      statWarranty: "Years Warranty",
+      statWarranty: "Official Warranty",
       statMeasurement: "Free Measurement & Estimate",
       yearsUnit: "Years"
     },

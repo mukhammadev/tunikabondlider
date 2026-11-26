@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { portfolio as defaultPortfolio } from '../data/portfolio';
 import { Compass, MapPin, Clock, Layers, Maximize2, X, CheckCircle2, ArrowRight, UserCheck } from 'lucide-react';
-import { getLocalizedField, localizeSpecText } from '../utils/localize';
+import { getLocalizedField, localizeSpecText, localizePersonName } from '../utils/localize';
 
 export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
   const [activeFilter, setActiveFilter] = useState('naves');
   const [selectedImage, setSelectedImage] = useState(null);
+
+  useEffect(() => {
+    if (!selectedImage) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedImage(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedImage]);
 
   const portfolioToUse = Array.isArray(items) ? items : defaultPortfolio;
 
@@ -162,7 +172,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                     <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
                       <div className="flex items-center gap-2">
                         <Layers className="w-3.5 h-3.5 text-brand-red flex-shrink-0" />
-                        <span className="truncate">{item.material}</span>
+                        <span className="truncate">{loc(item.material)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-brand-red flex-shrink-0" />
@@ -185,13 +195,13 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                         <div className="flex items-center gap-2.5 min-w-0">
                           <img
                             src={item.masterPhoto || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"}
-                            alt={item.masterName}
+                            alt={localizePersonName(item.masterName, currentLang)}
                             className="w-9 h-9 rounded-full object-cover border-2 border-brand-red/60 shadow-sm flex-shrink-0"
                           />
                           <div className="min-w-0">
                             <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">{t.portfolio?.masterLabel || "Mas'ul usta:"}</span>
                             <span className="text-xs font-bold text-slate-900 dark:text-white group-hover/master:text-brand-red transition-colors flex items-center gap-1 truncate">
-                              <span>{item.masterName}</span>
+                              <span>{localizePersonName(item.masterName, currentLang)}</span>
                               <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
                             </span>
                           </div>
@@ -220,10 +230,12 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
       </div>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
+      {selectedImage && typeof document !== 'undefined' && createPortal(
         <div 
+          role="dialog"
+          aria-modal="true"
           onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn"
         >
           <div 
             onClick={(e) => e.stopPropagation()}
@@ -255,7 +267,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                 <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
                   <span>📍 {localizeSpecText(selectedImage.location, currentLang)}</span>
                   <span>📐 {localizeSpecText(selectedImage.area, currentLang)}</span>
-                  <span>🛠 {selectedImage.material}</span>
+                  <span>🛠 {localizeSpecText(selectedImage.material, currentLang)}</span>
                   <span>⏱ {localizeSpecText(selectedImage.time, currentLang)}</span>
                 </div>
               </div>
@@ -277,14 +289,15 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                   <div>
                     <span className="block text-[10px] text-slate-600 dark:text-slate-400 font-medium">{t.portfolio?.masterLabel || "Mas'ul usta:"}</span>
                     <span className="font-bold text-sm text-slate-900 dark:text-white hover:text-brand-red flex items-center gap-1">
-                      {selectedImage.masterName} <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                      {localizePersonName(selectedImage.masterName, currentLang)} <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
                     </span>
                   </div>
                 </div>
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </section>

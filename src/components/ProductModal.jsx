@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, ShieldCheck, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { getLocalizedField, localizeSpecText } from '../utils/localize';
 
 export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderProduct }) => {
+  useEffect(() => {
+    if (!product) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [product, onClose]);
+
   if (!product) return null;
 
   const pm = t?.productModal || {};
@@ -38,7 +47,7 @@ export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderP
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 dark:bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -95,7 +104,7 @@ export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderP
             {specsList.map((spec, i) => (
               <div key={i} className="flex justify-between p-3.5 sm:px-4 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                 <span className="text-slate-600 dark:text-slate-400 font-medium">{spec.label || spec.name}</span>
-                <span className="font-semibold text-slate-900 dark:text-white text-right">{spec.value}</span>
+                <span className="font-semibold text-slate-900 dark:text-white text-right">{localizeVal(spec.value)}</span>
               </div>
             ))}
           </div>

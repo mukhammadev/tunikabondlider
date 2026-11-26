@@ -105,6 +105,6 @@ export const portfolio = [
     material: "Tunikabond Dark Walnut + LED chiziqlar",
     area: "120 metr",
     time: "6 ish kuni",
-    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=80"
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"
   }
 ];

@@ -9,7 +9,7 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   if (!isOpen) return null;
 
   const [hasAdmins, setHasAdmins] = useState(() => apiHasAdmins());
-  const [isRegisterTab, setIsRegisterTab] = useState(() => !apiHasAdmins());
+  const [isRegisterTab, setIsRegisterTab] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -54,7 +54,10 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   };
 
   return (
-    <div className="dark fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-6 bg-brand-dark text-slate-100 animate-fadeIn overflow-y-auto selection:bg-brand-red selection:text-white">
+    <div
+      style={{ colorScheme: 'dark' }}
+      className="dark fixed inset-0 z-[100] flex flex-col justify-between p-4 sm:p-6 bg-brand-dark text-slate-100 animate-fadeIn overflow-y-auto selection:bg-brand-red selection:text-white"
+    >
       
       {/* Top Header Navigation */}
       <div className="w-full max-w-4xl mx-auto flex items-center justify-between py-2 shrink-0">

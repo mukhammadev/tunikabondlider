@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Users, Award, ChevronLeft, ChevronRight, CheckCircle2, 
   Phone, Send, Sparkles, X, MapPin, Briefcase, Eye, 
   ShieldCheck, Hammer, Layers, Compass, ArrowRight
 } from 'lucide-react';
-import { localizeSpecText } from '../utils/localize';
+import { localizeSpecText, localizePersonName, formatWorksCount } from '../utils/localize';
 
 export const TeamSection = ({ 
   t, 
@@ -17,6 +18,18 @@ export const TeamSection = ({
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedMaster, setSelectedMaster] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
+
+  useEffect(() => {
+    if (!selectedMaster && !zoomedImage) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (zoomedImage) setZoomedImage(null);
+        else setSelectedMaster(null);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedMaster, zoomedImage]);
 
   // Dynamic localization helpers for team members
   const getMemberRole = (member) => {
@@ -283,9 +296,11 @@ export const TeamSection = ({
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {displayMembers.map((member, idx) => {
-                  const isBoss = member.label?.toLowerCase().includes('boshlig');
-                  const isAssistant = member.label?.toLowerCase().includes('yordamchi');
+                  const rawLabel = (typeof member.label === 'object' ? (member.label?.uz || '') : (member.label || '')).toLowerCase();
+                  const isBoss = member.id === 'team-boss' || rawLabel.includes('boshlig');
+                  const isAssistant = member.id === 'team-asst' || rawLabel.includes('ceo') || rawLabel.includes('yordamchi');
                   const worksCount = getMasterWorks(member).length;
+                  const displayName = localizePersonName(member.name, currentLang);
 
                   return (
                     <div
@@ -300,7 +315,7 @@ export const TeamSection = ({
                         <div className="relative aspect-[4/3] overflow-hidden bg-brand-dark">
                           <img
                             src={member.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"}
-                            alt={member.name}
+                            alt={displayName}
                             className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 pointer-events-none"
                             onError={(e) => {
                               e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
@@ -343,7 +358,7 @@ export const TeamSection = ({
                           <div>
                             <div className="flex items-center justify-between mb-1.5">
                               <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors flex items-center gap-1.5">
-                                <span>{member.name}</span>
+                                <span>{displayName}</span>
                                 <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                               </h3>
                             </div>
@@ -359,7 +374,7 @@ export const TeamSection = ({
                           <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
                             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
                               <Hammer className="w-3.5 h-3.5 text-brand-red" />
-                              <span>{worksCount} {t.team?.worksCountSuffix || "ta katalog ishi"}</span>
+                              <span>{formatWorksCount(worksCount, currentLang)}</span>
                             </span>
 
                             <span className="text-xs font-bold text-brand-red flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -386,9 +401,11 @@ export const TeamSection = ({
                 : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
             }`}>
               {filteredMembers.map((member) => {
-                const isBoss = member.label?.toLowerCase().includes('boshlig');
-                const isAssistant = member.label?.toLowerCase().includes('yordamchi');
+                const rawLabel = (typeof member.label === 'object' ? (member.label?.uz || '') : (member.label || '')).toLowerCase();
+                const isBoss = member.id === 'team-boss' || rawLabel.includes('boshlig');
+                const isAssistant = member.id === 'team-asst' || rawLabel.includes('ceo') || rawLabel.includes('yordamchi');
                 const worksCount = getMasterWorks(member).length;
+                const displayName = localizePersonName(member.name, currentLang);
 
                 return (
                   <div
@@ -403,7 +420,7 @@ export const TeamSection = ({
                       <div className="relative aspect-[4/3] overflow-hidden bg-brand-dark">
                         <img
                           src={member.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"}
-                          alt={member.name}
+                          alt={displayName}
                           className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 pointer-events-none"
                           onError={(e) => {
                             e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
@@ -446,7 +463,7 @@ export const TeamSection = ({
                         <div>
                           <div className="flex items-center justify-between mb-1.5">
                             <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white group-hover:text-brand-red transition-colors flex items-center gap-1.5">
-                              <span>{member.name}</span>
+                              <span>{displayName}</span>
                               <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                             </h3>
                           </div>
@@ -462,7 +479,7 @@ export const TeamSection = ({
                         <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between">
                           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
                             <Hammer className="w-3.5 h-3.5 text-brand-red" />
-                            <span>{worksCount} {t.team?.worksCountSuffix || "ta katalog ishi"}</span>
+                            <span>{formatWorksCount(worksCount, currentLang)}</span>
                           </span>
 
                           <span className="text-xs font-bold text-brand-red flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -514,10 +531,16 @@ export const TeamSection = ({
       </div>
 
       {/* --- MASTER DETAIL & PORTFOLIO WORKS MODAL --- */}
-      {selectedMaster && (() => {
+      {selectedMaster && typeof document !== 'undefined' && (() => {
         const masterWorks = getMasterWorks(selectedMaster);
-        return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn">
+        const masterDisplayName = localizePersonName(selectedMaster.name, currentLang);
+        return createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={() => setSelectedMaster(null)}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn"
+          >
             <div 
               className="glass-panel w-full max-w-4xl max-h-[90vh] rounded-3xl overflow-hidden border border-slate-200 dark:border-brand-red/30 shadow-glow-red flex flex-col bg-white dark:bg-brand-dark animate-scaleUp"
               onClick={(e) => e.stopPropagation()}
@@ -527,7 +550,7 @@ export const TeamSection = ({
                 <div className="flex items-center gap-4">
                   <img
                     src={selectedMaster.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"}
-                    alt={selectedMaster.name}
+                    alt={masterDisplayName}
                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-brand-red/50 shadow-md"
                   />
                   <div>
@@ -540,7 +563,7 @@ export const TeamSection = ({
                       </span>
                     </div>
                     <h3 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white mt-1 flex items-center gap-1.5">
-                      <span>{selectedMaster.name}</span>
+                      <span>{masterDisplayName}</span>
                       <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
                     </h3>
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
@@ -644,12 +667,12 @@ export const TeamSection = ({
                             {work.location && (
                               <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
                                 <MapPin className="w-3 h-3 text-brand-red flex-shrink-0" />
-                                <span>{work.location}</span>
+                                <span>{localizeSpecText(work.location, currentLang)}</span>
                               </div>
                             )}
                             {work.desc && (
                               <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-normal pt-1 border-t border-slate-100 dark:border-white/5">
-                                {work.desc}
+                                {localizeSpecText(work.desc, currentLang)}
                               </p>
                             )}
                           </div>
@@ -695,14 +718,17 @@ export const TeamSection = ({
               </div>
 
             </div>
-          </div>
+          </div>,
+          document.body
         );
       })()}
 
       {/* Full-screen Zoom Preview for Master's Works */}
-      {zoomedImage && (
+      {zoomedImage && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setZoomedImage(null)}
         >
           <div className="relative max-w-5xl max-h-[90vh]">
@@ -718,7 +744,8 @@ export const TeamSection = ({
               <X className="w-6 h-6" />
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </section>
