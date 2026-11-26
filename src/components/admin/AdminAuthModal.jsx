@@ -6,8 +6,6 @@ import {
 } from 'lucide-react';
 
 export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
-  if (!isOpen) return null;
-
   const [hasAdmins, setHasAdmins] = useState(() => apiHasAdmins());
   const [isRegisterTab, setIsRegisterTab] = useState(false);
   const [username, setUsername] = useState('');
@@ -17,6 +15,8 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+
+  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

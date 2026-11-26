@@ -245,6 +245,21 @@ export const AdminDashboard = ({
     type: 'user'
   });
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key !== 'Escape') return;
+      if (productModalOpen) setProductModalOpen(false);
+      else if (portfolioModalOpen) setPortfolioModalOpen(false);
+      else if (teamModalOpen) setTeamModalOpen(false);
+      else if (adminModalOpen) setAdminModalOpen(false);
+      else if (swatchModalOpen) setSwatchModalOpen(false);
+      else if (newRecipientModalOpen) setNewRecipientModalOpen(false);
+      else if (reviewModalOpen) setReviewModalOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [productModalOpen, portfolioModalOpen, teamModalOpen, adminModalOpen, swatchModalOpen, newRecipientModalOpen, reviewModalOpen]);
+
   // --- TELEGRAM ACTIONS ---
   const handleSaveTelegram = (e) => {
     if (e) e.preventDefault();
@@ -392,15 +407,15 @@ export const AdminDashboard = ({
   const handleOpenProductEdit = (prod) => {
     setEditingProduct(prod);
     setProductForm({
-      nameUz: prod.name?.uz || prod.name || '',
+      nameUz: getLocalizedField(prod.name, 'uz'),
       category: prod.category || 'tunikabond',
-      thickness: prod.thickness || '',
-      coating: prod.coating || '',
-      warranty: prod.warranty || '',
-      badge: prod.badge || '',
-      priceRange: prod.priceRange || '',
+      thickness: getLocalizedField(prod.thickness, 'uz'),
+      coating: getLocalizedField(prod.coating, 'uz'),
+      warranty: getLocalizedField(prod.warranty, 'uz'),
+      badge: getLocalizedField(prod.badge, 'uz'),
+      priceRange: getLocalizedField(prod.priceRange, 'uz'),
       image: prod.image || '',
-      descUz: prod.shortDesc?.uz || prod.shortDesc || ''
+      descUz: getLocalizedField(prod.shortDesc, 'uz')
     });
     setProductModalOpen(true);
   };
@@ -480,13 +495,13 @@ export const AdminDashboard = ({
       titleUz: getLocalizedField(item.title, 'uz'),
       category: item.category || 'naves',
       masterId: item.masterId || '',
-      masterName: item.masterName || '',
+      masterName: getLocalizedField(item.masterName, 'uz'),
       masterPhoto: item.masterPhoto || '',
-      masterRole: item.masterRole || '',
-      location: item.location || '',
-      material: item.material || '',
-      area: item.area || '',
-      time: item.time || '',
+      masterRole: getLocalizedField(item.masterRole, 'uz'),
+      location: getLocalizedField(item.location, 'uz'),
+      material: getLocalizedField(item.material, 'uz'),
+      area: getLocalizedField(item.area, 'uz'),
+      time: getLocalizedField(item.time, 'uz'),
       image: item.image || ''
     });
     setPortfolioModalOpen(true);
@@ -557,14 +572,14 @@ export const AdminDashboard = ({
   const handleOpenTeamEdit = (member) => {
     setEditingTeamMember(member);
     setTeamForm({
-      name: member.name || '',
-      role: member.role || '',
-      label: member.label || 'Usta',
-      experience: member.experience || '',
-      completedProjects: member.completedProjects || '',
+      name: getLocalizedField(member.name, 'uz'),
+      role: getLocalizedField(member.role, 'uz'),
+      label: getLocalizedField(member.label, 'uz', 'Usta'),
+      experience: getLocalizedField(member.experience, 'uz'),
+      completedProjects: getLocalizedField(member.completedProjects, 'uz'),
       phone: member.phone || '',
       photo: member.photo || '',
-      bio: member.bio || '',
+      bio: getLocalizedField(member.bio, 'uz'),
       specialties: member.specialties || ['naves']
     });
     setTeamModalOpen(true);
@@ -577,13 +592,14 @@ export const AdminDashboard = ({
       return;
     }
 
+    const labelStr = String(teamForm.label || 'Usta');
     const payload = {
       ...teamForm,
       works: editingTeamMember?.works || [
         {
           id: `w-${Date.now()}-1`,
-          title: `${teamForm.label} — Namuna Loyihasi`,
-          category: teamForm.label.includes('Naves') ? 'Naves' : teamForm.label.includes('Darvoza') ? 'Darvozaxona' : teamForm.label.includes('Kozir') ? 'Koziryok' : 'Fasad',
+          title: `${labelStr} — Namuna Loyihasi`,
+          category: labelStr.includes('Naves') ? 'Naves' : labelStr.includes('Darvoza') ? 'Darvozaxona' : labelStr.includes('Kozir') ? 'Koziryok' : 'Fasad',
           image: teamForm.photo || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80',
           location: 'Toshkent shahri',
           desc: 'Yuqori sifatli materiallar va 10 yillik kafolat bilan topshirilgan obyekt.'
@@ -1742,37 +1758,54 @@ export const AdminDashboard = ({
 
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProducts.map((prod) => (
+                    {filteredProducts.map((prod) => {
+                      const prodName = getLocalizedField(prod.name, 'uz', 'Mahsulot');
+                      const prodDesc = getLocalizedField(prod.shortDesc, 'uz');
+                      const prodBadge = getLocalizedField(prod.badge, 'uz') || prod.category;
+                      const prodThickness = getLocalizedField(prod.thickness, 'uz');
+                      const prodPrice = getLocalizedField(prod.priceRange, 'uz');
+                      return (
                       <div key={prod.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 group hover:border-brand-red/40">
                         <div>
                           <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
-                            <img src={prod.image} alt="" className="w-full h-full object-cover" />
+                            <img
+                              src={prod.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"}
+                              alt={prodName}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+                              }}
+                              className="w-full h-full object-cover"
+                            />
                             <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-brand-red text-white text-[10px] font-black">
-                              {prod.badge || prod.category}
+                              {prodBadge}
                             </span>
                           </div>
 
                           <h3 className="font-display font-bold text-base text-white mb-1">
-                            {prod.name?.uz || prod.name}
+                            {prodName}
                           </h3>
-                          <p className="text-xs text-slate-400 mb-3 line-clamp-2">
-                            {prod.shortDesc?.uz || prod.shortDesc}
-                          </p>
+                          {prodDesc && (
+                            <p className="text-xs text-slate-400 mb-3 line-clamp-2">
+                              {prodDesc}
+                            </p>
+                          )}
 
                           <div className="space-y-1 text-xs text-slate-300 border-t border-white/10 pt-2 mb-3">
                             <div className="flex justify-between">
                               <span className="text-slate-400">Qalinlik:</span>
-                              <span className="font-semibold text-white">{prod.thickness}</span>
+                              <span className="font-semibold text-white">{prodThickness}</span>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-400">Narx:</span>
-                              <span className="font-bold text-brand-red">{prod.priceRange}</span>
+                              <span className="font-bold text-brand-red">{prodPrice}</span>
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 pt-2 border-t border-white/10">
                           <button
+                            type="button"
                             onClick={() => handleOpenProductEdit(prod)}
                             className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                           >
@@ -1780,6 +1813,7 @@ export const AdminDashboard = ({
                             <span>Tahrirlash</span>
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDeleteProduct(prod.id)}
                             className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
                             title="O'chirish"
@@ -1788,7 +1822,8 @@ export const AdminDashboard = ({
                           </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 );
               })()}
@@ -1894,33 +1929,49 @@ export const AdminDashboard = ({
 
                 return (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredPortfolio.map((item) => (
+                    {filteredPortfolio.map((item) => {
+                      const itemTitle = getLocalizedField(item.title, 'uz', 'Loyiha');
+                      const itemLoc = getLocalizedField(item.location, 'uz');
+                      const itemMat = getLocalizedField(item.material, 'uz');
+                      const itemArea = getLocalizedField(item.area, 'uz');
+                      const itemTime = getLocalizedField(item.time, 'uz');
+                      const itemMaster = getLocalizedField(item.masterName, 'uz');
+                      return (
                       <div key={item.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10">
                         <div>
                           <div className="relative h-44 rounded-xl overflow-hidden mb-3 bg-brand-surface">
-                            <img src={item.image} alt="" className="w-full h-full object-cover" />
+                            <img
+                              src={item.image || "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1000&q=80"}
+                              alt={itemTitle}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1000&q=80";
+                              }}
+                              className="w-full h-full object-cover"
+                            />
                             <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-white text-[10px] font-bold">
-                              {item.location}
+                              {itemLoc}
                             </span>
                           </div>
 
                           <h3 className="font-display font-bold text-base text-white mb-2 line-clamp-2">
-                            {item.title?.uz || item.title}
+                            {itemTitle}
                           </h3>
 
                           <div className="space-y-1 text-xs text-slate-300 mb-4">
                             <div>📁 Yo'nalish: <strong className="text-brand-red font-bold uppercase">{item.category}</strong></div>
-                            <div>🛠 Material: {item.material}</div>
-                            <div>📐 Hajmi: {item.area} | ⏱ Muddat: {item.time}</div>
+                            <div>🛠 Material: {itemMat}</div>
+                            <div>📐 Hajmi: {itemArea} | ⏱ Muddat: {itemTime}</div>
                             <div className="flex items-center gap-1.5 pt-1 text-slate-200">
                               <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>Mas'ul usta: <strong className="text-white">{item.masterName || "Biriktirilmagan"}</strong></span>
+                              <span>Mas'ul usta: <strong className="text-white">{itemMaster || "Biriktirilmagan"}</strong></span>
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2 pt-2 border-t border-white/10">
                           <button
+                            type="button"
                             onClick={() => handleOpenPortfolioEdit(item)}
                             className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                           >
@@ -1928,6 +1979,7 @@ export const AdminDashboard = ({
                             <span>Tahrirlash</span>
                           </button>
                           <button
+                            type="button"
                             onClick={() => handleDeletePortfolio(item.id)}
                             className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
                             title="O'chirish"
@@ -1936,7 +1988,8 @@ export const AdminDashboard = ({
                           </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 );
               })()}
@@ -1982,36 +2035,46 @@ export const AdminDashboard = ({
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {teamList.map((member) => (
+                {teamList.map((member) => {
+                  const memberName = getLocalizedField(member.name, 'uz', 'Usta');
+                  const memberRole = getLocalizedField(member.role, 'uz');
+                  const memberLabel = getLocalizedField(member.label, 'uz') || memberRole;
+                  const memberProjects = getLocalizedField(member.completedProjects, 'uz') || "300+ obyekt";
+                  const memberExp = getLocalizedField(member.experience, 'uz');
+                  return (
                   <div key={member.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 bg-brand-surface/70">
                     <div>
                       <div className="relative h-48 rounded-xl overflow-hidden mb-3 bg-brand-surface">
                         <img 
                           src={member.photo || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80"} 
-                          alt="" 
+                          alt={memberName}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80";
+                          }}
                           className="w-full h-full object-cover object-top" 
                         />
                         <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md bg-brand-red text-white text-[11px] font-black shadow-md">
-                          {member.label || member.role}
+                          {memberLabel}
                         </span>
                         <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-white text-[10px] font-bold">
-                          {member.completedProjects || "300+ obyekt"}
+                          {memberProjects}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-1.5 mb-1">
                         <h3 className="font-display font-bold text-base text-white">
-                          {member.name}
+                          {memberName}
                         </h3>
                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                       </div>
 
                       <p className="text-xs font-semibold text-slate-300 mb-2">
-                        {member.role}
+                        {memberRole}
                       </p>
 
                       <div className="space-y-1 text-xs text-slate-400 mb-4">
-                        <div>🎖 Tajriba: <strong className="text-white">{member.experience}</strong></div>
+                        <div>🎖 Tajriba: <strong className="text-white">{memberExp}</strong></div>
                         <div>📞 Tel: <strong className="text-white">{member.phone || "+998 99 533-33-03"}</strong></div>
                         <div>🛠 Namunaviy ishlar: <strong className="text-brand-red">{member.works?.length || 0} ta</strong></div>
                       </div>
@@ -2019,22 +2082,25 @@ export const AdminDashboard = ({
 
                     <div className="flex items-center gap-2 pt-2 border-t border-white/10">
                       <button
+                        type="button"
                         onClick={() => handleOpenTeamEdit(member)}
-                        className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
+                        className="flex-1 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         <span>Tahrirlash</span>
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleDeleteTeamMember(member.id)}
-                        className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors"
+                        className="p-2 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white transition-colors cursor-pointer"
                         title="O'chirish"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 </div>
               )}
             </div>
@@ -3014,11 +3080,18 @@ export const AdminDashboard = ({
 
       {/* --- PRODUCT CREATE/EDIT MODAL --- */}
       {productModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
-          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setProductModalOpen(false); }}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto"
+          >
             <button
+              type="button"
               onClick={() => setProductModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -3190,11 +3263,18 @@ export const AdminDashboard = ({
 
       {/* --- PORTFOLIO CREATE/EDIT MODAL --- */}
       {portfolioModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
-          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setPortfolioModalOpen(false); }}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto"
+          >
             <button
+              type="button"
               onClick={() => setPortfolioModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -3263,9 +3343,9 @@ export const AdminDashboard = ({
                     setPortfolioForm({
                       ...portfolioForm,
                       masterId: e.target.value,
-                      masterName: selectedM ? selectedM.name : '',
+                      masterName: selectedM ? getLocalizedField(selectedM.name, 'uz') : '',
                       masterPhoto: selectedM ? selectedM.photo : '',
-                      masterRole: selectedM ? selectedM.role : ''
+                      masterRole: selectedM ? getLocalizedField(selectedM.role, 'uz') : ''
                     });
                   }}
                   className="w-full px-3 py-2.5 rounded-xl bg-brand-dark/80 border border-brand-red/40 text-white text-sm focus:outline-none focus:border-brand-red font-bold"
@@ -3273,7 +3353,7 @@ export const AdminDashboard = ({
                   <option value="">Ustani tanlang...</option>
                   {teamList.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.name} ({m.label || m.role})
+                      {getLocalizedField(m.name, 'uz')} ({getLocalizedField(m.label, 'uz') || getLocalizedField(m.role, 'uz')})
                     </option>
                   ))}
                 </select>
@@ -3383,11 +3463,18 @@ export const AdminDashboard = ({
 
       {/* --- TEAM MEMBER CREATE/EDIT MODAL --- */}
       {teamModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
-          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setTeamModalOpen(false); }}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto"
+          >
             <button
+              type="button"
               onClick={() => setTeamModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -3571,11 +3658,18 @@ export const AdminDashboard = ({
 
       {/* --- ADD ADMIN MODAL --- */}
       {adminModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn">
-          <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setAdminModalOpen(false); }}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative"
+          >
             <button
+              type="button"
               onClick={() => setAdminModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -3654,11 +3748,18 @@ export const AdminDashboard = ({
 
       {/* --- ADD / EDIT SWATCH MODAL --- */}
       {swatchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto">
-          <div className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setSwatchModalOpen(false); }}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-brand-red/30 shadow-2xl relative my-8 max-h-[90vh] overflow-y-auto"
+          >
             <button
+              type="button"
               onClick={() => setSwatchModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -3911,11 +4012,18 @@ export const AdminDashboard = ({
 
       {/* --- TELEGRAM NEW RECIPIENT MODAL --- */}
       {newRecipientModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn">
-          <div className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative">
+        <div
+          onClick={(e) => { if (e.target === e.currentTarget) setNewRecipientModalOpen(false); }}
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-fadeIn"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative"
+          >
             <button
+              type="button"
               onClick={() => setNewRecipientModalOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -3998,7 +4106,7 @@ export const AdminDashboard = ({
       {/* --- REVIEW CREATE / EDIT MODAL --- */}
       {reviewModalOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
           onClick={() => setReviewModalOpen(false)}
         >
           <div 

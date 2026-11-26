@@ -262,7 +262,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                   {getCategoryLabel(selectedImage.category)}
                 </span>
                 <h3 className="font-display font-bold text-xl text-slate-900 dark:text-white">
-                  {typeof selectedImage.title === 'object' ? (selectedImage.title[currentLang] || selectedImage.title.uz) : selectedImage.title}
+                  {getLocalizedField(selectedImage.title, currentLang)}
                 </h3>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
                   <span>📍 {localizeSpecText(selectedImage.location, currentLang)}</span>

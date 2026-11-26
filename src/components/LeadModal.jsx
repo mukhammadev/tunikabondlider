@@ -6,6 +6,15 @@ import { X, Send, CheckCircle2, ShieldCheck, Ruler, Camera, Image as ImageIcon }
 import { normalizePhoneForSubmit } from '../utils/localize';
 
 export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [note, setNote] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [photoName, setPhotoName] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKeyDown = (e) => {
@@ -16,15 +25,6 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
-
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [note, setNote] = useState('');
-  const [photoUrl, setPhotoUrl] = useState('');
-  const [photoName, setPhotoName] = useState('');
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const handlePhoneChange = (e) => {
     // Allow user to freely type, paste, or clear phone digits and formatting characters
@@ -88,6 +88,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
         {/* Close button */}
         <button
           onClick={onClose}
+          aria-label={t?.productModal?.closeAria || "Yopish"}
           className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 hover:text-brand-red dark:hover:text-white transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" />

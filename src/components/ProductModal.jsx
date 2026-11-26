@@ -105,8 +105,8 @@ export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderP
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-brand-surface/70 overflow-hidden divide-y divide-slate-200 dark:divide-white/10 text-xs sm:text-sm">
             {specsList.map((spec, i) => (
               <div key={i} className="flex justify-between p-3.5 sm:px-4 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">{spec.label || spec.name}</span>
-                <span className="font-semibold text-slate-900 dark:text-white text-right">{localizeVal(spec.value)}</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">{getLocalizedField(spec.label || spec.name, currentLang)}</span>
+                <span className="font-semibold text-slate-900 dark:text-white text-right">{localizeVal(getLocalizedField(spec.value, currentLang))}</span>
               </div>
             ))}
           </div>

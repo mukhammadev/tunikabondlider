@@ -5,7 +5,7 @@ import {
   Phone, Send, Sparkles, X, MapPin, Briefcase, Eye, 
   ShieldCheck, Hammer, Layers, Compass, ArrowRight
 } from 'lucide-react';
-import { localizeSpecText, localizePersonName, formatWorksCount } from '../utils/localize';
+import { getLocalizedField, localizeSpecText, localizePersonName, formatWorksCount } from '../utils/localize';
 
 export const TeamSection = ({ 
   t, 
@@ -213,7 +213,7 @@ export const TeamSection = ({
     const catalogWorks = (portfolioList || [])
       .filter((p) => p.masterId === master.id || p.masterName?.toLowerCase() === master.name?.toLowerCase())
       .map((p) => {
-        const title = typeof p.title === 'object' ? (p.title[currentLang] || p.title.uz || p.title) : p.title;
+        const title = getLocalizedField(p.title, currentLang);
         const cat = getLocalizedCat(p.category);
         return {
           id: p.id,
