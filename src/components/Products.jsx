@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { products as defaultProducts } from '../data/products';
 import { Layers, ShieldCheck, ArrowRight } from 'lucide-react';
+import { getLocalizedField, localizeSpecText } from '../utils/localize';
 
 export const Products = ({ currentLang, t, onSelectProduct, items }) => {
   const [activeTab, setActiveTab] = useState('tunikabond');
@@ -89,8 +90,9 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
             </div>
           ) : (
             filteredProducts.map((product) => {
-            const name = typeof product.name === 'object' ? (product.name[currentLang] || product.name.uz) : product.name;
-            const desc = typeof product.shortDesc === 'object' ? (product.shortDesc[currentLang] || product.shortDesc.uz) : product.shortDesc;
+            const name = getLocalizedField(product.name, currentLang);
+            const desc = getLocalizedField(product.shortDesc, currentLang);
+            const loc = (v) => localizeSpecText(v, currentLang);
 
             return (
               <div
@@ -101,25 +103,29 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                   {/* Image container */}
                   <div className="relative h-60 overflow-hidden bg-brand-surface">
                     <img
-                      src={product.image}
+                      src={product.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"}
                       alt={name}
                       loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80";
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70" />
                     
                     {/* Badge */}
                     <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-brand-red text-white text-xs font-black shadow-md">
-                      {product.badge || t.productModal?.defaultBadge || "Ommabop"}
+                      {loc(product.badge) || t.productModal?.defaultBadge || "Ommabop"}
                     </div>
 
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end text-xs font-bold text-white">
                       <span className="px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/20">
-                        {product.thickness}
+                        {loc(product.thickness)}
                       </span>
                       <span className="px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/20 flex items-center gap-1 text-brand-red">
                         <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>{product.warranty}</span>
+                        <span>{loc(product.warranty)}</span>
                       </span>
                     </div>
                   </div>
@@ -137,11 +143,11 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                     <div className="space-y-2 mb-6 text-xs text-slate-700 dark:text-slate-300">
                       <div className="flex justify-between py-1.5 border-b border-slate-200 dark:border-white/10">
                         <span className="text-slate-600 dark:text-slate-400 font-medium">{t.products.thicknessLabel}</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">{product.thickness}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{loc(product.thickness)}</span>
                       </div>
                       <div className="flex justify-between py-1.5 border-b border-slate-200 dark:border-white/10">
                         <span className="text-slate-600 dark:text-slate-400 font-medium">{t.products.coatingLabel}</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">{product.coating}</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{loc(product.coating)}</span>
                       </div>
                     </div>
                   </div>
@@ -154,7 +160,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
                       {t.products?.factoryPriceLabel || "Zavod narxi:"}
                     </span>
                     <span className="font-display font-extrabold text-base text-brand-red">
-                      {product.priceRange}
+                      {loc(product.priceRange)}
                     </span>
                   </div>
 

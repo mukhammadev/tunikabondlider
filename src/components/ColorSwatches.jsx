@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { swatches } from '../data/swatches';
 import { Palette, X, ArrowRight } from 'lucide-react';
+import { getLocalizedField as resolveLocalizedField } from '../utils/localize';
 
 export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatchesList = [] }) => {
   const [activeCategory, setActiveCategory] = useState('all');
@@ -12,21 +13,8 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
     ? allSwatches
     : allSwatches.filter(item => item.category === activeCategory);
 
-  const getSwatchName = (item) => {
-    if (!item || !item.name) return '';
-    if (typeof item.name === 'object') {
-      return item.name[currentLang] || item.name.uz || item.name.ru || '';
-    }
-    return String(item.name);
-  };
-
-  const getLocalizedField = (field) => {
-    if (!field) return '';
-    if (typeof field === 'object') {
-      return field[currentLang] || field.uz || field.ru || '';
-    }
-    return String(field);
-  };
+  const getSwatchName = (item) => resolveLocalizedField(item?.name, currentLang);
+  const getLocalizedField = (field) => resolveLocalizedField(field, currentLang);
 
   const categories = [
     { id: 'all', label: t.swatches.all },

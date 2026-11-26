@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, ShieldCheck, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { getLocalizedField, localizeSpecText } from '../utils/localize';
 
 export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderProduct }) => {
   if (!product) return null;
@@ -7,14 +8,12 @@ export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderP
   const pm = t?.productModal || {};
 
   // Safe localized name resolution
-  const name = typeof product.name === 'object' && product.name !== null
-    ? (product.name[currentLang] || product.name.uz || Object.values(product.name)[0] || "Mahsulot")
-    : (product.name || "Mahsulot");
+  const name = getLocalizedField(product.name, currentLang, "Mahsulot");
 
   // Safe localized description resolution
-  const desc = typeof product.shortDesc === 'object' && product.shortDesc !== null
-    ? (product.shortDesc[currentLang] || product.shortDesc.uz || Object.values(product.shortDesc)[0] || "")
-    : (product.shortDesc || "");
+  const desc = getLocalizedField(product.shortDesc, currentLang, "");
+
+  const localizeVal = (val) => localizeSpecText(val, currentLang);
 
   // Safe specs resolution
   let specsList = [];
@@ -67,11 +66,11 @@ export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderP
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2">
             <span className="px-3 py-1 rounded-full bg-brand-red text-white font-black text-xs shadow-glow-red uppercase tracking-wider flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
-              <span>{product.badge || pm.defaultBadge || "Ommabop"}</span>
+              <span>{localizeVal(product.badge) || pm.defaultBadge || "Ommabop"}</span>
             </span>
             <span className="px-3 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-white/15 text-xs text-brand-red font-bold flex items-center gap-1.5 shadow-sm">
               <ShieldCheck className="w-4 h-4" />
-              <span>{product.warranty || "10 yil"} {pm.officialWarranty || "rasmiy kafolat"}</span>
+              <span>{localizeVal(product.warranty || "10 yil")} {pm.officialWarranty || "rasmiy kafolat"}</span>
             </span>
           </div>
         </div>
@@ -109,7 +108,7 @@ export const ProductModal = ({ product, currentLang = 'uz', t, onClose, onOrderP
               {pm.priceLabel || "Amaldagi zavod narxi:"}
             </span>
             <div className="font-display font-black text-xl sm:text-2xl text-brand-red">
-              {product.priceRange || pm.defaultPrice || "Kelishilgan narxda"}
+              {localizeVal(product.priceRange) || pm.defaultPrice || "Kelishilgan narxda"}
             </div>
           </div>
 

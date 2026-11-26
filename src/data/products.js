@@ -140,7 +140,7 @@ export const products = [
     warranty: "10 yil",
     badge: "Ommabop",
     priceRange: "155,000 - 195,000 so'm / m²",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
     specs: {
       uz: [
         { label: "Umumiy qalinlik", value: "3.0 mm" },

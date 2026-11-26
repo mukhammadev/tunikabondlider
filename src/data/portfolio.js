@@ -15,7 +15,7 @@ export const portfolio = [
     material: "Tunikabond Premium 0.45mm + Temir Karkas",
     area: "140 m²",
     time: "5 ish kuni",
-    image: "https://images.unsplash.com/photo-1541888946425-d0fbb1861563?auto=format&fit=crop&w=1000&q=80"
+    image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1000&q=80"
   },
   {
     id: "port-koziryok-1",

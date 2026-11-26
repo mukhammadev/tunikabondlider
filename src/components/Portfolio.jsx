@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { portfolio as defaultPortfolio } from '../data/portfolio';
 import { Compass, MapPin, Clock, Layers, Maximize2, X, CheckCircle2, ArrowRight, UserCheck } from 'lucide-react';
+import { getLocalizedField, localizeSpecText } from '../utils/localize';
 
 export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
   const [activeFilter, setActiveFilter] = useState('naves');
@@ -63,7 +64,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
             {t.portfolio?.title || "Naveslar, Koziryoklar, Darvozaxonalar va Fasadlar"}
           </h2>
           <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg">
-            {t.portfolio?.subtitle || "Kerakli yo'nalishni tanlang va namunali ishlarni ko'ring. Har bir loyiha korxonamizning ma'sul ustasiga biriktirilgan."}
+            {t.portfolio?.subtitle || "Kerakli yo'nalishni tanlang va namunali ishlarni ko'ring. Har bir loyiha korxonamizning mas'ul ustasiga biriktirilgan."}
           </p>
         </div>
 
@@ -109,7 +110,8 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
             </div>
           ) : (
             filteredItems.map((item) => {
-            const title = typeof item.title === 'object' ? (item.title[currentLang] || item.title.uz) : item.title;
+            const title = getLocalizedField(item.title, currentLang);
+            const loc = (v) => localizeSpecText(v, currentLang);
             return (
               <div
                 key={item.id}
@@ -119,9 +121,13 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                 <div>
                   <div className="relative h-64 overflow-hidden bg-brand-surface">
                     <img
-                      src={item.image}
+                      src={item.image || "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1000&q=80"}
                       alt={title}
                       loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1000&q=80";
+                      }}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70" />
@@ -140,10 +146,10 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                     <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-white">
                       <span className="flex items-center gap-1 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/20">
                         <MapPin className="w-3.5 h-3.5 text-brand-red" />
-                        <span>{item.location}</span>
+                        <span>{loc(item.location)}</span>
                       </span>
                       <span className="bg-brand-red text-white font-black px-2.5 py-1 rounded-md">
-                        {item.area}
+                        {loc(item.area)}
                       </span>
                     </div>
                   </div>
@@ -160,7 +166,7 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-brand-red flex-shrink-0" />
-                        <span>{t.portfolio?.durationLabel || "Muddat:"} {item.time}</span>
+                        <span>{t.portfolio?.durationLabel || "Muddat:"} {loc(item.time)}</span>
                       </div>
                     </div>
 
@@ -247,10 +253,10 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                   {typeof selectedImage.title === 'object' ? (selectedImage.title[currentLang] || selectedImage.title.uz) : selectedImage.title}
                 </h3>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-300">
-                  <span>📍 {selectedImage.location}</span>
-                  <span>📐 {selectedImage.area}</span>
+                  <span>📍 {localizeSpecText(selectedImage.location, currentLang)}</span>
+                  <span>📐 {localizeSpecText(selectedImage.area, currentLang)}</span>
                   <span>🛠 {selectedImage.material}</span>
-                  <span>⏱ {selectedImage.time}</span>
+                  <span>⏱ {localizeSpecText(selectedImage.time, currentLang)}</span>
                 </div>
               </div>
 

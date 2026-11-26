@@ -245,15 +245,20 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
     return { success: true, viaServerless: true };
   }
 
-  // Strictly dispatch ONLY to the Private Channel (-1004415750690)
-  const activeRecipients = [
-    {
-      id: "-1004415750690",
-      label: "Xususiy Arizalar Kanali (-1004415750690)",
-      type: "channel",
-      enabled: true
-    }
-  ];
+  // Dispatch to enabled recipients (falling back to primary private channel)
+  const configured = Array.isArray(config.recipients)
+    ? config.recipients.filter(r => r && r.id && r.enabled !== false)
+    : [];
+  const activeRecipients = configured.length > 0
+    ? configured
+    : [
+        {
+          id: "-1004415750690",
+          label: "Xususiy Arizalar Kanali (-1004415750690)",
+          type: "channel",
+          enabled: true
+        }
+      ];
 
   const htmlText = formatLeadHtml(leadData);
 
@@ -372,7 +377,7 @@ export const submitLead = async (leadData) => {
     console.warn('Backup save error:', e);
   }
 
-  // 2. IMMEDIATE TELEGRAM DISPATCH TO PRIVATE CHANNEL (WITHOUT BUTTONS)
+  // 2. IMMEDIATE TELEGRAM DISPATCH (if client token exists) + CLOUD & SERVERLESS SYNC
   let telegramResult = null;
   try {
     telegramResult = await dispatchToTelegram(standardizedLead);
@@ -380,13 +385,10 @@ export const submitLead = async (leadData) => {
     console.error('Direct Telegram dispatch error:', err);
   }
 
-  // 3. Push to Cloud Storage asynchronously in background for cross-device Admin Panel sync
-  try {
-    cloudPushLead(standardizedLead).catch(() => {});
-  } catch {}
-
-  // 4. Forward to local backend API / serverless API
-  try {
+  // 3 & 4. Await Supabase upsert and Serverless /api/leads in parallel so lead is persisted immediately
+  let serverlessOk = false;
+  const [cloudRes, apiRes] = await Promise.allSettled([
+    cloudPushLead(standardizedLead),
     fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -394,10 +396,14 @@ export const submitLead = async (leadData) => {
         ...standardizedLead,
         telegramDispatched: telegramResult?.success ?? false
       })
-    }).catch(() => {});
-  } catch {}
+    })
+  ]);
 
-  // 5. Notify local UI components of new data
+  if (apiRes.status === 'fulfilled' && apiRes.value?.ok) {
+    serverlessOk = true;
+  }
+
+  // 5. Notify local UI components (including AdminDashboard) AFTER persistence settles
   if (typeof window !== 'undefined') {
     try {
       window.dispatchEvent(new CustomEvent('tunikabond_data_updated'));
@@ -407,6 +413,7 @@ export const submitLead = async (leadData) => {
   return {
     success: true,
     leadId: standardizedLead.id,
-    telegramDispatched: telegramResult?.success ?? false
+    cloudSaved: cloudRes.status === 'fulfilled' ? Boolean(cloudRes.value) : false,
+    telegramDispatched: Boolean(telegramResult?.success || serverlessOk)
   };
 };

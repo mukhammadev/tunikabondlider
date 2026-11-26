@@ -3,12 +3,13 @@ import { submitLead } from '../services/telegram';
 import { apiUploadFile } from '../services/api';
 import confetti from 'canvas-confetti';
 import { X, Send, CheckCircle2, ShieldCheck, Ruler, Camera, Image as ImageIcon } from 'lucide-react';
+import { normalizePhoneForSubmit } from '../utils/localize';
 
 export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   if (!isOpen) return null;
 
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('+998');
+  const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [photoName, setPhotoName] = useState('');
@@ -17,33 +18,37 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
   const [success, setSuccess] = useState(false);
 
   const handlePhoneChange = (e) => {
-    let val = e.target.value;
-    if (!val.startsWith('+998')) {
-      val = '+998';
-    }
-    setPhone(val);
+    // Allow user to freely type, paste, or clear phone digits and formatting characters
+    const cleaned = e.target.value.replace(/[^\d+\s()-]/g, '');
+    setPhone(cleaned);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (phone.length < 13) {
-      alert("Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX");
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length < 9) {
+      alert(t?.leadModal?.phoneAlert || "Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX");
       return;
     }
 
     setLoading(true);
     const res = await submitLead({
-      name,
-      phone,
-      service: initialData?.service || "Bepul o'lchash va konsultatsiya",
+      name: name.trim(),
+      phone: normalizePhoneForSubmit(phone),
+      service: initialData?.service || t?.leadModal?.defaultService || "Bepul o'lchash va konsultatsiya",
       calcData: initialData?.calcData,
-      message: note,
+      message: note.trim(),
       photoUrl,
       source: initialData?.source || "Modal oynasi"
     });
     setLoading(false);
 
     if (res.success) {
+      setName('');
+      setPhone('');
+      setNote('');
+      setPhotoUrl('');
+      setPhotoName('');
       setSuccess(true);
       confetti({
         particleCount: 100,
@@ -187,7 +192,7 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                           if (res.success) {
                             setPhotoUrl(res.url);
                           } else {
-                            alert(res.error || "Rasm yuklashda xatolik");
+                            alert(res.error || t?.leadModal?.uploadError || "Rasm yuklashda xatolik");
                           }
                         }
                       }}

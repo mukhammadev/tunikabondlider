@@ -167,7 +167,7 @@ export const translations = {
     portfolio: {
       badge: "Konstruksiyalar & Ishlar Katalogi",
       title: "Naveslar, Koziryoklar, Darvozaxonalar va Fasadlar",
-      subtitle: "Kerakli yo'nalishni tanlang va namunali ishlarni ko'ring. Har bir loyiha korxonamizning ma'sul ustasiga biriktirilgan.",
+      subtitle: "Kerakli yo'nalishni tanlang va namunali ishlarni ko'ring. Har bir loyiha korxonamizning mas'ul ustasiga biriktirilgan.",
       all: "Barchasi",
       naves: "Naveslar",
       koziryok: "Koziryoklar",
@@ -212,7 +212,8 @@ export const translations = {
       callBtn: "Qo'ng'iroq qilish",
       callMasterBtn: "Shu ustani chaqirish (Bepul o'lchov)",
       expUnit: "yil tajriba",
-      projectsUnit: "ta obyekt"
+      projectsUnit: "ta obyekt",
+      emptyTeam: "Ushbu toifada hozircha mutaxassislar mavjud emas."
     },
     whyUs: {
       badge: "Nega Tunikabond Lider?",
@@ -224,13 +225,13 @@ export const translations = {
       p1Pt1: "Yuridik Shartnoma",
       p1Pt2: "Zavod Sertifikati",
       p1Pt3: "100% Ishonch",
-      p2Badge: "MILLIMETR ANIKLIK",
+      p2Badge: "MILLIMETR ANIQLIK",
       p2Title: "100% Bepul O'lchash va Smeta",
       p2Desc: "Mutaxassisimiz manzilingizga borib, binoni aniq lazer bilan o'lchaydi va bepul smeta hisoblab beradi.",
       p3Badge: "O'Z VAQTIDA",
       p3Title: "Tezkor va Toza Montaj",
       p3Desc: "O'zimizning 20+ kishilik tajribali ustalar brigadasi obyektni belgilangan muddatda toza topshiradi.",
-      p4Badge: "O'RTAKASHLARSIZ",
+      p4Badge: "VOSITACHILARSIZ",
       p4Title: "Birinchi Qo'l Zavod Narxlari",
       p4Desc: "Hech qanday vositachilarsiz, to'g'ridan-to'g'ri ishlab chiqaruvchi narxlarida eng maqbul narx taklif qilamiz.",
       p4Pt1: "1 m² 75 000 so'mdan",
@@ -262,9 +263,19 @@ export const translations = {
       reviewModalTitle: "Fikr va Sharh Qoldirish",
       reviewModalSubtitle: "Xizmatimiz va bajarilgan ish sifati haqidagi fikringiz biz uchun juda muhim!",
       nameLabel: "Ismingiz *",
-      namePlaceholder: "Masalan: Jasur Aliyev",
+      namePlaceholder: "Jasur Aliyev",
       projectLabel: "Obyekt yoki bajarilgan ish",
-      projectPlaceholder: "Masalan: Hovli navesi yoki Kottej fasadi",
+      projectPlaceholder: "Hovli navesi yoki kottej fasadi",
+      cityLabel: "Shahar / Tuman",
+      cityPlaceholder: "Toshkent shahri",
+      cancelBtn: "Bekor qilish",
+      starUnit: "yulduz",
+      emptyReviews: "Hozircha sharhlar qoldirilmagan — birinchi bo'lib fikr bildiring!",
+      fillRequiredAlert: "Iltimos, ismingiz va fikringizni kiriting",
+      submitErrorAlert: "Fikrni yuborishda xatolik yuz berdi",
+      defaultRole: "Mijoz",
+      defaultLocation: "Toshkent shahri",
+      defaultProject: "Fasad / Naves montaji",
       ratingLabel: "Bahoingiz:",
       commentLabel: "Fikringiz va taassurotlaringiz *",
       commentPlaceholder: "Ish sifati, ustalar muomalasi va natija haqida yozing...",
@@ -287,41 +298,45 @@ export const translations = {
           badge: "O'zDSt Tasdiqlangan"
         },
         {
-          title: "Yong'in Xavfsizligi A2 Sinifi",
+          title: "Yong'in Xavfsizligi A2 Sinfi",
           desc: "Tunikabond va Alyukabond panellari alangalanmaydigan mineral o'zakka ega bo'lib, xalqaro yong'in xavfsizligi me'yorlariga javob beradi.",
           badge: "Olovga Bardoshli"
         }
       ],
       reviews: [
         {
+          id: "rev-seed-1",
           name: "Akmal Qodirov",
           role: "Tadbirkor, 'Golden Plast' MChJ rahbari",
           location: "Toshkent, Sergeli",
           project: "Ofis binosi fasadi (850 m²)",
           comment: "Tunikabond Lider jamoasiga alohida minnatdorchilik bildiraman. 850 kvadratlik binomizni 14 kunda a'lo darajada bitirib berishdi. Ranglari quyoshda o'chmaydi, montaj juda aniq va toza bajarilgan.",
-          date: "2026-yil, Mart"
+          date: "2026-yil, Noyabr"
         },
         {
+          id: "rev-seed-2",
           name: "Sherzodbek To'xtayev",
           role: "Xususiy kottej egasi",
           location: "Toshkent viloyati, Qibray",
           project: "Kottej fasadi va karnizlari (420 m²)",
           comment: "Usta Muhammadaziz aka bilan Telegram orqali bog'langan edim, o'sha kuniyoq kelib lazerda o'lchab ketishdi. Neoklassik karniz va yog'och teksturali tunikabond o'rnatdik. Uyimiz ko'chada eng chiroylisi bo'lib turibdi.",
-          date: "2026-yil, Fevral"
+          date: "2026-yil, Oktabr"
         },
         {
+          id: "rev-seed-3",
           name: "Dilshod Yusupov",
           role: "Avtosalon menejeri",
           location: "Samarqand shahri",
           project: "Avtosalon tashqi fasadi (1,100 m²)",
           comment: "Avval boshqa ustalarga murojaat qilgandik, muddatni cho'zib yuborishgan. Tunikabond Lider esa shartnomada ko'rsatilgan kunda 100% sifat bilan topshirdi. 10 yillik rasmiy kafolat qog'ozini ham berishdi.",
-          date: "2026-yil, Yanvar"
+          date: "2026-yil, Sentabr"
         }
       ]
     },
     leadModal: {
       badge: "Bepul o'lchov va smeta",
       defaultTitle: "Bepul Usta Chaqirish",
+      defaultService: "Bepul o'lchash va konsultatsiya",
       desc: "Raqamingizni qoldiring, mutaxassisimiz bepul namuna va lazerli o'lchov asbobi bilan tashrif buyuradi.",
       calcCostLabel: "Hisoblangan xarajat:",
       calcArea: "Hajmi:",
@@ -331,6 +346,8 @@ export const translations = {
       namePlaceholder: "Jasur Aliyev",
       phoneLabel: "Telefon raqamingiz *",
       phonePlaceholder: "+998 (90) 123-45-67",
+      phoneAlert: "Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX",
+      uploadError: "Rasm yuklashda xatolik yuz berdi",
       noteLabel: "Manzilingiz yoki qo'shimcha izoh",
       notePlaceholder: "Masalan: Yunusobod 14-mavze, kottedj",
       photoLabel: "Bino yoki uy rasmi (ixtiyoriy)",
@@ -363,8 +380,9 @@ export const translations = {
       title: "Bepul Konsultatsiya va O'lchashga Yoziling",
       subtitle: "Mutaxassislarimiz 15 daqiqa ichida siz bilan bog'lanib, barcha savollaringizga javob berishadi.",
       formName: "Ismingiz",
-      formNamePlaceholder: "Masalan: Jasur Aliyev",
+      formNamePlaceholder: "Jasur Aliyev",
       formPhone: "Telefon raqamingiz",
+      phoneAlert: "Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX",
       formService: "Qiziqtirgan xizmat",
       formMessage: "Qo'shimcha izoh yoki bino manzili",
       formMessagePlaceholder: "Bino turi, taxminiy hajmi yoki qulay vaqtingizni yozing...",
@@ -376,7 +394,7 @@ export const translations = {
       addressText: "Toshkent shahri, Sergeli tumani, Yangi Sergeli ko'chasi (Mo'ljal: Sergeli mashina bozori yaqinida)",
       phoneTitle: "Telefonlarimiz",
       workHoursTitle: "Siz uchun to'xtovsiz xizmatdamiz",
-      workHoursText: "24/7 — Dam olish kunlarisiz, qo'ng'iroqlar va buyurtmalar har doim qabul qilinadi",
+      workHoursText: "Dam olish kunlarisiz, 24/7 rejimda ishlaymiz — qo'ng'iroqlar va buyurtmalar har doim qabul qilinadi",
       socialsTitle: "Ijtimoiy tarmoqlarimiz",
       adminManager: "Telegram Admin & Menejer",
       writeBtn: "Yozish",
@@ -631,7 +649,8 @@ export const translations = {
       callBtn: "Позвонить",
       callMasterBtn: "Вызвать этого мастера (Бесплатный замер)",
       expUnit: "лет опыта",
-      projectsUnit: "объектов"
+      projectsUnit: "объектов",
+      emptyTeam: "В этой категории пока нет специалистов."
     },
     whyUs: {
       badge: "Почему Tunikabond Lider?",
@@ -681,9 +700,19 @@ export const translations = {
       reviewModalTitle: "Оставить Отзыв",
       reviewModalSubtitle: "Ваше мнение о нашем сервисе и качестве выполненных работ очень важно для нас!",
       nameLabel: "Ваше имя *",
-      namePlaceholder: "Например: Жасур Алиев",
+      namePlaceholder: "Жасур Алиев",
       projectLabel: "Объект или вид работы",
-      projectPlaceholder: "Например: Навес во дворе или Фасад коттеджа",
+      projectPlaceholder: "Навес во дворе или фасад коттеджа",
+      cityLabel: "Город / Район",
+      cityPlaceholder: "г. Ташкент",
+      cancelBtn: "Отмена",
+      starUnit: "звезд",
+      emptyReviews: "Отзывов пока нет — оставьте первый отзыв о нашей работе!",
+      fillRequiredAlert: "Пожалуйста, укажите ваше имя и напишите отзыв",
+      submitErrorAlert: "Произошла ошибка при отправке отзыва",
+      defaultRole: "Заказчик",
+      defaultLocation: "г. Ташкент",
+      defaultProject: "Монтаж фасада / навеса",
       ratingLabel: "Ваша оценка:",
       commentLabel: "Ваш отзыв и впечатления *",
       commentPlaceholder: "Расскажите о качестве работ, общении мастеров и результате...",
@@ -713,34 +742,38 @@ export const translations = {
       ],
       reviews: [
         {
+          id: "rev-seed-1",
           name: "Акмаль Кадыров",
           role: "Предприниматель, руководитель ООО 'Golden Plast'",
           location: "г. Ташкент, Сергели",
           project: "Фасад офисного здания (850 м²)",
           comment: "Огромная благодарность команде Tunikabond Lider. Наш фасад площадью 850 м² сдали за 14 дней в превосходном качестве. Цвета не выгорают, монтаж выполнен предельно аккуратно.",
-          date: "Март 2026 г."
+          date: "Ноябрь 2026 г."
         },
         {
+          id: "rev-seed-2",
           name: "Шерзодбек Тухтаев",
           role: "Владелец частного коттеджа",
           location: "Ташкентская обл., Кибрай",
           project: "Фасад коттеджа и карнизы (420 м²)",
           comment: "Связался с мастером Мухаммадазизом через Telegram — в тот же день приехали с лазерным замером. Установили неоклассический карниз и туникабонд под дерево. Наш дом самый красивый на улице.",
-          date: "Февраль 2026 г."
+          date: "Октябрь 2026 г."
         },
         {
+          id: "rev-seed-3",
           name: "Дильшод Юсупов",
           role: "Менеджер автосалона",
           location: "г. Самарканд",
           project: "Внешний фасад автосалона (1 100 м²)",
           comment: "Ранее обращались к другим бригадам, сильно затягивали сроки. Команда Tunikabond Lider сдала объект точно в день по договору со 100% качеством и официальной 10-летней гарантией.",
-          date: "Январь 2026 г."
+          date: "Сентябрь 2026 г."
         }
       ]
     },
     leadModal: {
       badge: "Бесплатный замер и смета",
       defaultTitle: "Вызов Мастера на Замер",
+      defaultService: "Бесплатный замер и консультация",
       desc: "Оставьте ваш номер, наш инженер приедет с физическими образцами и лазерным оборудованием.",
       calcCostLabel: "Расчетная стоимость:",
       calcArea: "Площадь:",
@@ -750,6 +783,8 @@ export const translations = {
       namePlaceholder: "Жасур Алиев",
       phoneLabel: "Номер телефона *",
       phonePlaceholder: "+998 (90) 123-45-67",
+      phoneAlert: "Пожалуйста, введите полный номер телефона: +998 (XX) XXX-XX-XX",
+      uploadError: "Ошибка при загрузке изображения",
       noteLabel: "Адрес объекта или примечание",
       notePlaceholder: "Например: Юнусабад 14-квартал, коттедж",
       photoLabel: "Фото здания (по желанию)",
@@ -782,8 +817,9 @@ export const translations = {
       title: "Запишитесь на Бесплатный Замер и Консультацию",
       subtitle: "Наши специалисты свяжутся с вами в течение 15 минут и ответят на все вопросы.",
       formName: "Ваше имя",
-      formNamePlaceholder: "Например: Жасур Алиев",
+      formNamePlaceholder: "Жасур Алиев",
       formPhone: "Номер телефона",
+      phoneAlert: "Пожалуйста, введите полный номер телефона: +998 (XX) XXX-XX-XX",
       formService: "Интересующая услуга",
       formMessage: "Комментарий или адрес объекта",
       formMessagePlaceholder: "Тип здания, ориентировочная площадь или удобное время звонка...",
@@ -1050,7 +1086,8 @@ export const translations = {
       callBtn: "Call Now",
       callMasterBtn: "Request this Master (Free Quote)",
       expUnit: "years experience",
-      projectsUnit: "projects"
+      projectsUnit: "projects",
+      emptyTeam: "No specialists available in this category yet."
     },
     whyUs: {
       badge: "Why Tunikabond Lider?",
@@ -1100,9 +1137,19 @@ export const translations = {
       reviewModalTitle: "Submit a Review",
       reviewModalSubtitle: "Your feedback regarding our craftsmanship and service quality is greatly appreciated!",
       nameLabel: "Your Name *",
-      namePlaceholder: "e.g. John Doe",
+      namePlaceholder: "Jasur Aliyev",
       projectLabel: "Project or service type",
-      projectPlaceholder: "e.g. Courtyard Canopy or Villa Facade",
+      projectPlaceholder: "Courtyard canopy or villa facade",
+      cityLabel: "City / District",
+      cityPlaceholder: "Tashkent city",
+      cancelBtn: "Cancel",
+      starUnit: "stars",
+      emptyReviews: "No reviews yet — be the first to share your feedback!",
+      fillRequiredAlert: "Please enter your name and write a review",
+      submitErrorAlert: "An error occurred while submitting your review",
+      defaultRole: "Customer",
+      defaultLocation: "Tashkent city",
+      defaultProject: "Facade / Canopy installation",
       ratingLabel: "Your rating:",
       commentLabel: "Your feedback & experience *",
       commentPlaceholder: "Tell us about installation quality, timing, and results...",
@@ -1132,43 +1179,49 @@ export const translations = {
       ],
       reviews: [
         {
+          id: "rev-seed-1",
           name: "Akmal Qodirov",
           role: "Entrepreneur, 'Golden Plast' LLC CEO",
           location: "Tashkent, Sergeli",
           project: "Office building facade (850 sq.m)",
           comment: "Special thanks to the Tunikabond Lider team. They completed our 850 sq.m facility in 14 days with exceptional craftsmanship. Clean installation and zero fading.",
-          date: "March 2026"
+          date: "November 2026"
         },
         {
+          id: "rev-seed-2",
           name: "Sherzodbek Tukhtaev",
           role: "Private villa owner",
           location: "Tashkent reg., Qibray",
           project: "Cottage facade & cornices (420 sq.m)",
           comment: "Reached out via Telegram and they arrived the very same day for laser measurement. Neo-classical cornices and wood grain tunikabond turned our residence into a showpiece.",
-          date: "February 2026"
+          date: "October 2026"
         },
         {
+          id: "rev-seed-3",
           name: "Dilshod Yusupov",
           role: "Dealership manager",
           location: "Samarkand city",
           project: "Car showroom exterior (1,100 sq.m)",
           comment: "Other contractors delayed previously, but Tunikabond Lider delivered exactly on schedule with 100% quality and issued an official 10-year warranty document.",
-          date: "January 2026"
+          date: "September 2026"
         }
       ]
     },
     leadModal: {
       badge: "Free Measurement & Estimate",
       defaultTitle: "Request Free Measurement",
+      defaultService: "Free measurement and consultation",
       desc: "Leave your contact number; our technician will arrive with physical samples and laser equipment.",
       calcCostLabel: "Estimated calculation:",
       calcArea: "Area:",
       calcMaterial: "Material:",
       calcEstSum: "Estimated sum:",
       nameLabel: "Your Name *",
-      namePlaceholder: "e.g. Jasur Aliyev",
+      namePlaceholder: "Jasur Aliyev",
       phoneLabel: "Phone Number *",
       phonePlaceholder: "+998 (90) 123-45-67",
+      phoneAlert: "Please enter your full phone number: +998 (XX) XXX-XX-XX",
+      uploadError: "Error uploading image",
       noteLabel: "Address or Additional Notes",
       notePlaceholder: "e.g. Yunusabad block 14, cottage",
       photoLabel: "Building Photo (optional)",
@@ -1201,8 +1254,9 @@ export const translations = {
       title: "Book Free Measurement & Consultation",
       subtitle: "Our facade engineers will contact you within 15 minutes to assist with any questions.",
       formName: "Your Name",
-      formNamePlaceholder: "e.g. Jasur Aliyev",
+      formNamePlaceholder: "Jasur Aliyev",
       formPhone: "Phone Number",
+      phoneAlert: "Please enter your full phone number: +998 (XX) XXX-XX-XX",
       formService: "Desired Service",
       formMessage: "Additional details or address",
       formMessagePlaceholder: "Building type, estimated dimensions, or preferred call time...",

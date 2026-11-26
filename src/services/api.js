@@ -11,6 +11,19 @@ import { supabase } from './supabase.js';
 
 const memoryStore = new Map();
 
+const parseMaybeJson = (val) => {
+  if (typeof val !== 'string') return val;
+  const trimmed = val.trim();
+  if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return val;
+    }
+  }
+  return val;
+};
+
 export const safeStorage = {
   get: (key) => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -280,16 +293,43 @@ export const apiUpdateAdminPassword = async (username, currentPassword, newPassw
 };
 
 export const apiGetAdmins = async () => {
+  let list = [];
   try {
     const res = await apiFetch('/api/auth/admins');
-    if (res.ok) {
+    const ct = res.headers.get('content-type') || '';
+    if (res.ok && ct.includes('application/json')) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) return data;
+      if (Array.isArray(data) && data.length > 0) list = data;
     }
   } catch {}
 
-  // Return admins without exposing plaintext passwords
-  return getStoredAdmins().map(({ password, ...rest }) => rest);
+  if (list.length === 0) {
+    list = getStoredAdmins().map(({ password, ...rest }) => rest);
+  }
+
+  // Always reflect active logged-in user so Adminlar ro'yxati never shows 0 while signed in
+  const activeUser = getStoredUser();
+  if (activeUser && (activeUser.username || activeUser.id)) {
+    const exists = list.some(
+      (a) =>
+        (activeUser.id && String(a.id) === String(activeUser.id)) ||
+        (activeUser.username && (a.username || '').toLowerCase() === activeUser.username.toLowerCase())
+    );
+    if (!exists) {
+      list = [
+        {
+          id: activeUser.id || `admin-${activeUser.username || 'current'}`,
+          username: activeUser.username || 'admin',
+          fullName: activeUser.fullName || activeUser.username || 'Bosh Administrator',
+          role: activeUser.role || 'Super Admin',
+          createdAt: activeUser.createdAt || new Date().toISOString()
+        },
+        ...list
+      ];
+    }
+  }
+
+  return list;
 };
 
 export const apiDeleteAdmin = async (adminId, currentUserId = null) => {
@@ -315,13 +355,14 @@ export const apiDeleteAdmin = async (adminId, currentUserId = null) => {
 export const apiGetStats = async () => {
   try {
     const res = await apiFetch('/api/stats/');
-    if (res.ok) {
+    const ct = res.headers.get('content-type') || '';
+    if (res.ok && ct.includes('application/json')) {
       const data = await res.json();
       if (data && data.totalLeads !== undefined) return data;
     }
   } catch {}
 
-  const [leads, products, portfolio, admins, team, swatches] = await Promise.all([
+  const [leadsRes, prodsRes, portsRes, adminsRes, teamRes, swatchesRes] = await Promise.allSettled([
     apiGetLeads(),
     apiGetProducts(),
     apiGetPortfolio(),
@@ -329,6 +370,13 @@ export const apiGetStats = async () => {
     apiGetTeam(),
     apiGetSwatches()
   ]);
+
+  const leads = leadsRes.status === 'fulfilled' && Array.isArray(leadsRes.value) ? leadsRes.value : [];
+  const products = prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value) ? prodsRes.value : [];
+  const portfolio = portsRes.status === 'fulfilled' && Array.isArray(portsRes.value) ? portsRes.value : [];
+  const admins = adminsRes.status === 'fulfilled' && Array.isArray(adminsRes.value) ? adminsRes.value : [];
+  const team = teamRes.status === 'fulfilled' && Array.isArray(teamRes.value) ? teamRes.value : [];
+  const swatches = swatchesRes.status === 'fulfilled' && Array.isArray(swatchesRes.value) ? swatchesRes.value : [];
 
   return {
     totalLeads: leads.length,
@@ -356,10 +404,14 @@ export const cloudPushLead = async (newLead) => {
       photo_url: newLead.photoUrl || newLead.photo_url || null,
       created_at: newLead.timestamp || newLead.date || new Date().toISOString()
     };
-    await supabase.from('leads').upsert(supaLead);
+    const { error } = await supabase.from('leads').upsert(supaLead);
+    if (error) {
+      console.warn('Supabase push lead error:', error);
+      return false;
+    }
     return true;
   } catch (e) {
-    console.warn('Supabase push lead error:', e);
+    console.warn('Supabase push lead exception:', e);
     return false;
   }
 };
@@ -506,24 +558,6 @@ export const apiUpdateLead = async (leadId, patchData) => {
     localStorage.setItem(STORAGE_LEADS_KEY, JSON.stringify(updated));
   } catch {}
 
-  // Sync to Cloud Storage
-  try {
-    const cloudRes = await fetch(CLOUD_LEADS_URL);
-    if (cloudRes.ok) {
-      const json = await cloudRes.json();
-      const current = json?.data?.leads || [];
-      const updatedCloud = current.map(l => (String(l.id) === String(leadId) ? { ...l, ...patchData } : l));
-      await fetch(CLOUD_LEADS_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'tunikabond_leads_v2',
-          data: { leads: updatedCloud }
-        })
-      });
-    }
-  } catch {}
-
   notifyDataChanged();
   return true;
 };
@@ -557,24 +591,6 @@ export const apiDeleteLead = async (leadId) => {
     if (!deletedList.includes(strId)) {
       deletedList.push(strId);
       localStorage.setItem(STORAGE_DELETED_LEADS_KEY, JSON.stringify(deletedList.slice(-300)));
-    }
-  } catch {}
-
-  // Sync to Cloud Storage
-  try {
-    const cloudRes = await fetch(CLOUD_LEADS_URL);
-    if (cloudRes.ok) {
-      const json = await cloudRes.json();
-      const current = json?.data?.leads || [];
-      const updatedCloud = current.filter(l => String(l.id) !== String(leadId));
-      await fetch(CLOUD_LEADS_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'tunikabond_leads_v2',
-          data: { leads: updatedCloud }
-        })
-      });
     }
   } catch {}
 
@@ -1108,6 +1124,7 @@ export const apiGetReviews = async () => {
     if (!error && Array.isArray(data)) {
       const filtered = data.filter(r => r && r.id && !deletedSet.has(String(r.id)));
       safeStorage.set(STORAGE_REVIEWS_KEY, filtered);
+      safeStorage.set('tunikabond_reviews_synced_v1', '1');
       return filtered;
     }
   } catch (err) {
@@ -1117,11 +1134,13 @@ export const apiGetReviews = async () => {
   // 2. Fetch from serverless API /api/reviews fallback
   try {
     const res = await fetch('/api/reviews');
-    if (res.ok) {
+    const ct = res.headers.get('content-type') || '';
+    if (res.ok && ct.includes('application/json')) {
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         const filtered = data.filter(r => r && r.id && !deletedSet.has(String(r.id)));
         safeStorage.set(STORAGE_REVIEWS_KEY, filtered);
+        safeStorage.set('tunikabond_reviews_synced_v1', '1');
         return filtered;
       }
     }
@@ -1138,7 +1157,7 @@ export const apiGetReviews = async () => {
     }
   } catch {}
 
-  return [];
+  return null;
 };
 
 export const apiAddReview = async (reviewData) => {
@@ -1153,9 +1172,18 @@ export const apiAddReview = async (reviewData) => {
     date: reviewData.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' })
   };
 
+  // Ensure re-added or edited review ID is removed from deleted tombstones
+  try {
+    const rawDeleted = JSON.parse(safeStorage.get(STORAGE_DELETED_REVIEWS_KEY) || '[]');
+    const strId = String(newReview.id);
+    if (Array.isArray(rawDeleted) && rawDeleted.includes(strId)) {
+      safeStorage.set(STORAGE_DELETED_REVIEWS_KEY, JSON.stringify(rawDeleted.filter(id => String(id) !== strId)));
+    }
+  } catch {}
+
   // 1. Save directly to Supabase reviews table (Instant & permanent for all users!)
   try {
-    await supabase.from('reviews').upsert({
+    const { error } = await supabase.from('reviews').upsert({
       id: String(newReview.id),
       name: newReview.name,
       role: newReview.role,
@@ -1166,6 +1194,7 @@ export const apiAddReview = async (reviewData) => {
       date: newReview.date,
       created_at: new Date().toISOString()
     });
+    if (error) console.warn('Supabase upsert review error:', error);
   } catch (e) {
     console.warn('Supabase upsert review error:', e);
   }
@@ -1390,6 +1419,11 @@ export const apiGetSwatches = async () => {
     if (!error && Array.isArray(data)) {
       const formatted = data.map(s => ({
         ...s,
+        name: parseMaybeJson(s.name),
+        texture: parseMaybeJson(s.texture),
+        finish: parseMaybeJson(s.finish),
+        coating: parseMaybeJson(s.coating),
+        application: parseMaybeJson(s.application),
         colorHex: s.color_hex || s.colorHex,
         bgGradient: s.bg_gradient || s.bgGradient
       }));

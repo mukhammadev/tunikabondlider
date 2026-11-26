@@ -61,6 +61,7 @@ export function App() {
   };
 
   const handleCloseAdmin = () => {
+    setShowBrandIntro(false);
     setIsAdminOpen(false);
     if ((window.location.pathname || '').toLowerCase().startsWith('/admin')) {
       window.history.pushState(null, '', '/');
@@ -193,19 +194,37 @@ export function App() {
     document.documentElement.lang = currentLang;
   }, [currentLang]);
 
-  // Fetch dynamic products, portfolio, team members, and swatches
+  // Isolate document title & robots directive between public site and /admin portal
+  useEffect(() => {
+    const robotsMeta = document.querySelector('meta[name="robots"]');
+    if (isAdminOpen) {
+      document.title = "TL Admin – Boshqaruv Paneli | Tunikabond Lider";
+      if (robotsMeta) robotsMeta.setAttribute('content', 'noindex, nofollow');
+    } else {
+      document.title = "Tunikabond Lider – Premium Fasad va Tom Yechimlari | O'zbekiston";
+      if (robotsMeta) robotsMeta.setAttribute('content', 'index, follow');
+    }
+  }, [isAdminOpen]);
+
+  // Fetch dynamic products, portfolio, team members, and swatches resiliently
   const loadDynamicData = async () => {
-    const [prods, ports, teams, swt] = await Promise.all([
+    const results = await Promise.allSettled([
       apiGetProducts(),
       apiGetPortfolio(),
       apiGetTeam(),
       apiGetSwatches()
     ]);
-    setProductsList(prods);
-    setPortfolioList(ports);
-    setTeamList(teams);
-    if (Array.isArray(swt)) {
-      setSwatchesList(swt);
+    if (results[0]?.status === 'fulfilled' && Array.isArray(results[0].value)) {
+      setProductsList(results[0].value);
+    }
+    if (results[1]?.status === 'fulfilled' && Array.isArray(results[1].value)) {
+      setPortfolioList(results[1].value);
+    }
+    if (results[2]?.status === 'fulfilled' && Array.isArray(results[2].value)) {
+      setTeamList(results[2].value);
+    }
+    if (results[3]?.status === 'fulfilled' && Array.isArray(results[3].value)) {
+      setSwatchesList(results[3].value);
     }
   };
 
@@ -265,11 +284,39 @@ export function App() {
     setLeadModalOpen(true);
   };
 
+  // Dedicated, completely separate Admin UI when /admin or admin mode is active
+  // (never mounts public homepage DOM underneath for clean structure & SEO)
+  if (isAdminOpen) {
+    return currentUser ? (
+      <AdminDashboard
+        currentUser={currentUser}
+        onLogout={() => {
+          clearAuthSession();
+          setCurrentUser(null);
+          handleCloseAdmin();
+        }}
+        onClose={handleCloseAdmin}
+        onDataChanged={loadDynamicData}
+        isStandaloneApp={false}
+        swatchesList={swatchesList}
+      />
+    ) : (
+      <AdminAuthModal
+        isOpen={isAdminOpen}
+        onClose={handleCloseAdmin}
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          setIsAdminOpen(true);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-brand-dark text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-brand-red selection:text-white">
       
       {/* Brand Intro & Splash Screen Animation on Site Load & Refresh */}
-      {showBrandIntro && !isAdminOpen && (
+      {showBrandIntro && (
         <BrandIntro onComplete={() => setShowBrandIntro(false)} t={t} />
       )}
 
@@ -463,7 +510,7 @@ export function App() {
       />
 
       {/* Discreet Floating Admin Badge (Visible ONLY when admin is currently logged in) */}
-      {currentUser && !isAdminOpen && (
+      {currentUser && (
         <button
           type="button"
           onClick={handleOpenAdmin}
@@ -474,33 +521,6 @@ export function App() {
           <span className="text-brand-red font-black">TL Admin</span>
           <span className="text-[10px] text-slate-400 group-hover:text-white transition-colors">({currentUser.username})</span>
         </button>
-      )}
-
-      {/* Seamless Integrated Admin Panel & Authentication */}
-      {isAdminOpen && (
-        currentUser ? (
-          <AdminDashboard
-            currentUser={currentUser}
-            onLogout={() => {
-              clearAuthSession();
-              setCurrentUser(null);
-              handleCloseAdmin();
-            }}
-            onClose={handleCloseAdmin}
-            onDataChanged={loadDynamicData}
-            isStandaloneApp={false}
-            swatchesList={swatchesList}
-          />
-        ) : (
-          <AdminAuthModal
-            isOpen={isAdminOpen}
-            onClose={handleCloseAdmin}
-            onLoginSuccess={(user) => {
-              setCurrentUser(user);
-              setIsAdminOpen(true);
-            }}
-          />
-        )
       )}
 
     </div>

@@ -24,6 +24,7 @@ import {
   ShieldCheck, Layers, Eye, Filter, TrendingUp, Sparkles,
   Star, MessageSquareQuote, KeyRound, Lock
 } from 'lucide-react';
+import { getLocalizedField, formatReviewMonthYear } from '../../utils/localize';
 
 export const AdminDashboard = ({ 
   currentUser, 
@@ -138,11 +139,11 @@ export const AdminDashboard = ({
     comment: ''
   });
 
-  // Load all initial data
+  // Load all initial data resiliently (if one call fails, others still populate)
   const loadData = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      const [st, ld, pr, pf, ad, tm, swt, revs] = await Promise.all([
+      const results = await Promise.allSettled([
         apiGetStats(),
         apiGetLeads(),
         apiGetProducts(),
@@ -152,19 +153,29 @@ export const AdminDashboard = ({
         apiGetSwatches(),
         apiGetReviews()
       ]);
-      setStats(st);
-      setLeads(ld);
-      setProductsList(pr);
-      setPortfolioList(pf);
-      setAdminsList(ad);
-      setTeamList(tm);
-      if (swt && Array.isArray(swt)) {
-        setSwatchesList(swt);
-      }
-      if (revs && Array.isArray(revs)) {
-        setReviewsList(revs);
-      }
+
+      const val = (idx) => (results[idx]?.status === 'fulfilled' ? results[idx].value : null);
+
+      const st = val(0);
+      const ld = val(1);
+      const pr = val(2);
+      const pf = val(3);
+      const ad = val(4);
+      const tm = val(5);
+      const swt = val(6);
+      const revs = val(7);
+
+      if (st) setStats(st);
+      if (Array.isArray(ld)) setLeads(ld);
+      if (Array.isArray(pr)) setProductsList(pr);
+      if (Array.isArray(pf)) setPortfolioList(pf);
+      if (Array.isArray(ad)) setAdminsList(ad);
+      if (Array.isArray(tm)) setTeamList(tm);
+      if (Array.isArray(swt)) setSwatchesList(swt);
+      if (Array.isArray(revs)) setReviewsList(revs);
       setTelegramConfig(getTelegramConfig());
+    } catch (e) {
+      console.warn('Admin loadData error:', e);
     } finally {
       if (!isSilent) setLoading(false);
     }
@@ -308,24 +319,37 @@ export const AdminDashboard = ({
       alert("Yuklab olish uchun arizalar mavjud emas");
       return;
     }
-    const headers = ["ID", "Vaqti", "Mijoz", "Telefon", "Xizmat", "Holati", "Xabar"];
+    const cleanCell = (val) => `"${String(val || '').replace(/\r?\n/g, ' ').replace(/"/g, '""')}"`;
+    const headers = ["ID", "Vaqti", "Mijoz", "Telefon", "Xizmat", "Holati", "Manba", "Xabar"];
     const rows = leads.map(l => [
-      l.id,
-      l.timestamp ? new Date(l.timestamp).toLocaleString('uz-UZ') : '',
-      `"${(l.name || '').replace(/"/g, '""')}"`,
-      `"${l.phone || ''}"`,
-      `"${(l.service || '').replace(/"/g, '""')}"`,
-      l.status === 'in_progress' ? 'Jarayonda' : l.status === 'completed' ? 'Bajarildi' : l.status === 'cancelled' ? 'Bekor qilindi' : 'Yangi',
-      `"${(l.message || '').replace(/"/g, '""')}"`
+      cleanCell(l.id),
+      cleanCell(l.timestamp ? new Date(l.timestamp).toLocaleString('uz-UZ') : ''),
+      cleanCell(l.name),
+      cleanCell(l.phone),
+      cleanCell(l.service),
+      cleanCell(
+        l.status === 'in_progress'
+          ? 'Jarayonda'
+          : l.status === 'completed'
+          ? 'Bajarildi'
+          : l.status === 'cancelled'
+          ? 'Bekor qilindi'
+          : 'Yangi'
+      ),
+      cleanCell(l.source),
+      cleanCell(l.message)
     ]);
-    const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    // Prepend UTF-8 BOM (\uFEFF) and use CRLF so Uzbek Latin/Cyrillic characters render cleanly in Excel
+    const csvContent = "\uFEFF" + [headers.map(cleanCell).join(','), ...rows.map(r => r.join(','))].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `tunikabond_arizalar_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.setAttribute("download", `tunikabond_arizalar_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
     link.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // --- PRODUCTS CRUD ---
@@ -425,7 +449,7 @@ export const AdminDashboard = ({
       material: 'Tunikabond 0.45mm',
       area: '140 m²',
       time: '5 ish kuni',
-      image: 'https://images.unsplash.com/photo-1541888946425-d0fbb1861563?auto=format&fit=crop&w=1000&q=80'
+      image: 'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?auto=format&fit=crop&w=1000&q=80'
     });
     setPortfolioModalOpen(true);
   };
@@ -433,7 +457,7 @@ export const AdminDashboard = ({
   const handleOpenPortfolioEdit = (item) => {
     setEditingPortfolio(item);
     setPortfolioForm({
-      titleUz: item.title?.uz || item.title || '',
+      titleUz: getLocalizedField(item.title, 'uz'),
       category: item.category || 'naves',
       masterId: item.masterId || '',
       masterName: item.masterName || '',
@@ -659,20 +683,20 @@ export const AdminDashboard = ({
 
   const handleOpenSwatchEdit = (swatch) => {
     setEditingSwatch(swatch);
-    const nameUz = typeof swatch.name === 'object' ? (swatch.name.uz || swatch.name.ru || '') : (swatch.name || '');
-    const nameRu = typeof swatch.name === 'object' ? (swatch.name.ru || '') : '';
+    const nameUz = getLocalizedField(swatch.name, 'uz');
+    const nameRu = getLocalizedField(swatch.name, 'ru', '');
     setSwatchForm({
       nameUz: nameUz,
-      nameRu: nameRu,
+      nameRu: nameRu === nameUz ? '' : nameRu,
       category: swatch.category || 'wood',
       code: swatch.code || '',
       colorHex: swatch.colorHex || '#A05A2C',
       bgGradient: swatch.bgGradient || '',
       image: swatch.image || '',
-      texture: swatch.texture || '',
-      finish: swatch.finish || 'Mat',
-      coating: swatch.coating || 'PVDF 3-qavat',
-      application: swatch.application || ''
+      texture: getLocalizedField(swatch.texture, 'uz'),
+      finish: getLocalizedField(swatch.finish, 'uz', 'Mat'),
+      coating: getLocalizedField(swatch.coating, 'uz', 'PVDF 3-qavat'),
+      application: getLocalizedField(swatch.application, 'uz')
     });
     setSwatchModalOpen(true);
   };
@@ -781,11 +805,10 @@ export const AdminDashboard = ({
       location: reviewForm.location.trim() || "Toshkent shahri",
       rating: Number(reviewForm.rating) || 5,
       comment: reviewForm.comment.trim(),
-      date: editingReview?.date || new Date().toLocaleDateString('uz-UZ', { month: 'long', year: 'numeric' })
+      date: editingReview?.date || formatReviewMonthYear(new Date(), 'uz')
     };
 
     if (editingReview) {
-      await apiDeleteReview(editingReview.id);
       await apiAddReview(payload);
       setReviewsList(reviewsList.map(r => r.id === editingReview.id ? { ...r, ...payload } : r));
     } else {
@@ -887,7 +910,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <LayoutDashboard className="w-4 h-4" />
-                <span>Umumiy Ko'rinish</span>
+                <span>Umumiy ko'rinish</span>
               </div>
               <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-slate-300">Asosiy</span>
             </button>
@@ -902,7 +925,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <Inbox className="w-4 h-4" />
-                <span>Arizalar & Buyurtmalar</span>
+                <span>Arizalar va buyurtmalar</span>
               </div>
               {leads.filter(l => l.status === 'new' || !l.status).length > 0 && (
                 <span className="w-5 h-5 rounded-full bg-white text-brand-red text-[11px] font-black flex items-center justify-center">
@@ -936,7 +959,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <Briefcase className="w-4 h-4" />
-                <span>Portfolio / Obyektlar</span>
+                <span>Portfolio / obyektlar</span>
               </div>
               <span className="text-xs text-slate-400">{portfolioList.length}</span>
             </button>
@@ -951,7 +974,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <Hammer className="w-4 h-4" />
-                <span>Jamoa & Ustalar</span>
+                <span>Jamoa va ustalar</span>
               </div>
               <span className="text-xs text-slate-400">{teamList.length}</span>
             </button>
@@ -966,7 +989,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <Palette className="w-4 h-4" />
-                <span>Ranglar & Teksturalar</span>
+                <span>Ranglar va teksturalar</span>
               </div>
               <span className="text-xs text-slate-400">{swatchesList.length}</span>
             </button>
@@ -981,7 +1004,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <MessageSquareQuote className="w-4 h-4 text-amber-400" />
-                <span>Mijozlar Fikrlari</span>
+                <span>Mijozlar fikrlari</span>
               </div>
               <span className="text-xs text-slate-400">{reviewsList.length}</span>
             </button>
@@ -996,7 +1019,7 @@ export const AdminDashboard = ({
             >
               <div className="flex items-center gap-2.5">
                 <Send className="w-4 h-4 text-sky-400" />
-                <span>Telegram Bot & Arizalar</span>
+                <span>Telegram bot va arizalar</span>
               </div>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             </button>
@@ -1024,7 +1047,7 @@ export const AdminDashboard = ({
             <div className="flex items-center justify-between mb-1">
               <span className="font-bold text-white flex items-center gap-1.5">
                 <Send className="w-3.5 h-3.5 text-sky-400" />
-                Telegram Bot
+                Telegram bot
               </span>
               <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.5 rounded">Faol</span>
             </div>
@@ -1054,10 +1077,10 @@ export const AdminDashboard = ({
                       </span>
                     </div>
                     <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-white">
-                      Xush kelibsiz, {currentUser?.fullName || currentUser?.username}!
+                      Xush kelibsiz, {(currentUser?.fullName || currentUser?.username || 'Administrator').trim()}!
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                      Sayt faoliyati, yangi arizalar, mahsulotlar va telegram botingiz monitoringi.
+                      Sayt faoliyati, yangi arizalar, mahsulotlar va Telegram botingiz monitoringi.
                     </p>
                   </div>
 
@@ -1182,7 +1205,7 @@ export const AdminDashboard = ({
                   </div>
                   <div>
                     <div className="font-display font-black text-lg text-emerald-400">Faol</div>
-                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Telegram Bot</div>
+                    <div className="text-xs text-slate-400 group-hover:text-white transition-colors">Telegram bot</div>
                   </div>
                 </div>
               </div>
@@ -1191,7 +1214,7 @@ export const AdminDashboard = ({
               <div className="glass-panel p-5 rounded-2xl border border-white/10">
                 <h3 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-brand-red" />
-                  <span>Tezkor Amallar</span>
+                  <span>Tezkor amallar</span>
                 </h3>
                 <div className="flex flex-wrap items-center gap-2.5">
                   <button
@@ -1200,7 +1223,7 @@ export const AdminDashboard = ({
                     className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-brand-red" />
-                    <span>Yangi Mahsulot</span>
+                    <span>Yangi mahsulot</span>
                   </button>
 
                   <button
@@ -1209,7 +1232,7 @@ export const AdminDashboard = ({
                     className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-brand-red" />
-                    <span>Yangi Obyekt</span>
+                    <span>Yangi obyekt</span>
                   </button>
 
                   <button
@@ -1218,7 +1241,7 @@ export const AdminDashboard = ({
                     className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-brand-red" />
-                    <span>Yangi Usta</span>
+                    <span>Yangi usta</span>
                   </button>
 
                   <button
@@ -1227,7 +1250,7 @@ export const AdminDashboard = ({
                     className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-brand-red" />
-                    <span>Yangi Rang</span>
+                    <span>Yangi rang</span>
                   </button>
 
                   <button
@@ -1247,7 +1270,7 @@ export const AdminDashboard = ({
                   <div>
                     <h3 className="font-bold text-white text-base flex items-center gap-2">
                       <Inbox className="w-5 h-5 text-brand-red" />
-                      <span>So'nggi Kelib Tushgan Arizalar</span>
+                      <span>So'nggi kelib tushgan arizalar</span>
                     </h3>
                     <p className="text-xs text-slate-400">
                       Eng so'nggi murojaat qilgan mijozlar ro'yxati
@@ -1258,8 +1281,7 @@ export const AdminDashboard = ({
                     onClick={() => setActiveTab('leads')}
                     className="text-xs text-brand-red hover:underline font-bold flex items-center gap-1 cursor-pointer"
                   >
-                    <span>Barchasini ko'rish ({leads.length})</span>
-                    <span>&rarr;</span>
+                    <span>Barchasini ko'rish ({leads.length}) →</span>
                   </button>
                 </div>
 
@@ -1365,7 +1387,7 @@ export const AdminDashboard = ({
                       title="Telegram va bulutdan arizalarni qayta yuklash"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                      <span>Telegramdan Yangilash</span>
+                      <span>Telegramdan yangilash</span>
                     </button>
 
                     <button
@@ -1607,7 +1629,7 @@ export const AdminDashboard = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white">
-                    Mahsulotlar Katalogi ({productsList.length})
+                    Mahsulotlar katalogi ({productsList.length})
                   </h2>
                   <p className="text-xs text-slate-400">
                     Saytdagi mahsulotlarni tahrirlash, yangi qo'shish yoki toifalar bo'yicha saralash
@@ -1676,9 +1698,21 @@ export const AdminDashboard = ({
 
                 if (filteredProducts.length === 0) {
                   return (
-                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
-                      <Package className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                      <p className="text-slate-400 text-sm">Ushbu toifada mahsulot topilmadi</p>
+                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10 space-y-3">
+                      <Package className="w-12 h-12 text-slate-600 mx-auto" />
+                      <p className="text-slate-300 text-sm font-semibold">
+                        {productsList.length === 0
+                          ? "Hali mahsulot qo'shilmagan — «Yangi mahsulot qo'shish» tugmasini bosing"
+                          : "Ushbu toifada mahsulot topilmadi"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleOpenProductCreate}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Yangi mahsulot qo'shish</span>
+                      </button>
                     </div>
                   );
                 }
@@ -1744,7 +1778,7 @@ export const AdminDashboard = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white">
-                    Portfolio / Obyektlar ({portfolioList.length})
+                    Portfolio / obyektlar ({portfolioList.length})
                   </h2>
                   <p className="text-xs text-slate-400">
                     Bajarilgan ishlar galereyasiga loyiha qo'shish va toifalar bo'yicha ko'rish
@@ -1816,9 +1850,21 @@ export const AdminDashboard = ({
 
                 if (filteredPortfolio.length === 0) {
                   return (
-                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
-                      <Briefcase className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                      <p className="text-slate-400 text-sm">Ushbu toifada loyiha topilmadi</p>
+                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10 space-y-3">
+                      <Briefcase className="w-12 h-12 text-slate-600 mx-auto" />
+                      <p className="text-slate-300 text-sm font-semibold">
+                        {portfolioList.length === 0
+                          ? "Hali obyekt qo'shilmagan — «Yangi loyiha qo'shish» tugmasini bosing"
+                          : "Ushbu toifada loyiha topilmadi"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleOpenPortfolioCreate}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Yangi loyiha qo'shish</span>
+                      </button>
                     </div>
                   );
                 }
@@ -1880,7 +1926,7 @@ export const AdminDashboard = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white">
-                    Jamoa va Ustalar ({teamList.length})
+                    Jamoa va ustalar ({teamList.length})
                   </h2>
                   <p className="text-xs text-slate-400">
                     Firma rahbariyati, naves, darvozaxona, koziryok va fasad ustalari
@@ -1896,7 +1942,23 @@ export const AdminDashboard = ({
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teamList.length === 0 ? (
+                <div className="p-12 text-center rounded-3xl glass-card border border-white/10 space-y-3">
+                  <Hammer className="w-12 h-12 text-slate-600 mx-auto" />
+                  <p className="text-slate-300 text-sm font-semibold">
+                    Hali usta qo'shilmagan — «Yangi usta qo'shish» tugmasini bosing
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleOpenTeamCreate}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Yangi usta qo'shish</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {teamList.map((member) => (
                   <div key={member.id} className="glass-card rounded-2xl p-4 flex flex-col justify-between border border-white/10 bg-brand-surface/70">
                     <div>
@@ -1950,7 +2012,8 @@ export const AdminDashboard = ({
                     </div>
                   </div>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -1960,7 +2023,7 @@ export const AdminDashboard = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white flex items-center gap-2.5">
-                    <span>Ranglar & Teksturalar ({swatchesList.length})</span>
+                    <span>Ranglar va teksturalar ({swatchesList.length})</span>
                     <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-brand-red/20 text-brand-red border border-brand-red/30">
                       Katalog
                     </span>
@@ -2012,9 +2075,21 @@ export const AdminDashboard = ({
 
                 if (filteredSwatches.length === 0) {
                   return (
-                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10">
-                      <Palette className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                      <p className="text-slate-400 text-sm">Ushbu toifada rang namunasi topilmadi</p>
+                    <div className="p-12 text-center rounded-3xl glass-card border border-white/10 space-y-3">
+                      <Palette className="w-12 h-12 text-slate-600 mx-auto" />
+                      <p className="text-slate-300 text-sm font-semibold">
+                        {swatchesList.length === 0
+                          ? "Hali rang qo'shilmagan — «Yangi rang qo'shish» tugmasini bosing"
+                          : "Ushbu toifada rang namunasi topilmadi"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleOpenSwatchCreate}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Yangi rang qo'shish</span>
+                      </button>
                     </div>
                   );
                 }
@@ -2022,7 +2097,12 @@ export const AdminDashboard = ({
                 return (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {filteredSwatches.map((swatch) => {
-                      const name = typeof swatch.name === 'object' ? (swatch.name.uz || swatch.name.ru || '') : (swatch.name || '');
+                      const name = getLocalizedField(swatch.name, 'uz');
+                      const nameRu = getLocalizedField(swatch.name, 'ru', '');
+                      const textureText = getLocalizedField(swatch.texture, 'uz');
+                      const finishText = getLocalizedField(swatch.finish, 'uz');
+                      const coatingText = getLocalizedField(swatch.coating, 'uz');
+                      const appText = getLocalizedField(swatch.application, 'uz');
                       return (
                         <div 
                           key={swatch.id} 
@@ -2049,28 +2129,28 @@ export const AdminDashboard = ({
                             <h3 className="font-display font-bold text-sm sm:text-base text-white mb-1 group-hover:text-brand-red transition-colors">
                               {name}
                             </h3>
-                            {typeof swatch.name === 'object' && swatch.name.ru && (
+                            {nameRu && nameRu !== name && (
                               <p className="text-[11px] text-slate-400 mb-2 italic">
-                                {swatch.name.ru}
+                                {nameRu}
                               </p>
                             )}
                             <p className="text-xs text-slate-300 font-medium mb-3">
-                              {swatch.texture}
+                              {textureText}
                             </p>
 
                             <div className="space-y-1.5 text-xs text-slate-300 border-t border-white/10 pt-2.5 mb-3">
                               <div className="flex justify-between">
                                 <span className="text-slate-400">Yuzasi / Faktura:</span>
-                                <span className="font-semibold text-white">{swatch.finish}</span>
+                                <span className="font-semibold text-white">{finishText}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="text-slate-400">Qoplama:</span>
-                                <span className="font-semibold text-white">{swatch.coating}</span>
+                                <span className="font-semibold text-white">{coatingText}</span>
                               </div>
-                              {swatch.application && (
+                              {appText && (
                                 <div className="pt-1 text-[11px] text-slate-400 line-clamp-2">
-                                  <span className="text-slate-400 font-medium">Qo'llanishi: </span>
-                                  {swatch.application}
+                                  <span className="text-slate-400 font-medium">Qo'llanilishi: </span>
+                                  {appText}
                                 </div>
                               )}
                             </div>
@@ -2107,7 +2187,7 @@ export const AdminDashboard = ({
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-white">
-                    Tizim Adminlari ({adminsList.length})
+                    Adminlar ro'yxati ({adminsList.length})
                   </h2>
                   <p className="text-xs text-slate-400">
                     Sayt boshqaruviga ega bo'lgan foydalanuvchilar
@@ -2243,7 +2323,11 @@ export const AdminDashboard = ({
               )}
 
               <div className="rounded-2xl border border-white/10 bg-brand-surface/70 overflow-hidden divide-y divide-white/10">
-                {adminsList.map((a) => (
+                {adminsList.length === 0 ? (
+                  <div className="p-8 text-center text-slate-400 text-xs">
+                    Administratorlar ro'yxati bo'sh. Yangi admin qo'shish uchun yuqoridagi tugmani bosing.
+                  </div>
+                ) : adminsList.map((a) => (
                   <div key={a.id} className="p-4 sm:px-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-brand-red/20 text-brand-red flex items-center justify-center font-bold">
@@ -2347,7 +2431,7 @@ export const AdminDashboard = ({
                     </div>
                     <div>
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <h2 className="text-xl sm:text-2xl font-bold text-white">Telegram Bot & Arizalar</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Telegram bot va arizalar</h2>
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                           Avtomatik tarqatish faol
@@ -2639,7 +2723,7 @@ export const AdminDashboard = ({
                 <div>
                   <h2 className="text-xl sm:text-2xl font-display font-extrabold text-white flex items-center gap-2">
                     <MessageSquareQuote className="w-6 h-6 text-amber-400" />
-                    <span>Mijozlar Fikrlari & Sharhlar Boshqaruvi</span>
+                    <span>Mijozlar fikrlari va sharhlar</span>
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-400 mt-1">
                     Saytda mijozlar qoldirgan barcha sharh va fikrlarni ko'rish, tahrirlash, o'chirish yoki yangi sharh qo'shish.
@@ -2652,7 +2736,7 @@ export const AdminDashboard = ({
                     className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-glow-red transition-all cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Yangi Sharh Qo'shish</span>
+                    <span>Yangi sharh qo'shish</span>
                   </button>
                 </div>
               </div>
@@ -2709,10 +2793,22 @@ export const AdminDashboard = ({
                   return (
                     <div className="glass-panel p-12 text-center rounded-3xl border border-white/10 space-y-3">
                       <MessageSquareQuote className="w-12 h-12 text-slate-500 mx-auto" />
-                      <h3 className="font-bold text-white text-base">Sharhlar topilmadi</h3>
+                      <h3 className="font-bold text-white text-base">
+                        {reviewsList.length === 0 ? "Hali sharh qo'shilmagan" : "Sharhlar topilmadi"}
+                      </h3>
                       <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                        Hozircha hech qanday sharh mavjud emas yoki qidiruv so'rovingizga mos kelmadi.
+                        {reviewsList.length === 0
+                          ? "Yangi mijoz sharhi qo'shish uchun «Yangi sharh qo'shish» tugmasini bosing."
+                          : "Qidiruv so'rovingizga mos keladigan sharh topilmadi."}
                       </p>
+                      <button
+                        type="button"
+                        onClick={handleOpenReviewCreate}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-red hover:bg-brand-redHover text-white text-xs font-bold shadow-glow-red cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Yangi sharh qo'shish</span>
+                      </button>
                     </div>
                   );
                 }
@@ -3462,7 +3558,7 @@ export const AdminDashboard = ({
             </button>
 
             <h3 className="font-display font-extrabold text-2xl text-white mb-4">
-              Yangi Admin qo'shish
+              Yangi admin qo'shish
             </h3>
 
             <form onSubmit={handleRegisterAdmin} className="space-y-4">
@@ -3894,7 +3990,7 @@ export const AdminDashboard = ({
                 </div>
                 <div>
                   <h3 className="font-display font-extrabold text-lg text-white">
-                    {editingReview ? "Sharhni Tahrirlash" : "Yangi Mijoz Sharhi Qo'shish"}
+                    {editingReview ? "Sharhni tahrirlash" : "Yangi mijoz sharhi qo'shish"}
                   </h3>
                   <p className="text-xs text-slate-400">
                     Mijoz haqidagi ma'lumotlar va qoldirgan bahosi

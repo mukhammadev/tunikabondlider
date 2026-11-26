@@ -2,35 +2,37 @@ import React, { useState } from 'react';
 import { submitLead } from '../services/telegram';
 import confetti from 'canvas-confetti';
 import { Phone, MapPin, Clock, Send, CheckCircle2, ShieldCheck, UserCheck, Factory, Navigation, ExternalLink, Car, Sparkles } from 'lucide-react';
+import { normalizePhoneForSubmit } from '../utils/localize';
 
 export const ContactSection = ({ t }) => {
   const [formData, setFormData] = useState({
     name: '',
-    phone: '+998',
-    service: 'Tunikabond Fasad',
+    phone: '',
+    service: 'Tunikabond Fasad Paneli',
     message: ''
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const handlePhoneChange = (e) => {
-    let val = e.target.value;
-    if (!val.startsWith('+998')) {
-      val = '+998';
-    }
-    setFormData({ ...formData, phone: val });
+    const cleaned = e.target.value.replace(/[^\d+\s()-]/g, '');
+    setFormData({ ...formData, phone: cleaned });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.phone.length < 13) {
-      alert("Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX");
+    const digits = formData.phone.replace(/\D/g, '');
+    if (digits.length < 9) {
+      alert(t?.contact?.phoneAlert || "Iltimos, telefon raqamingizni to'liq kiriting: +998 (XX) XXX-XX-XX");
       return;
     }
 
     setLoading(true);
     const res = await submitLead({
       ...formData,
+      name: formData.name.trim(),
+      phone: normalizePhoneForSubmit(formData.phone),
+      message: formData.message.trim(),
       source: "Bog'lanish bo'limi formasi"
     });
     setLoading(false);
@@ -44,8 +46,8 @@ export const ContactSection = ({ t }) => {
       });
       setFormData({
         name: '',
-        phone: '+998',
-        service: 'Tunikabond Fasad',
+        phone: '',
+        service: 'Tunikabond Fasad Paneli',
         message: ''
       });
     }

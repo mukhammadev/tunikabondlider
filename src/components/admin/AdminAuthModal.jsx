@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { apiLogin, apiRegister } from '../../services/api';
+import { apiLogin, apiRegister, apiHasAdmins } from '../../services/api';
 import { 
   X, Lock, User, UserPlus, LogIn, ShieldAlert, CheckCircle2, 
   ArrowLeft, Eye, EyeOff, ShieldCheck, Sparkles 
@@ -8,7 +8,8 @@ import {
 export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   if (!isOpen) return null;
 
-  const [isRegisterTab, setIsRegisterTab] = useState(false);
+  const [hasAdmins, setHasAdmins] = useState(() => apiHasAdmins());
+  const [isRegisterTab, setIsRegisterTab] = useState(() => !apiHasAdmins());
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -27,11 +28,17 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     const cleanPass = (password || '').trim();
 
     if (isRegisterTab) {
-      const res = await apiRegister(cleanUser, cleanPass, fullName.trim(), 'Admin');
+      const res = await apiRegister(cleanUser, cleanPass, fullName.trim(), hasAdmins ? 'Admin' : 'Super Admin');
       setLoading(false);
       if (res.success) {
-        setSuccessMsg("Yangi admin muvaffaqiyatli ro'yxatdan o'tdi! Endi tizimga kirishingiz mumkin.");
-        setIsRegisterTab(false);
+        setHasAdmins(true);
+        const loginRes = await apiLogin(cleanUser, cleanPass);
+        if (loginRes.success) {
+          onLoginSuccess(loginRes.user);
+        } else {
+          setSuccessMsg("Yangi admin muvaffaqiyatli ro'yxatdan o'tdi! Endi tizimga kirishingiz mumkin.");
+          setIsRegisterTab(false);
+        }
       } else {
         setError(res.error || "Ro'yxatdan o'tishda xatolik yuz berdi");
       }
@@ -47,7 +54,7 @@ export const AdminAuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-6 bg-brand-dark/98 backdrop-blur-2xl animate-fadeIn overflow-y-auto selection:bg-brand-red selection:text-white">
+    <div className="dark fixed inset-0 z-50 flex flex-col justify-between p-4 sm:p-6 bg-brand-dark text-slate-100 animate-fadeIn overflow-y-auto selection:bg-brand-red selection:text-white">
       
       {/* Top Header Navigation */}
       <div className="w-full max-w-4xl mx-auto flex items-center justify-between py-2 shrink-0">

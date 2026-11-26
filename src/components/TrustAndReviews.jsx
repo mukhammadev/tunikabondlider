@@ -4,8 +4,10 @@ import {
   ThumbsUp, MessageSquarePlus, ChevronDown, ChevronUp, X, 
   Send, Sparkles, User, MapPin, Briefcase 
 } from 'lucide-react';
-import { apiGetReviews, apiAddReview } from '../services/api';
+import { apiGetReviews, apiAddReview, safeStorage } from '../services/api';
 import { dispatchToTelegram } from '../services/telegram';
+import { formatReviewMonthYear } from '../utils/localize';
+import { translations } from '../data/translations';
 
 export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   const tr = t?.trustReviews || {};
@@ -40,14 +42,39 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   const loadReviews = async () => {
     try {
       const storedReviews = await apiGetReviews();
-      if (Array.isArray(storedReviews) && storedReviews.length > 0) {
-        setAllReviews(storedReviews);
-        return;
+      if (Array.isArray(storedReviews)) {
+        // Check if Supabase was synced (empty list after deletions should stay empty, not revert to hardcoded)
+        const synced = safeStorage.get('tunikabond_reviews_synced_v1') === '1';
+        if (storedReviews.length > 0 || synced) {
+          setAllReviews(storedReviews);
+          return;
+        }
       }
       setAllReviews(defaultReviews);
     } catch {
       setAllReviews(defaultReviews);
     }
+  };
+
+  // Resolve translated display values for seeded reviews across UZ / RU / EN
+  const getLocalizedReview = (rev) => {
+    if (!rev) return rev;
+    const seedMatch = (defaultReviews || []).find((dr) => dr.id && dr.id === rev.id);
+    if (!seedMatch) return rev;
+    const uzSeed = (translations.uz?.trustReviews?.reviews || []).find((ur) => ur.id === rev.id);
+    // Only use translated seed text if the admin hasn't modified the review away from its Uzbek seed text
+    if (!uzSeed || rev.comment === uzSeed.comment) {
+      return {
+        ...rev,
+        name: seedMatch.name || rev.name,
+        role: seedMatch.role || rev.role,
+        location: seedMatch.location || rev.location,
+        project: seedMatch.project || rev.project,
+        comment: seedMatch.comment || rev.comment,
+        date: seedMatch.date || rev.date
+      };
+    }
+    return rev;
   };
 
   useEffect(() => {
@@ -62,13 +89,13 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
   }, [currentLang, tr.reviews]);
 
   // First 3 reviews by default, all when showAll is true
-  const displayedReviews = showAll ? allReviews : allReviews.slice(0, 3);
+  const displayedReviews = (showAll ? allReviews : allReviews.slice(0, 3)).map(getLocalizedReview);
   const hasMoreThanThree = allReviews.length > 3;
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!form.name.trim() || !form.comment.trim()) {
-      alert(currentLang === 'ru' ? "Пожалуйста, укажите имя и напишите отзыв" : "Iltimos, ismingiz va fikringizni kiriting");
+      alert(tr.fillRequiredAlert || "Iltimos, ismingiz va fikringizni kiriting");
       return;
     }
 
@@ -76,12 +103,12 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
     try {
       const reviewPayload = {
         name: form.name.trim(),
-        role: form.role.trim() || (currentLang === 'ru' ? "Заказчик" : "Mijoz"),
-        location: form.location.trim() || (currentLang === 'ru' ? "г. Ташкент" : "Toshkent shahri"),
-        project: form.project.trim() || (currentLang === 'ru' ? "Монтаж фасада / навеса" : "Fasad / Naves montaji"),
+        role: form.role.trim() || (tr.defaultRole || "Mijoz"),
+        location: form.location.trim() || (tr.defaultLocation || "Toshkent shahri"),
+        project: form.project.trim() || (tr.defaultProject || "Fasad / Naves montaji"),
         rating: Number(form.rating) || 5,
         comment: form.comment.trim(),
-        date: new Date().toLocaleDateString(currentLang === 'ru' ? 'ru-RU' : 'uz-UZ', { month: 'long', year: 'numeric' })
+        date: formatReviewMonthYear(new Date(), currentLang)
       };
 
       const res = await apiAddReview(reviewPayload);
@@ -112,7 +139,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
       }
     } catch (err) {
       console.error(err);
-      alert(currentLang === 'ru' ? "Произошла ошибка при отправке отзыва" : "Fikrni yuborishda xatolik yuz berdi");
+      alert(tr.submitErrorAlert || "Fikrni yuborishda xatolik yuz berdi");
     } finally {
       setSubmitting(false);
     }
@@ -218,7 +245,12 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
           </div>
 
           {/* Reviews Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          {displayedReviews.length === 0 ? (
+            <div className="glass-panel p-10 text-center rounded-3xl border border-slate-200 dark:border-white/10 max-w-xl mx-auto text-sm text-slate-600 dark:text-slate-400">
+              {tr.emptyReviews || "Hozircha sharhlar qoldirilmagan — birinchi bo'lib fikr bildiring!"}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {displayedReviews.map((rev, idx) => (
               <div
                 key={rev.id || idx}
@@ -264,7 +296,8 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
 
           {/* Load More Button (only if > 3 reviews) */}
           {hasMoreThanThree && (
@@ -361,7 +394,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                       key={starVal}
                       onClick={() => setForm({ ...form, rating: starVal })}
                       className="p-0.5 hover:scale-125 transition-transform cursor-pointer"
-                      title={`${starVal} yulduz`}
+                      title={`${starVal} ${tr.starUnit || "yulduz"}`}
                     >
                       <Star
                         className={`w-6 h-6 ${
@@ -416,7 +449,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    {currentLang === 'ru' ? "Город / Район" : "Shahar / Tuman"}
+                    {tr.cityLabel || "Shahar / Tuman"}
                   </label>
                   <div className="relative">
                     <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -424,7 +457,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                       type="text"
                       value={form.location}
                       onChange={(e) => setForm({ ...form, location: e.target.value })}
-                      placeholder={currentLang === 'ru' ? "г. Ташкент" : "Toshkent shahri"}
+                      placeholder={tr.cityPlaceholder || "Toshkent shahri"}
                       className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-brand-surface text-slate-900 dark:text-white text-xs sm:text-sm focus:border-brand-red focus:ring-1 focus:ring-brand-red outline-none"
                     />
                   </div>
@@ -453,7 +486,7 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
                   onClick={() => setIsModalOpen(false)}
                   className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer"
                 >
-                  {currentLang === 'ru' ? "Отмена" : "Bekor qilish"}
+                  {tr.cancelBtn || "Bekor qilish"}
                 </button>
 
                 <button

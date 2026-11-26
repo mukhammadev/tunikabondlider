@@ -66,7 +66,7 @@ export const WhyUs = ({ t }) => {
             </div>
 
             <div className="inline-block px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-white/10 mb-3">
-              {t.whyUs?.p2Badge || "MILLIMETR ANIKLIK"}
+              {t.whyUs?.p2Badge || "MILLIMETR ANIQLIK"}
             </div>
 
             <h3 className="font-display font-bold text-lg sm:text-xl text-slate-900 dark:text-white mb-2 group-hover:text-brand-red transition-colors">
@@ -102,7 +102,7 @@ export const WhyUs = ({ t }) => {
                 <Banknote className="w-7 h-7" />
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] font-mono font-bold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
-                {t.whyUs?.p4Badge || "O'RTAKASHLARSIZ"}
+                {t.whyUs?.p4Badge || "VOSITACHILARSIZ"}
               </span>
             </div>
 

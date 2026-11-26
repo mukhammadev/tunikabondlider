@@ -4,6 +4,7 @@ import {
   Phone, Send, Sparkles, X, MapPin, Briefcase, Eye, 
   ShieldCheck, Hammer, Layers, Compass, ArrowRight
 } from 'lucide-react';
+import { localizeSpecText } from '../utils/localize';
 
 export const TeamSection = ({ 
   t, 
@@ -271,7 +272,7 @@ export const TeamSection = ({
         >
           {filteredMembers.length === 0 ? (
             <div className="text-center py-16 text-slate-400 glass-panel rounded-3xl">
-              Ushbu toifada hozircha xodimlar mavjud emas.
+              {t.team?.emptyTeam || "Ushbu toifada hozircha mutaxassislar mavjud emas."}
             </div>
           ) : isCarousel ? (
             <div className="relative overflow-hidden rounded-3xl">
@@ -324,7 +325,7 @@ export const TeamSection = ({
                           {/* Projects Count Pill */}
                           <div className="absolute bottom-3 right-3">
                             <span className="px-2.5 py-1 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-sm">
-                              {member.completedProjects || `250+ ${t.team?.projectsUnit || "obyekt"}`}
+                              {localizeSpecText(member.completedProjects, currentLang) || `250+ ${t.team?.projectsUnit || "obyekt"}`}
                             </span>
                           </div>
 
@@ -332,7 +333,7 @@ export const TeamSection = ({
                           <div className="absolute bottom-3 left-3">
                             <span className="px-2.5 py-1 rounded-xl bg-brand-red text-white text-[11px] font-black flex items-center gap-1 shadow-sm">
                               <ShieldCheck className="w-3 h-3" />
-                              <span>{member.experience || `5+ ${t.team?.expUnit || "yil"}`}</span>
+                              <span>{localizeSpecText(member.experience, currentLang) || `5+ ${t.team?.expUnit || "yil"}`}</span>
                             </span>
                           </div>
                         </div>
@@ -427,7 +428,7 @@ export const TeamSection = ({
                         {/* Projects Count Pill */}
                         <div className="absolute bottom-3 right-3">
                           <span className="px-2.5 py-1 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold shadow-sm">
-                            {member.completedProjects || `250+ ${t.team?.projectsUnit || "obyekt"}`}
+                            {localizeSpecText(member.completedProjects, currentLang) || `250+ ${t.team?.projectsUnit || "obyekt"}`}
                           </span>
                         </div>
 
@@ -435,7 +436,7 @@ export const TeamSection = ({
                         <div className="absolute bottom-3 left-3">
                           <span className="px-2.5 py-1 rounded-xl bg-brand-red text-white text-[11px] font-black flex items-center gap-1 shadow-sm">
                             <ShieldCheck className="w-3 h-3" />
-                            <span>{member.experience || `5+ ${t.team?.expUnit || "yil"}`}</span>
+                            <span>{localizeSpecText(member.experience, currentLang) || `5+ ${t.team?.expUnit || "yil"}`}</span>
                           </span>
                         </div>
                       </div>
@@ -535,7 +536,7 @@ export const TeamSection = ({
                         {getMemberLabel(selectedMaster)}
                       </span>
                       <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300">
-                        {selectedMaster.experience || `5+ ${t.team?.expUnit || "yil tajriba"}`}
+                        {localizeSpecText(selectedMaster.experience, currentLang) || `5+ ${t.team?.expUnit || "yil tajriba"}`}
                       </span>
                     </div>
                     <h3 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900 dark:text-white mt-1 flex items-center gap-1.5">
@@ -575,11 +576,11 @@ export const TeamSection = ({
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                     <div className="p-3 rounded-xl bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/5 shadow-sm">
                       <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t.team?.expLabel || "Ish tajribasi:"}</span>
-                      <span className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{selectedMaster.experience || `6+ ${t.team?.expUnit || "yil"}`}</span>
+                      <span className="font-bold text-slate-900 dark:text-white text-sm sm:text-base">{localizeSpecText(selectedMaster.experience, currentLang) || `6+ ${t.team?.expUnit || "yil"}`}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/5 shadow-sm">
                       <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t.team?.projectsLabel || "Topshirgan obyektlari:"}</span>
-                      <span className="font-bold text-brand-red text-sm sm:text-base">{selectedMaster.completedProjects || `350+ ${t.team?.projectsUnit || "ta"}`}</span>
+                      <span className="font-bold text-brand-red text-sm sm:text-base">{localizeSpecText(selectedMaster.completedProjects, currentLang) || `350+ ${t.team?.projectsUnit || "ta"}`}</span>
                     </div>
                     <div className="col-span-2 sm:col-span-1 p-3 rounded-xl bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/5 shadow-sm">
                       <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t.team?.warrantyLabel || "Rasmiy kafolat:"}</span>

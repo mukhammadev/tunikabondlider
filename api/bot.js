@@ -10,6 +10,11 @@
  * 4. Leads are synchronized with Admin Panel.
  */
 
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = 'https://iimajjknpugrmndnidte.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbWFqamtucHVncm1uZG5pZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyMTc1NDUsImV4cCI6MjEwNjc5MzU0NX0.oXpDF5pSqGfBUg20V93tzzGwsVliJcm9w4ymuuyoyTQ';
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -60,11 +65,28 @@ export default async function handler(req, res) {
     }
   };
 
-  // Helper: sync lead to Admin Panel (via serverless API)
+  // Helper: sync lead directly to Supabase and Admin Panel
   const syncLeadToAdminPanel = async (leadRecord) => {
     try {
-      // Post to Vercel serverless /api/leads
-      fetch('https://tunikabondlider.uz/api/leads', {
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      await supabase.from('leads').upsert({
+        id: String(leadRecord.id),
+        name: leadRecord.name || '',
+        phone: leadRecord.phone || '',
+        service: leadRecord.service || '',
+        message: leadRecord.message || '',
+        source: leadRecord.source || 'Telegram Bot',
+        calc_data: leadRecord.calcData || null,
+        status: 'new',
+        created_at: leadRecord.timestamp || new Date().toISOString()
+      });
+    } catch (e) {
+      console.warn('Supabase bot lead sync error:', e);
+    }
+
+    try {
+      const host = req.headers?.host ? `https://${req.headers.host}` : 'https://tunikabondlider.vercel.app';
+      await fetch(`${host}/api/leads`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(leadRecord)
@@ -165,7 +187,7 @@ export default async function handler(req, res) {
     await sendMessage(CHANNEL_ID, leadNotification, null);
 
     // C) Sync to Admin Panel
-    syncLeadToAdminPanel({
+    await syncLeadToAdminPanel({
       id: `tg-miniapp-${chatId}-${Date.now()}`,
       name: leadName,
       phone: leadPhone,
@@ -212,7 +234,7 @@ export default async function handler(req, res) {
     await sendMessage(CHANNEL_ID, adminNotification, null);
 
     // C) Sync to Admin Panel
-    syncLeadToAdminPanel({
+    await syncLeadToAdminPanel({
       id: `tg-contact-${chatId}-${Date.now()}`,
       name: contactName,
       phone: formattedPhone,
@@ -258,7 +280,7 @@ export default async function handler(req, res) {
     await sendMessage(CHANNEL_ID, adminNotification, null);
 
     // C) Sync to Admin Panel
-    syncLeadToAdminPanel({
+    await syncLeadToAdminPanel({
       id: `tg-msg-${chatId}-${Date.now()}`,
       name: firstName,
       phone: extractedPhone || (username || `ID: ${chatId}`),
