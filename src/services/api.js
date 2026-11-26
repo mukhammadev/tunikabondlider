@@ -1542,20 +1542,19 @@ export const apiUpdateSwatch = async (swatchId, swatchData) => {
 export const apiDeleteSwatch = async (swatchId) => {
   // 1. Delete from Supabase
   try {
-    await supabase.from('swatches').delete().eq('id', String(swatchId));
+    const { error } = await supabase.from('swatches').delete().eq('id', String(swatchId));
+    if (error) console.error('Supabase delete swatch error:', error);
   } catch (e) {
     console.warn('Supabase delete swatch error:', e);
   }
 
   // 2. Update localStorage directly
   try {
-    const saved = localStorage.getItem(STORAGE_SWATCHES_KEY);
-    if (saved) {
-      const current = JSON.parse(saved);
-      const updated = Array.isArray(current) ? current.filter(s => String(s.id) !== String(swatchId)) : [];
-      localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
-      localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
-    }
+    const saved = localStorage.getItem(STORAGE_SWATCHES_KEY) || localStorage.getItem('tl_dynamic_swatches');
+    const current = saved ? JSON.parse(saved) : [];
+    const updated = Array.isArray(current) ? current.filter(s => String(s.id) !== String(swatchId)) : [];
+    localStorage.setItem(STORAGE_SWATCHES_KEY, JSON.stringify(updated));
+    localStorage.setItem('tl_dynamic_swatches', JSON.stringify(updated));
   } catch {}
 
   notifyDataChanged();

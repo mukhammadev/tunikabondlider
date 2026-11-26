@@ -17,7 +17,7 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selectedSwatch]);
 
-  const allSwatches = (swatchesList && swatchesList.length > 0) ? swatchesList : swatches;
+  const allSwatches = Array.isArray(swatchesList) ? swatchesList : swatches;
 
   const filteredSwatches = activeCategory === 'all'
     ? allSwatches
@@ -71,44 +71,58 @@ export const ColorSwatches = ({ currentLang, t, onOpenLeadModalWithSwatch, swatc
 
         {/* Swatches Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {filteredSwatches.map((item) => {
-            const name = getSwatchName(item);
-            return (
-              <div
-                key={item.id}
-                onClick={() => setSelectedSwatch(item)}
-                className="glass-card rounded-2xl p-4 cursor-pointer group hover:scale-[1.03] transition-all flex flex-col justify-between hover:border-brand-red/50"
-              >
-                <div>
-                  {/* Swatch Sample Box */}
-                  <div 
-                    className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow-red"
-                    style={{ 
-                      background: item.image 
-                        ? `url(${item.image}) center/cover no-repeat` 
-                        : (item.bgGradient || item.colorHex || '#444')
-                    }}
-                  >
-                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/20 shadow-sm">
-                      {item.code}
+          {filteredSwatches.length === 0 ? (
+            <div className="col-span-full py-16 text-center glass-card rounded-3xl p-8 border border-white/10 max-w-md mx-auto">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-brand-red/10 border border-brand-red/20 flex items-center justify-center text-brand-red">
+                <Palette className="w-8 h-8" />
+              </div>
+              <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">
+                {t.swatches?.emptyTitle || "Hozircha rang namunalari mavjud emas"}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {t.swatches?.emptyDesc || "Tez orada ushbu bo'limga yangi rang va teksturalar qo'shiladi."}
+              </p>
+            </div>
+          ) : (
+            filteredSwatches.map((item) => {
+              const name = getSwatchName(item);
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedSwatch(item)}
+                  className="glass-card rounded-2xl p-4 cursor-pointer group hover:scale-[1.03] transition-all flex flex-col justify-between hover:border-brand-red/50"
+                >
+                  <div>
+                    {/* Swatch Sample Box */}
+                    <div 
+                      className="w-full h-32 sm:h-36 rounded-xl shadow-inner mb-4 relative overflow-hidden border border-white/20 transition-transform group-hover:shadow-glow-red"
+                      style={{ 
+                        background: item.image 
+                          ? `url(${item.image}) center/cover no-repeat` 
+                          : (item.bgGradient || item.colorHex || '#444')
+                      }}
+                    >
+                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/85 backdrop-blur-md text-[10px] font-bold text-white tracking-wider border border-white/20 shadow-sm">
+                        {item.code}
+                      </div>
                     </div>
+
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-brand-red transition-colors leading-snug mb-1">
+                      {name}
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-3">
+                      {getLocalizedField(item.texture)}
+                    </p>
                   </div>
 
-                  <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-brand-red transition-colors leading-snug mb-1">
-                    {name}
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-3">
-                    {getLocalizedField(item.texture)}
-                  </p>
+                  <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>{getLocalizedField(item.finish)}</span>
+                    <span className="text-brand-red font-bold">{t?.swatches?.seeMore || "Ko'rish →"}</span>
+                  </div>
                 </div>
-
-                <div className="pt-2 border-t border-slate-200 dark:border-white/10 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                  <span>{getLocalizedField(item.finish)}</span>
-                  <span className="text-brand-red font-bold">{t?.swatches?.seeMore || "Ko'rish →"}</span>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
       </div>

@@ -130,7 +130,9 @@ export const translations = {
       application: "Qo'llanilishi:",
       seeMore: "Ko'rish →",
       textureLabel: "Faktura / Yuzasi:",
-      sampleBtn: "Ushbu rangda namuna so'rash"
+      sampleBtn: "Ushbu rangda namuna so'rash",
+      emptyTitle: "Hozircha rang namunalari mavjud emas",
+      emptyDesc: "Tez orada ushbu bo'limga yangi rang va teksturalar qo'shiladi."
     },
     products: {
       badge: "Mahsulotlar katalogi",
@@ -567,7 +569,9 @@ export const translations = {
       application: "Применение:",
       seeMore: "Смотреть →",
       textureLabel: "Фактура / Поверхность:",
-      sampleBtn: "Запросить образец в этом цвете"
+      sampleBtn: "Запросить образец в этом цвете",
+      emptyTitle: "Цветовых образцов пока нет",
+      emptyDesc: "В ближайшее время в этот раздел будут добавлены новые цвета и фактуры."
     },
     products: {
       badge: "Каталог продукции",
@@ -1004,7 +1008,9 @@ export const translations = {
       application: "Best Used For:",
       seeMore: "View →",
       textureLabel: "Texture / Finish:",
-      sampleBtn: "Request Sample in this Color"
+      sampleBtn: "Request Sample in this Color",
+      emptyTitle: "No color samples available yet",
+      emptyDesc: "New colors and architectural finishes will be added to this section shortly."
     },
     products: {
       badge: "Product Catalog",
