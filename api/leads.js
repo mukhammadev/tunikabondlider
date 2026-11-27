@@ -50,6 +50,9 @@ export default async function handler(req, res) {
     const rawService = String(data.service || data.product || 'Tunikabond xizmatlari').trim().slice(0, 150);
     const rawMessage = String(data.message || '').trim().slice(0, 1000);
     const rawSource = String(data.source || 'Veb-sayt').trim().slice(0, 80);
+    const rawPhotoUrl = typeof (data.photoUrl || data.photo_url) === 'string'
+      ? String(data.photoUrl || data.photo_url).trim()
+      : '';
 
     // Validate phone number (must have at least 9 digits)
     const digitsOnly = rawPhone.replace(/\D/g, '');
@@ -65,6 +68,7 @@ export default async function handler(req, res) {
       message: rawMessage,
       source: rawSource,
       calc_data: data.calcData || null,
+      photo_url: rawPhotoUrl || null,
       status: "new",
       created_at: new Date().toISOString()
     };
@@ -80,6 +84,7 @@ export default async function handler(req, res) {
         message: leadRecord.message,
         source: leadRecord.source,
         calc_data: leadRecord.calc_data,
+        photo_url: leadRecord.photo_url,
         status: leadRecord.status,
         created_at: leadRecord.created_at
       });

@@ -278,22 +278,38 @@ export const dispatchToTelegram = async (leadData, customConfig = null) => {
       });
     };
 
-    // 1. If photo attached and is a valid web URL, send photo WITHOUT buttons
-    if (leadData.photoUrl && leadData.photoUrl.startsWith('http')) {
+    // 1. If photo attached (HTTP URL or base64 Data URL), send photo WITHOUT buttons
+    if (leadData.photoUrl) {
       try {
-        const photoRes = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            photo: leadData.photoUrl,
-            caption: htmlText,
-            parse_mode: 'HTML'
-          })
-        });
-        const photoJson = await photoRes.json();
-        if (photoJson.ok) {
-          return { chatId, recipient, ok: true };
+        let photoRes;
+        if (leadData.photoUrl.startsWith('http')) {
+          photoRes = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              photo: leadData.photoUrl,
+              caption: htmlText,
+              parse_mode: 'HTML'
+            })
+          });
+        } else if (leadData.photoUrl.startsWith('data:image/')) {
+          const blob = await (await fetch(leadData.photoUrl)).blob();
+          const formData = new FormData();
+          formData.append('chat_id', chatId);
+          formData.append('photo', blob, 'mijoz-rasmi.jpg');
+          formData.append('caption', htmlText);
+          formData.append('parse_mode', 'HTML');
+          photoRes = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+            method: 'POST',
+            body: formData
+          });
+        }
+        if (photoRes) {
+          const photoJson = await photoRes.json();
+          if (photoJson.ok) {
+            return { chatId, recipient, ok: true };
+          }
         }
       } catch (err) {
         console.warn('Telegram sendPhoto error, fallback to text:', err);

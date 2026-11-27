@@ -517,6 +517,8 @@ export const apiGetLeads = async () => {
     return {
       ...l,
       id: l.id || `lead-${index}-${Date.now()}`,
+      photoUrl: l.photoUrl || l.photo_url || null,
+      calcData: l.calcData || l.calc_data || null,
       status: status,
       timestamp: l.timestamp || l.date || new Date().toISOString()
     };

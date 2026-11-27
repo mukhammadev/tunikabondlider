@@ -221,14 +221,29 @@ export const LeadModal = ({ isOpen, onClose, initialData, t }) => {
                     </button>
                   )}
                 </div>
+                {photoUrl && (
+                  <div className="mt-2.5 flex items-center gap-3 p-2 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                    <img
+                      src={photoUrl}
+                      alt={photoName || "Biriktirilgan rasm"}
+                      className="w-12 h-12 rounded-lg object-cover border border-slate-300 dark:border-white/20 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <span className="block text-xs font-bold text-slate-800 dark:text-white truncate">{photoName || "Rasm yuklandi"}</span>
+                      <span className="block text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">✓ Arizaga biriktirildi</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploadingPhoto}
                 className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-brand-redLight via-brand-red to-brand-redHover text-white font-extrabold text-sm shadow-glow-red hover:shadow-glow-red-lg flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 mt-6 cursor-pointer"
               >
-                {loading ? (
+                {uploadingPhoto ? (
+                  <span>{t?.leadModal?.photoUploading || "Rasm yuklanmoqda..."}</span>
+                ) : loading ? (
                   <span>{t?.leadModal?.submitting || "Yuborilmoqda..."}</span>
                 ) : (
                   <>

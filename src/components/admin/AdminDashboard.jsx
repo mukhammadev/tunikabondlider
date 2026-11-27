@@ -41,6 +41,7 @@ export const AdminDashboard = ({
   const [leads, setLeads] = useState([]);
   const [leadSearch, setLeadSearch] = useState('');
   const [leadStatusFilter, setLeadStatusFilter] = useState('all');
+  const [previewLeadPhoto, setPreviewLeadPhoto] = useState(null);
   const [productsList, setProductsList] = useState(propProductsList || []);
   const [portfolioList, setPortfolioList] = useState(propPortfolioList || []);
   const [teamList, setTeamList] = useState(propTeamList || []);
@@ -248,7 +249,8 @@ export const AdminDashboard = ({
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.key !== 'Escape') return;
-      if (productModalOpen) setProductModalOpen(false);
+      if (previewLeadPhoto) setPreviewLeadPhoto(null);
+      else if (productModalOpen) setProductModalOpen(false);
       else if (portfolioModalOpen) setPortfolioModalOpen(false);
       else if (teamModalOpen) setTeamModalOpen(false);
       else if (adminModalOpen) setAdminModalOpen(false);
@@ -258,7 +260,7 @@ export const AdminDashboard = ({
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [productModalOpen, portfolioModalOpen, teamModalOpen, adminModalOpen, swatchModalOpen, newRecipientModalOpen, reviewModalOpen]);
+  }, [previewLeadPhoto, productModalOpen, portfolioModalOpen, teamModalOpen, adminModalOpen, swatchModalOpen, newRecipientModalOpen, reviewModalOpen]);
 
   // --- TELEGRAM ACTIONS ---
   const handleSaveTelegram = (e) => {
@@ -1356,6 +1358,16 @@ export const AdminDashboard = ({
                         </div>
 
                         <div className="flex items-center gap-2">
+                          {lead.photoUrl && (
+                            <button
+                              type="button"
+                              onClick={() => setPreviewLeadPhoto({ url: lead.photoUrl, name: lead.name || "Mijoz rasmi", phone: lead.phone, service: lead.service })}
+                              className="px-2.5 py-1 rounded-lg bg-brand-red/20 text-brand-red text-xs font-bold hover:bg-brand-red hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              <ImageIcon className="w-3.5 h-3.5" />
+                              <span>Rasm</span>
+                            </button>
+                          )}
                           {lead.phone && !lead.phone.startsWith('@') && (
                             <a
                               href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}
@@ -1583,18 +1595,28 @@ export const AdminDashboard = ({
                             )}
 
                             {lead.photoUrl && (
-                              <div className="pt-2 flex items-center gap-2">
-                                <span className="text-[11px] text-slate-400">Biriktirilgan rasm:</span>
-                                <a
-                                  href={lead.photoUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-brand-red/20 text-brand-red font-bold text-xs border border-brand-red/30 transition-colors"
+                              <div className="pt-2.5 flex items-center gap-3 flex-wrap">
+                                <button
+                                  type="button"
+                                  onClick={() => setPreviewLeadPhoto({ url: lead.photoUrl, name: lead.name || "Mijoz rasmi", phone: lead.phone, service: lead.service })}
+                                  className="group/thumb relative w-16 h-12 rounded-xl overflow-hidden border border-white/20 hover:border-brand-red shadow-md shrink-0 cursor-pointer bg-brand-dark"
+                                  title="Rasmni kattalashtirib ko'rish"
+                                >
+                                  <img
+                                    src={lead.photoUrl}
+                                    alt={lead.name || "Biriktirilgan rasm"}
+                                    className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform"
+                                  />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setPreviewLeadPhoto({ url: lead.photoUrl, name: lead.name || "Mijoz rasmi", phone: lead.phone, service: lead.service })}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-brand-red text-brand-red hover:text-white font-bold text-xs border border-brand-red/30 transition-colors cursor-pointer"
                                 >
                                   <ImageIcon className="w-3.5 h-3.5" />
                                   <span>Rasmni ko'rish</span>
-                                  <ExternalLink className="w-3 h-3" />
-                                </a>
+                                  <Eye className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             )}
                           </div>
@@ -4261,6 +4283,75 @@ export const AdminDashboard = ({
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- LEAD PHOTO LIGHTBOX MODAL --- */}
+      {previewLeadPhoto && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          data-modal="lead-photo"
+          className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn"
+          onClick={() => setPreviewLeadPhoto(null)}
+        >
+          <div
+            className="glass-panel w-full max-w-3xl rounded-3xl overflow-hidden border border-white/20 shadow-2xl bg-brand-surface flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between gap-3 bg-brand-dark/70">
+              <div className="min-w-0">
+                <h3 className="font-display font-bold text-base sm:text-lg text-white truncate">
+                  {previewLeadPhoto.name || "Mijoz biriktirgan rasm"}
+                </h3>
+                <p className="text-xs text-slate-400 truncate">
+                  {[previewLeadPhoto.phone, previewLeadPhoto.service].filter(Boolean).join(' • ')}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const resp = await fetch(previewLeadPhoto.url);
+                      const blob = await resp.blob();
+                      const blobUrl = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = blobUrl;
+                      a.download = `ariza-rasm-${Date.now()}.jpg`;
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                    } catch {
+                      window.open(previewLeadPhoto.url, '_blank', 'noopener,noreferrer');
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Yuklab olish</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewLeadPhoto(null)}
+                  aria-label="Yopish"
+                  className="p-2 rounded-xl bg-white/10 hover:bg-brand-red text-slate-300 hover:text-white transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 bg-black/60 flex items-center justify-center overflow-auto flex-1">
+              <img
+                src={previewLeadPhoto.url}
+                alt={previewLeadPhoto.name || "Biriktirilgan rasm"}
+                className="max-w-full max-h-[72vh] object-contain rounded-xl shadow-lg"
+              />
+            </div>
           </div>
         </div>
       )}
