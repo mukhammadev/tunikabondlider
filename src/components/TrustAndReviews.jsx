@@ -6,7 +6,6 @@ import {
   Send, Sparkles, User, MapPin, Briefcase 
 } from 'lucide-react';
 import { apiGetReviews, apiAddReview, safeStorage } from '../services/api';
-import { dispatchToTelegram } from '../services/telegram';
 import { formatReviewMonthYear } from '../utils/localize';
 import { translations } from '../data/translations';
 
@@ -123,17 +122,6 @@ export const TrustAndReviews = ({ t, currentLang = 'uz', onOpenLeadModal }) => {
 
       const res = await apiAddReview(reviewPayload);
       if (res?.success) {
-        // Also dispatch to Telegram channel for admin awareness
-        try {
-          await dispatchToTelegram({
-            name: reviewPayload.name,
-            phone: reviewPayload.role || "Mijoz fikri",
-            service: `⭐ Yangi Fikr (${reviewPayload.rating}/5): ${reviewPayload.comment.slice(0, 80)}...`,
-            source: "Mijozlar Fikrlari Bo'limi (Saytdan izoh)",
-            note: `Loyiha: ${reviewPayload.project} | Manzil: ${reviewPayload.location} | Baho: ${reviewPayload.rating} yulduz`
-          });
-        } catch {}
-
         setForm({
           name: '',
           role: '',

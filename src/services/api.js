@@ -820,7 +820,7 @@ export const apiGetPortfolio = async () => {
     const { data, error } = await supabase
       .from('portfolio')
       .select('*')
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: false });
     if (!error && Array.isArray(data)) {
       const formatted = data.map(item => {
         const desc = item.description || item.desc || {};
@@ -1209,7 +1209,10 @@ export const apiAddReview = async (reviewData) => {
     fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newReview)
+      body: JSON.stringify({
+        ...newReview,
+        skipTelegram: Boolean(reviewData.skipTelegram)
+      })
     }).catch(() => {});
   } catch {}
 

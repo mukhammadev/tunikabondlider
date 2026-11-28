@@ -85,6 +85,7 @@ export const AdminDashboard = ({
   });
 
   const [portfolioModalOpen, setPortfolioModalOpen] = useState(false);
+  const [savingPortfolio, setSavingPortfolio] = useState(false);
   const [editingPortfolio, setEditingPortfolio] = useState(null);
   const [portfolioForm, setPortfolioForm] = useState({
     titleUz: '',
@@ -473,7 +474,19 @@ export const AdminDashboard = ({
   };
 
   // --- PORTFOLIO CRUD ---
+  const normalizePortfolioCategory = (cat) => {
+    const c = String(cat || '').toLowerCase().trim();
+    if (c.includes('naves')) return 'naves';
+    if (c.includes('kozir')) return 'koziryok';
+    if (c.includes('darvoza')) return 'darvozaxona';
+    if (c.includes('fasad') || c.includes('tunikabond') || c.includes('alyukabond') || c.includes('residential') || c.includes('commercial')) return 'fasad';
+    if (c.includes('cornice') || c.includes('karniz') || c.includes('shift')) return 'cornices';
+    return 'naves';
+  };
+
   const handleOpenPortfolioCreate = () => {
+    setUploadingImage(false);
+    setSavingPortfolio(false);
     setEditingPortfolio(null);
     setPortfolioForm({
       titleUz: '',
@@ -492,10 +505,12 @@ export const AdminDashboard = ({
   };
 
   const handleOpenPortfolioEdit = (item) => {
+    setUploadingImage(false);
+    setSavingPortfolio(false);
     setEditingPortfolio(item);
     setPortfolioForm({
       titleUz: getLocalizedField(item.title, 'uz'),
-      category: item.category || 'naves',
+      category: normalizePortfolioCategory(item.category),
       masterId: item.masterId || '',
       masterName: getLocalizedField(item.masterName, 'uz'),
       masterPhoto: item.masterPhoto || '',
@@ -511,39 +526,52 @@ export const AdminDashboard = ({
 
   const handleSavePortfolio = async (e) => {
     e.preventDefault();
-    const portfolioPayload = {
-      title: { uz: portfolioForm.titleUz, ru: portfolioForm.titleUz, en: portfolioForm.titleUz },
-      category: portfolioForm.category,
-      masterId: portfolioForm.masterId || '',
-      masterName: portfolioForm.masterName || '',
-      masterPhoto: portfolioForm.masterPhoto || '',
-      masterRole: portfolioForm.masterRole || '',
-      location: portfolioForm.location,
-      material: portfolioForm.material,
-      area: portfolioForm.area,
-      time: portfolioForm.time,
-      image: portfolioForm.image
-    };
-
-    if (editingPortfolio) {
-      const res = await apiUpdatePortfolio(editingPortfolio.id, portfolioPayload);
-      if (res && res.error) {
-        alert("Xatolik: " + res.error);
-        return;
-      }
-      setPortfolioList(portfolioList.map(p => p.id === editingPortfolio.id ? { ...p, ...portfolioPayload } : p));
-    } else {
-      const res = await apiCreatePortfolio(portfolioPayload);
-      if (res && res.error) {
-        alert("Xatolik: " + res.error);
-        return;
-      }
-      if (res.item) {
-        setPortfolioList([...portfolioList, res.item]);
-      }
+    if (savingPortfolio || uploadingImage) return;
+    const cleanTitle = (portfolioForm.titleUz || '').trim();
+    if (!cleanTitle) {
+      alert("Iltimos, loyiha sarlavhasini kiriting");
+      return;
     }
-    setPortfolioModalOpen(false);
-    notifyChange();
+
+    setSavingPortfolio(true);
+    try {
+      const portfolioPayload = {
+        title: { uz: cleanTitle, ru: cleanTitle, en: cleanTitle },
+        category: normalizePortfolioCategory(portfolioForm.category),
+        masterId: portfolioForm.masterId || '',
+        masterName: portfolioForm.masterName || '',
+        masterPhoto: portfolioForm.masterPhoto || '',
+        masterRole: portfolioForm.masterRole || '',
+        location: portfolioForm.location,
+        material: portfolioForm.material,
+        area: portfolioForm.area,
+        time: portfolioForm.time,
+        image: portfolioForm.image
+      };
+
+      if (editingPortfolio) {
+        const res = await apiUpdatePortfolio(editingPortfolio.id, portfolioPayload);
+        if (res && res.error) {
+          alert("Xatolik: " + res.error);
+          return;
+        }
+        setPortfolioList(portfolioList.map(p => p.id === editingPortfolio.id ? { ...p, ...portfolioPayload } : p));
+      } else {
+        const res = await apiCreatePortfolio(portfolioPayload);
+        if (res && res.error) {
+          alert("Xatolik: " + res.error);
+          return;
+        }
+        if (res && res.item) {
+          setPortfolioList([res.item, ...portfolioList]);
+        }
+        setAdminPortfolioCat('all');
+      }
+      setPortfolioModalOpen(false);
+      notifyChange();
+    } finally {
+      setSavingPortfolio(false);
+    }
   };
 
   const handleDeletePortfolio = async (itemId) => {
@@ -847,10 +875,10 @@ export const AdminDashboard = ({
     };
 
     if (editingReview) {
-      await apiAddReview(payload);
+      await apiAddReview({ ...payload, skipTelegram: true });
       setReviewsList(reviewsList.map(r => r.id === editingReview.id ? { ...r, ...payload } : r));
     } else {
-      const res = await apiAddReview(payload);
+      const res = await apiAddReview({ ...payload, skipTelegram: true });
       if (res?.review) {
         setReviewsList([res.review, ...reviewsList]);
       }
@@ -3361,7 +3389,7 @@ export const AdminDashboard = ({
                 <select
                   value={portfolioForm.masterId || ''}
                   onChange={(e) => {
-                    const selectedM = teamList.find(m => m.id === e.target.value);
+                    const selectedM = teamList.find(m => String(m.id) === String(e.target.value));
                     setPortfolioForm({
                       ...portfolioForm,
                       masterId: e.target.value,
@@ -3474,9 +3502,16 @@ export const AdminDashboard = ({
 
               <button
                 type="submit"
-                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red hover:shadow-glow-red-lg transition-all"
+                disabled={uploadingImage || savingPortfolio}
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-red via-brand-red to-brand-redHover text-white font-bold text-sm shadow-glow-red hover:shadow-glow-red-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
-                {editingPortfolio ? "O'zgarishlarni saqlash" : "Loyihani qo'shish"}
+                {uploadingImage
+                  ? "Rasm yuklanmoqda..."
+                  : savingPortfolio
+                    ? "Saqlanmoqda..."
+                    : editingPortfolio
+                      ? "O'zgarishlarni saqlash"
+                      : "Loyihani qo'shish"}
               </button>
             </form>
           </div>

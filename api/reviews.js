@@ -13,6 +13,16 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const getSupabase = () => createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -94,19 +104,19 @@ export default async function handler(req, res) {
       console.warn('Supabase upsert error:', e);
     }
 
-    // 2. Broadcast to Telegram channel with #REV_DATA tag
-    if (BOT_TOKEN) {
+    // 2. Broadcast clean human-readable review notification to Telegram channel (no raw JSON / tags)
+    if (BOT_TOKEN && !data.skipTelegram) {
       try {
-        const escapedJson = JSON.stringify(reviewRecord);
+        const starCount = Math.min(5, Math.max(1, Number(reviewRecord.rating) || 5));
+        const stars = '⭐'.repeat(starCount);
         const text =
-          `#REV_DATA\n\n` +
-          `⭐ <b>YANGI MIJOZ SHARHI (${reviewRecord.rating}/5)</b>\n\n` +
-          `👤 <b>Ism:</b> ${reviewRecord.name}\n` +
-          `💼 <b>Obyekt:</b> ${reviewRecord.project}\n` +
-          `📍 <b>Manzil:</b> ${reviewRecord.location}\n` +
-          `💬 <b>Sharh:</b> <i>"${reviewRecord.comment}"</i>\n` +
-          `⏰ <b>Sana:</b> ${reviewRecord.date}\n\n` +
-          `<code>${escapedJson}</code>`;
+          `⭐ <b>YANGI MIJOZ SHARHI — TUNIKABOND LIDER</b> ⭐\n\n` +
+          `👤 <b>Mijoz:</b> ${escapeHtml(reviewRecord.name)}\n` +
+          `🌟 <b>Baho:</b> ${stars} (${starCount}/5)\n` +
+          `💼 <b>Obyekt:</b> ${escapeHtml(reviewRecord.project)}\n` +
+          `📍 <b>Manzil:</b> ${escapeHtml(reviewRecord.location)}\n` +
+          `💬 <b>Sharh:</b> <i>"${escapeHtml(reviewRecord.comment)}"</i>\n` +
+          `⏰ <b>Sana:</b> ${escapeHtml(reviewRecord.date)}`;
 
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
@@ -145,39 +155,7 @@ export default async function handler(req, res) {
       console.warn('Supabase GET reviews error:', e);
     }
 
-    // Fallback: Sync from Telegram channel feed (#REV_DATA)
-    const list = [];
-    const seenIds = new Set();
-    try {
-      const feedRes = await fetch('https://t.me/s/tunikabondlider_uz?q=%23REV_DATA', {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-      });
-      if (feedRes.ok) {
-        const html = await feedRes.text();
-        const codeRegex = /<code[^>]*>(.*?)<\/code>/gis;
-        let match;
-        while ((match = codeRegex.exec(html)) !== null) {
-          try {
-            const raw = match[1]
-              .replace(/&quot;/g, '"')
-              .replace(/&amp;/g, '&')
-              .replace(/&lt;/g, '<')
-              .replace(/&gt;/g, '>')
-              .replace(/&#39;/g, "'");
-            const parsed = JSON.parse(raw);
-            if (parsed && parsed.id && parsed.comment && !seenIds.has(String(parsed.id))) {
-              seenIds.add(String(parsed.id));
-              list.push(parsed);
-            }
-          } catch {}
-        }
-      }
-    } catch (e) {
-      console.warn("Feed fetch error:", e);
-    }
-
-    list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    return res.status(200).json(list);
+    return res.status(200).json([]);
   }
 
   return res.status(405).json({ error: "Method not allowed" });

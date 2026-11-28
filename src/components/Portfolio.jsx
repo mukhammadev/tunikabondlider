@@ -5,7 +5,7 @@ import { Compass, MapPin, Clock, Layers, Maximize2, X, CheckCircle2, ArrowRight,
 import { getLocalizedField, localizeSpecText, localizePersonName } from '../utils/localize';
 
 export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
-  const [activeFilter, setActiveFilter] = useState('naves');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
@@ -35,12 +35,12 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
     : portfolioToUse.filter(item => getPortfolioCategory(item) === activeFilter);
 
   const filters = [
+    { id: 'all', label: t.portfolio?.all || "Barchasi" },
     { id: 'naves', label: t.portfolio?.naves || "Naveslar" },
     { id: 'koziryok', label: t.portfolio?.koziryok || "Koziryoklar" },
     { id: 'darvozaxona', label: t.portfolio?.darvozaxona || "Darvozaxonalar" },
     { id: 'fasad', label: t.portfolio?.fasad || "Fasadlar" },
-    { id: 'cornices', label: t.portfolio?.cornices || "Karniz va Shift" },
-    { id: 'all', label: t.portfolio?.all || "Barchasi" }
+    { id: 'cornices', label: t.portfolio?.cornices || "Karniz va Shift" }
   ];
 
   const getCategoryCount = (fId) => {
@@ -153,15 +153,21 @@ export const Portfolio = ({ currentLang, t, items, onSelectMaster }) => {
                       <Maximize2 className="w-4 h-4 text-brand-red" />
                     </div>
 
-                    <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-white">
-                      <span className="flex items-center gap-1 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/20">
-                        <MapPin className="w-3.5 h-3.5 text-brand-red" />
-                        <span>{loc(item.location)}</span>
-                      </span>
-                      <span className="bg-brand-red text-white font-black px-2.5 py-1 rounded-md">
-                        {loc(item.area)}
-                      </span>
-                    </div>
+                    {(loc(item.location) || loc(item.area)) && (
+                      <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between gap-2 text-xs text-white">
+                        {loc(item.location) ? (
+                          <span className="flex items-center gap-1 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-md border border-white/20 truncate">
+                            <MapPin className="w-3.5 h-3.5 text-brand-red shrink-0" />
+                            <span className="truncate">{loc(item.location)}</span>
+                          </span>
+                        ) : <span />}
+                        {loc(item.area) && (
+                          <span className="bg-brand-red text-white font-black px-2.5 py-1 rounded-md shrink-0">
+                            {loc(item.area)}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6">

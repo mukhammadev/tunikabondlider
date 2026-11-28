@@ -4,7 +4,7 @@ import { Layers, ShieldCheck, ArrowRight } from 'lucide-react';
 import { getLocalizedField, localizeSpecText } from '../utils/localize';
 
 export const Products = ({ currentLang, t, onSelectProduct, items }) => {
-  const [activeTab, setActiveTab] = useState('tunikabond');
+  const [activeTab, setActiveTab] = useState('all');
 
   const productsToUse = Array.isArray(items) ? items : defaultProducts;
 
@@ -17,9 +17,12 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
     return cat || 'tunikabond';
   };
 
-  const filteredProducts = productsToUse.filter(p => getProductCategory(p) === activeTab);
+  const filteredProducts = activeTab === 'all'
+    ? productsToUse
+    : productsToUse.filter(p => getProductCategory(p) === activeTab);
 
   const tabs = [
+    { id: 'all', label: t.products?.all || "Barchasi" },
     { id: 'tunikabond', label: t.products?.tunikabond || "Tunikabond" },
     { id: 'alyukabond', label: t.products?.alyukabond || "Alyukabond" },
     { id: 'cornice', label: t.products?.cornice || "Karnizlar" },
@@ -27,6 +30,7 @@ export const Products = ({ currentLang, t, onSelectProduct, items }) => {
   ];
 
   const getCategoryCount = (catId) => {
+    if (catId === 'all') return productsToUse.length;
     return productsToUse.filter(p => getProductCategory(p) === catId).length;
   };
 
